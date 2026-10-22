@@ -1,0 +1,1166 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<meta charset="utf-8">
+<title>Развороты ПДД РК</title>
+<meta name="description" content="Тренажёр по разворотам и перестроению по ПДД Республики Казахстан: мосты, путепроводы, эстакады, тоннели, запреты разворота, разворот с обочины и через двор, одновременное перестроение, полосы разгона и торможения.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:wght@500;600;700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* Layout: asphalt hero, sticky filter strip, grid of scenario cards.
+   Each card: top-view scene (SVG) + question + animated correct manoeuvre + rule reference. */
+:root {
+  --bg: #F2F5F7;
+  --surface: #FFFFFF;
+  --surface-2: #EAF0F3;
+  --ink: #14202A;
+  --ink-2: #33414D;
+  --muted: #5B6975;
+  --line: #D5DEE4;
+  --accent: #0A87A8;
+  --accent-text: #006C8A;
+  --accent-soft: #DCF1F6;
+  --ok: #1E8C4E;
+  --ok-soft: #E1F4E8;
+  --bad: #C62A2F;
+  --bad-soft: #FBE6E6;
+  --road: #3A434A;
+  --road-line: #EEF2F4;
+  --ground: #D7E2D2;
+  --walk: #C3CCD2;
+  --shoulder: #C9BFA6;
+  --lawn: #9CC98A;
+  --water: #86BFDD;
+  --curb: #8E9BA4;
+  --on-road: #F3F6F8;
+  --on-road-2: #AEBAC3;
+  --f-num: "Fira Sans Extra Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --f-body: "Golos Text", system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1317; --surface: #151D23; --surface-2: #1B252C; --ink: #E3EAEE; --ink-2: #C3CDD4; --muted: #93A2AD;
+    --line: #283540; --accent: #3BBFDB; --accent-text: #5CCBE3; --accent-soft: #0E3540;
+    --ok: #4CC97F; --ok-soft: #12321F; --bad: #F0666B; --bad-soft: #3A1719;
+    --road: #3C464E; --road-line: #D9E1E6; --ground: #22302A; --walk: #56626A; --shoulder: #5E5747; --lawn: #2F5A32; --water: #24506A;
+    --curb: #75838D; --on-road: #F3F6F8; --on-road-2: #B5C2CB;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1317; --surface: #151D23; --surface-2: #1B252C; --ink: #E3EAEE; --ink-2: #C3CDD4; --muted: #93A2AD;
+  --line: #283540; --accent: #3BBFDB; --accent-text: #5CCBE3; --accent-soft: #0E3540;
+  --ok: #4CC97F; --ok-soft: #12321F; --bad: #F0666B; --bad-soft: #3A1719;
+  --road: #3C464E; --road-line: #D9E1E6; --ground: #22302A; --walk: #56626A; --shoulder: #5E5747; --lawn: #2F5A32; --water: #24506A;
+  --curb: #75838D; --on-road: #F3F6F8; --on-road-2: #B5C2CB;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--f-body); -webkit-text-size-adjust: 100%; }
+.wrap {
+  max-width: 1240px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+a { color: var(--accent-text); }
+
+/* Hero */
+.hero { background: #2B3339; color: var(--on-road); }
+.hero .wrap { padding-block: 28px 30px; display: grid; gap: 10px; }
+.kicker { margin: 0; font: 600 12px/1.3 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--on-road-2); display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.kicker .kz { background: #00AFCA; color: #062A33; padding: 3px 8px; border-radius: 4px; }
+.hero h1 { margin: 0; font: 700 clamp(40px, 8.5vw, 88px)/.92 var(--f-num); text-transform: uppercase; text-wrap: balance; }
+.hero h1 span { color: #FFC72C; }
+.lead { margin: 0; max-width: 66ch; color: var(--on-road-2); font-size: 16px; }
+.lead b { color: var(--on-road); font-weight: 600; }
+.hero-links { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; margin: 0; }
+.hero-links a { color: #7FDBEC; font-weight: 600; }
+.lane-line { height: 6px; margin-top: 4px; background: repeating-linear-gradient(90deg, var(--on-road) 0 56px, transparent 56px 96px); opacity: .9; }
+
+/* Controls */
+.controls { background: var(--bg); border-bottom: 1px solid var(--line); z-index: 5; }
+.controls .wrap { padding-block: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+@media (min-width: 760px) {
+  .controls { position: sticky; top: env(safe-area-inset-top, 0px); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+}
+.chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 auto; min-width: 0; }
+@media (max-width: 759px) { .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; } }
+.chip { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; height: 34px; padding: 0 12px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+.chip .n { font: 600 12px var(--f-num); color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.chip[aria-pressed="true"] .n { color: var(--surface); opacity: .7; }
+.chip.todo[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
+.progress { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); white-space: nowrap; }
+.progress b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.bar { width: 90px; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--ok); width: 0; transition: width .3s; }
+.link-btn { border: 0; background: transparent; color: var(--accent-text); font-weight: 600; padding: 4px 2px; font-size: 14px; }
+.link-btn:hover { text-decoration: underline; }
+
+/* Legend */
+.legend { margin: 18px 0 6px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 16px; }
+.legend summary { cursor: pointer; font-weight: 600; padding: 10px 0; }
+.legend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 10px 18px; padding: 4px 0 14px; }
+.lg { display: grid; grid-template-columns: 52px 1fr; gap: 10px; align-items: center; font-size: 13.5px; color: var(--ink-2); }
+.lg svg { width: 52px; height: 36px; border-radius: 6px; }
+.how { margin: 0 0 12px; font-size: 14px; color: var(--ink-2); max-width: 80ch; }
+
+/* Sections */
+.list { display: grid; gap: 14px; padding-block: 10px 30px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 450px), 1fr)); align-items: start; }
+.sec { grid-column: 1 / -1; margin-top: 18px; display: grid; gap: 10px; }
+.sec:first-child { margin-top: 4px; }
+.sec h2 { margin: 0; font: 700 clamp(26px, 4vw, 34px)/1.05 var(--f-num); text-transform: uppercase; letter-spacing: .01em; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.sec h2 small { font: 600 15px var(--f-num); color: var(--muted); letter-spacing: 0; }
+.rules { margin: 0; padding: 12px 16px 12px 34px; background: var(--accent-soft); border-radius: var(--r); display: grid; gap: 4px; max-width: 980px; font-size: 14.5px; }
+.rules li::marker { color: var(--accent-text); font-weight: 700; }
+
+/* Card */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card.ok { border-color: var(--ok); }
+.card-h { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; justify-content: space-between; }
+.card-h h3 { min-width: 0; }
+.card-h h3 { margin: 0; font: 600 17px/1.3 var(--f-body); text-wrap: balance; }
+.tag { font: 600 11px/1.25 var(--f-body); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.tag .tick { color: var(--ok); margin-left: 6px; }
+.signtop { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: center; align-items: flex-end; }
+.stk { margin: 0; display: grid; justify-items: center; gap: 2px; }
+.stk img { display: block; background: #fff; }
+.stk .sg { width: 58px; height: 58px; object-fit: contain; }
+.stk .pl { width: auto; height: auto; max-width: 74px; max-height: 64px; min-height: 30px; border-radius: 3px; }
+.stk figcaption { font: 600 12.5px/1.2 var(--f-num); color: var(--muted); }
+.stage { position: relative; width: 100%; max-width: 460px; margin: 0 auto; }
+.stage svg { display: block; width: 100%; height: auto; border-radius: 10px; touch-action: manipulation; }
+.setup { margin: 0; font-size: 14px; color: var(--ink-2); }
+.qtext { margin: 0; font-weight: 600; font-size: 15px; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.opts.col { display: grid; gap: 6px; }
+.opt { min-height: 38px; height: auto; padding: 7px 14px; text-align: left; line-height: 1.35; }
+.opt.right { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); opacity: 1; }
+.opt.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); opacity: 1; }
+.who { display: flex; flex-wrap: wrap; gap: 6px; }
+.who button { border: 1px solid var(--line); background: var(--surface-2); border-radius: 9px; padding: 5px 10px 5px 6px; font-size: 13.5px; display: inline-flex; align-items: center; gap: 7px; }
+.who button i { width: 20px; height: 20px; border-radius: 50%; display: inline-grid; place-items: center; font: 700 11px var(--f-body); font-style: normal; color: #14202A; border: 2.5px solid; background: #fff; }
+.who button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.who button b { font: 700 12px var(--f-num); color: var(--accent-text); min-width: 10px; }
+.hint { margin: 0; font-size: 13.5px; color: var(--muted); }
+.seq { font-weight: 600; color: var(--ink); }
+.act { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { height: 38px; padding: 0 14px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; font-size: 14px; }
+.btn.primary { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.opt:disabled { cursor: default; }
+.result { border-radius: 10px; padding: 12px 14px; background: var(--surface-2); display: grid; gap: 6px; font-size: 14.5px; }
+.result p { margin: 0; }
+.verdict { font-weight: 700; }
+.card.r-ok .result { background: var(--ok-soft); }
+.card.r-ok .verdict { color: var(--ok); }
+.card.r-bad .result { background: var(--bad-soft); }
+.card.r-bad .verdict { color: var(--bad); }
+.answer { font: 600 15px/1.4 var(--f-body); }
+.answer .n { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #FFC72C; color: #14202A; font: 700 12px var(--f-num); margin-right: 4px; vertical-align: 1px; }
+.why { color: var(--ink-2); }
+.ref { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+/* Scene */
+.sc .gr { fill: var(--ground); }
+.sc .walk, .sc .lot { fill: var(--walk); }
+.sc .sh { fill: var(--shoulder); }
+.sc .rd { fill: var(--road); }
+.sc .rd2 { fill: var(--road); opacity: .7; }
+.sc .curb { stroke: var(--curb); stroke-width: 3; }
+.sc .dl { stroke: var(--road-line); stroke-width: 2; stroke-dasharray: 12 10; fill: none; }
+.sc .ln { stroke: var(--road-line); stroke-width: 2; fill: none; }
+.sc .island { fill: var(--ground); stroke: var(--curb); stroke-width: 3; }
+.sc .zebra { fill: var(--road-line); }
+.sc .zok { fill: #30C26B; fill-opacity: .3; stroke: #1E8C4E; stroke-width: 1.5; stroke-dasharray: 4 3; }
+.sc .zno { fill: #E5484D; fill-opacity: .26; stroke: #C62A2F; stroke-width: 1.5; stroke-dasharray: 4 3; }
+.sc .lbl, .sc .lbl-r { font: 600 11px var(--f-body); paint-order: stroke; stroke-width: 3.5px; stroke-linejoin: round; }
+.sc .lbl { fill: var(--ink); stroke: var(--ground); }
+.sc .lbl-r { fill: #fff; stroke: var(--road); }
+.sc .lbl-ok { font: 700 11px var(--f-body); fill: #14612F; paint-order: stroke; stroke: #fff; stroke-width: 3px; }
+.sc .lbl-no { font: 700 11px var(--f-body); fill: #A01E23; paint-order: stroke; stroke: #fff; stroke-width: 3px; }
+.sc .water { fill: var(--water); }
+.sc .rail2 { stroke: #A3ADB4; stroke-width: 4; }
+.sc .deck { fill: #59636B; fill-opacity: .93; }
+.sc .shadow { fill: #000; opacity: .16; }
+.sc .pier { fill: #8C969E; }
+.sc .tun { fill: #1E2326; opacity: .5; }
+.sc .portal { fill: #7B858C; }
+.sc .sleeper { stroke: #8B7355; stroke-width: 3; }
+.sc .railb { stroke: #AEB7BD; stroke-width: 2.5; }
+.sc .hill { fill: #000; opacity: .1; }
+.sc .plat { fill: var(--walk); stroke: var(--curb); stroke-width: 1.5; }
+.sc .m14 { stroke: #F2C230; stroke-width: 3.5; }
+.sc .m110 { stroke: #F2C230; stroke-width: 3.5; stroke-dasharray: 9 7; }
+.sc .m117 { stroke: #F2C230; stroke-width: 2.5; fill: none; }
+.sc .gr2 { fill: var(--lawn); }
+.sc .zarc-ok { fill: none; stroke: #30C26B; stroke-opacity: .55; }
+.sc .zarc-no { fill: none; stroke: #E5484D; stroke-opacity: .5; }
+.sc .bikeln { fill: #2E9E5B; fill-opacity: .55; }
+.sc .w18 { stroke: var(--road-line); stroke-width: 4; stroke-dasharray: 8 8; }
+.sc .l-top { pointer-events: none; }
+.sc .mk { fill: none; stroke: var(--road-line); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.sc .clock rect { fill: #14202A; stroke: #FFC72C; stroke-width: 1.5; }
+.sc .clock text { fill: #FFC72C; font: 700 14px var(--f-num); }
+.sc .pole { stroke: #6B7680; stroke-width: 2; }
+.sc .resp { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.sc .okp { stroke: #30C26B; }
+.sc .nop { stroke: #E5484D; stroke-dasharray: 7 6; }
+.sc .resx { stroke: #E5484D; stroke-width: 4; stroke-linecap: round; }
+.sc .resh { fill: #30C26B; }
+.sc .dim line { stroke: var(--ink-2); stroke-width: 1.3; }
+.sc .dim text { font: 600 11px var(--f-body); fill: var(--ink); paint-order: stroke; stroke: var(--ground); stroke-width: 3px; }
+.sc .l-res, .sc .after { display: none; }
+.card.answered .sc .l-res, .card.shown .sc .l-res, .card.answered .sc .after, .card.shown .sc .after { display: inline; }
+.sc .veh, .sc .bdg { cursor: pointer; }
+.sc .ghost { opacity: .45; }
+.sc .ans, .sc .pk, .sc .xs { display: none; }
+.sc .ans.on, .card.answered .sc .ans { display: inline; }
+.card.answered .sc .xs { display: inline; }
+.sc .pk.on { display: inline; }
+.card.answered .sc .pk.on { display: none; }
+.sc .arrow { fill: none; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; opacity: .9; }
+.sc .arrow.dash { stroke-dasharray: 2 6; }
+.sc .blink { animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: .15; } }
+@media (prefers-reduced-motion: reduce) { .sc .blink { animation: none; } .bar i { transition: none; } }
+
+.foot { padding-block: 24px 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; display: grid; gap: 8px; }
+.foot p { margin: 0; max-width: 90ch; }
+.foot b { color: var(--ink-2); }
+
+@media print {
+  :root:not(#x), :root[data-theme]:not(#x) {
+    --bg: #fff; --surface: #fff; --surface-2: #F1F4F6; --ink: #000; --ink-2: #1E2A33; --muted: #4B5863; --line: #C9D2D8;
+    --accent-soft: #EEF7FA; --road: #4A545B; --road-line: #F2F5F7; --ground: #E3EBDF; --walk: #CDD5DA; --shoulder: #D6CDB6;
+    --lawn: #B5D9A6; --water: #A9D2E8; --curb: #8E9BA4; color-scheme: light;
+  }
+  @page { size: A4; margin: 10mm; }
+  body { font-size: 10.5px; }
+  .controls, .legend, .who, .hint, .act, .opts, .verdict, .lane-line, .hero-links, .link-btn { display: none !important; }
+  .hero { background: none; color: #000; }
+  .hero .wrap { padding: 0 0 4px; gap: 3px; }
+  .hero h1 { font-size: 26px; }
+  .hero h1 span { color: #000; }
+  .kicker, .lead { color: #333; font-size: 10px; }
+  .lead b { color: #000; }
+  .kicker .kz { background: none; padding: 0; color: #333; }
+  .wrap { max-width: none; padding: 0; }
+  .list { grid-template-columns: 1fr 1fr; gap: 6px; padding: 0; }
+  .sec { margin-top: 4px; break-after: avoid; }
+  .sec h2 { font-size: 16px; }
+  .rules { font-size: 9.5px; padding: 6px 8px 6px 22px; }
+  .card { break-inside: avoid; padding: 6px 8px; gap: 4px; border-radius: 6px; }
+  .card-h h3 { font-size: 11.5px; }
+  .stk .sg { width: 34px; height: 34px; }
+  .stk .pl { max-width: 42px; max-height: 36px; min-height: 0; }
+  .stage { max-width: 62mm; }
+  .setup, .qtext { font-size: 9.5px; }
+  .result { display: grid !important; padding: 5px 7px; font-size: 9.5px; gap: 2px; background: #F1F4F6 !important; }
+  .answer { font-size: 10.5px; }
+  .ref { font-size: 9px; }
+  .sc .ans, .sc .xs, .sc .l-res, .sc .after { display: inline !important; }
+  .sc .pk { display: none !important; }
+  .foot { font-size: 9px; padding: 6px 0 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker"><span class="kz">Казахстан</span><span>Тренажёр разворотов и перестроений</span><span>сверено с adilet.zan.kz 22.10.2026</span></p>
+    <h1>Развороты и перестроения <span>ПДД РК</span></h1>
+    <p class="lead"><b id="total">0 ситуаций</b>: мосты, путепроводы, эстакады и тоннели, где разворачиваться нельзя, как развернуться с обочины и через двор, кто уступает при перестроении. Ответьте на вопрос и посмотрите правильный манёвр. К каждому ответу приложен пункт ПДД.</p>
+    <p class="hero-links"><a href="./">Все тренажёры</a><a href="cifry.html">Цифры ПДД РК →</a><a href="perekrestki.html">Перекрёстки →</a><a href="znaki.html">Знаки и разметка →</a><a href="kolca.html">Кольца →</a><a href="stoyanka.html">Стоянка и остановка →</a></p>
+    <div class="lane-line" aria-hidden="true"></div>
+  </div>
+</header>
+
+<section class="controls" aria-label="Фильтры">
+  <div class="wrap">
+    <div class="chips" id="chips" role="group" aria-label="Раздел"></div>
+    <div class="progress"><span>Верно: <b id="okc">0</b> из <b id="okt">0</b></span><span class="bar" aria-hidden="true"><i id="okbar"></i></span><button type="button" class="link-btn" id="resetp">Сбросить</button></div>
+  </div>
+</section>
+
+<div class="wrap">
+  <details class="legend" id="legend">
+    <summary>Как читать схему</summary>
+    <p class="how">Вид сверху, движение правостороннее. Стрелка показывает, куда собирается ехать участник. В вопросах об очереди нажимайте участников в том порядке, в каком они проедут. После ответа машина проедет по правилам: зелёная линия показывает разрешённый манёвр, красный пунктир с крестом — запрещённый.</p>
+    <div class="legend-grid">
+      <div class="lg"><svg viewBox="0 0 52 36" aria-hidden="true"><rect width="52" height="36" fill="var(--road)"/><path d="M6 18H40" stroke="#2F80ED" stroke-width="3.2" stroke-linecap="round" fill="none"/><path d="M46 18L37 13V23Z" fill="#2F80ED"/></svg><span>Стрелка: куда собирается ехать участник</span></div>
+      <div class="lg"><svg viewBox="0 0 52 36" aria-hidden="true"><rect width="52" height="36" fill="var(--road)"/><path d="M6 18H40" stroke="#30C26B" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M46 18L37 13V23Z" fill="#30C26B"/></svg><span>Зелёная линия: так правильно</span></div>
+      <div class="lg"><svg viewBox="0 0 52 36" aria-hidden="true"><rect width="52" height="36" fill="var(--road)"/><path d="M6 18H46" stroke="#E5484D" stroke-width="4" stroke-dasharray="7 6" stroke-linecap="round" fill="none"/><path d="M19 11L33 25M33 11L19 25" stroke="#E5484D" stroke-width="4" stroke-linecap="round"/></svg><span>Красный пунктир с крестом: так нельзя</span></div>
+      <div class="lg"><svg viewBox="0 0 52 36" aria-hidden="true"><rect width="52" height="36" fill="var(--road)"/><rect x="4" y="6" width="20" height="24" fill="#30C26B" fill-opacity=".35" stroke="#1E8C4E" stroke-dasharray="4 3"/><rect x="28" y="6" width="20" height="24" fill="#E5484D" fill-opacity=".3" stroke="#C62A2F" stroke-dasharray="4 3"/></svg><span>Зелёная зона: стоять можно. Красная: нельзя</span></div>
+      <div class="lg"><svg viewBox="0 0 52 36" aria-hidden="true"><rect width="52" height="36" fill="var(--ground)"/><rect y="0" width="52" height="14" fill="var(--walk)"/><line x1="0" y1="14" x2="52" y2="14" stroke="var(--curb)" stroke-width="3"/><rect y="14" width="52" height="22" fill="var(--road)"/></svg><span>Серая полоса за бордюром: тротуар</span></div>
+      <div class="lg"><svg viewBox="0 0 52 36" aria-hidden="true"><rect width="52" height="36" fill="var(--ground)"/><rect y="0" width="52" height="14" fill="var(--shoulder)"/><rect y="14" width="52" height="22" fill="var(--road)"/></svg><span>Песочная полоса: обочина</span></div>
+    </div>
+  </details>
+  <main class="list" id="list"></main>
+</div>
+
+<footer class="wrap foot">
+<p><b>Источник.</b> Правила дорожного движения РК, приказ Министра внутренних дел от 30 июня 2023 года № 534, с изменениями по приказу № 305 от 27.04.2026: главы 8 (маневрирование), 9 (расположение на проезжей части), 12 (остановка и стоянка), 13 (перекрёстки), 16 (автомагистрали), приложения 1 и 2 (знаки и разметка). Текст: <a href="https://adilet.zan.kz/rus/docs/V2300033003" target="_blank" rel="noopener">adilet.zan.kz</a>.</p>
+<p><b>Про сооружения.</b> ПДД РК называют мосты, путепроводы, эстакады и тоннели, но не дают им определений. Пояснения на этой странице взяты из общепринятых строительных терминов.</p>
+</footer>
+
+<script>window.IMG = {"3.19": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjcwMCIgaGVpZ2h0PSI3MDAiIHZlcnNpb249IjEuMSI+DQogIDx0aXRsZT4zLjE5INCg0LDQt9Cy0L7RgNC+0YIg0LfQsNC/0YDQtdGJ0LXQvTwvdGl0bGU+DQogIDxjaXJjbGUgc3R5bGU9ImZpbGw6I2ZmZmZmZjsiIGN4PSIzNTAiIGN5PSIzNTAiIHI9IjM1MCIvPg0KICA8Y2lyY2xlIHN0eWxlPSJmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7IiBjeD0iMzUwIiBjeT0iMzUwIiByPSIzNDkiLz4NCiAgPHBhdGggc3R5bGU9ImZpbGw6I2ZmMDAwMDsiIGQ9Im0gMzUwIDY5MCBhIDM0MCAzNDAgMCAwIDAgMzQwIC0zNDAgYSAzNDAgMzQwIDAgMCAwIC0zNDAgLTM0MCBhIDM0MCAzNDAgMCAwIDAgLTM0MCAzNDAgYSAzNDAgMzQwIDAgMCAwIDM0MCAzNDAgeiBtIDE4Mi45OCAtMTI1LjA4IGEgMjgyLjI2IDI4Mi4yNiAwIDAgMSAtMTgyLjk4IDY3LjM0IGEgMjgyLjI2IDI4Mi4yNiAwIDAgMSAtMjgyLjI2IC0yODIuMjYgYSAyODIuMjYgMjgyLjI2IDAgMCAxIDY3LjM0IC0xODIuOTggeiBtIC0zNjUuOTYgLTQyOS44NCBhIDI4Mi4yNiAyODIuMjYgMCAwIDEgMTgyLjk4IC02Ny4zNCBhIDI4Mi4yNiAyODIuMjYgMCAwIDEgMjgyLjI2IDI4Mi4yNiBhIDI4Mi4yNiAyODIuMjYgMCAwIDEgLTY3LjM0IDE4Mi45OCB6Ii8+DQogIDxjbGlwUGF0aCBpZD0iY2xpcFBhdGgiPg0KICAgIDxyZWN0IHRyYW5zZm9ybT0icm90YXRlKDQ1IDMxMCAzMTApICIgeD0iNjAiIHk9IjYwIiB3aWR0aD0iNTAwIiBoZWlnaHQ9IjIyMCIvPg0KICAgIDxyZWN0IHRyYW5zZm9ybT0icm90YXRlKDQ1IDMxMCAzMTApICIgeD0iNjAiIHk9IjM0MCIgd2lkdGg9IjUwMCIgaGVpZ2h0PSIyMjAiLz4NCiAgPC9jbGlwUGF0aD4NCiAgPHBhdGggc3R5bGU9ImZpbGw6IzAwMDAwMDsiIGNsaXAtcGF0aD0idXJsKCNjbGlwUGF0aCkiIHRyYW5zZm9ybT0ic2NhbGUoMS4xMjkwMzIyNikiIGQ9Im0gNDQwIDUwMCB2IC0yODAgYSAxMzAgMTMwIDAgMCAwIC0xMzAgLTEzMCBhIDEzMCAxMzAgMCAwIDAgLTEzMCAxMzAgdiAxMjAgaCAtNTAgbCA4MCAxMzguNjcgbCA4MCAtMTM4LjY3IGggLTUwIHYgLTEyMCBhIDcwIDcwIDAgMCAxIDcwIC03MCBhIDcwIDcwIDAgMCAxIDcwIDcwIHYgMjgwIHoiLz4NCjwvc3ZnPg0K", "4.1.3": "data:image/jpeg;base64,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", "5.1": "data:image/jpeg;base64,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", "5.11.1": "data:image/jpeg;base64,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", "5.12": "data:image/jpeg;base64,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", "5.16.1": "data:image/jpeg;base64,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"};</script>
+<script>
+// Shared scene library for the PDD RK trainers (rings, U-turns and lane changes, parking).
+// Exposes window.ENG: route builder, ring point helper and layout builders used by page data.
+(() => {
+  const CX = 200, CY = 200;
+
+  // Route commands -> SVG polyline path. Commands:
+  //   ['M', x, y]            start
+  //   ['L', x, y]            straight line
+  //   ['Q', cx, cy, x, y]    quadratic curve
+  //   ['A', r, deg, k]       counter-clockwise (on screen) arc around the ring centre to angle deg,
+  //                          radius moves to r within the first 1/k of the arc (k defaults to 1)
+  function route(cmds, cx = CX, cy = CY) {
+    const pts = [];
+    let x = 0, y = 0;
+    const push = (px, py) => { pts.push([px, py]); x = px; y = py; };
+    for (const c of cmds) {
+      const op = c[0];
+      if (op === 'M') push(c[1], c[2]);
+      else if (op === 'L') {
+        const x0 = x, y0 = y, n = Math.max(1, Math.ceil(Math.hypot(c[1] - x0, c[2] - y0) / 4));
+        for (let i = 1; i <= n; i++) push(x0 + (c[1] - x0) * i / n, y0 + (c[2] - y0) * i / n);
+      } else if (op === 'Q') {
+        const x0 = x, y0 = y, n = 28;
+        for (let i = 1; i <= n; i++) { const t = i / n, u = 1 - t; push(u * u * x0 + 2 * u * t * c[1] + t * t * c[3], u * u * y0 + 2 * u * t * c[2] + t * t * c[4]); }
+      } else if (op === 'A') {
+        const r0 = Math.hypot(x - cx, y - cy), phi0 = Math.atan2(y - cy, x - cx) * 180 / Math.PI;
+        let pe = c[2];
+        while (pe > phi0) pe -= 360;
+        while (phi0 - pe > 360) pe += 360;
+        const k = c[3] || 1, n = Math.max(2, Math.ceil((phi0 - pe) / 2));
+        for (let i = 1; i <= n; i++) {
+          const t = i / n, ph = (phi0 + (pe - phi0) * t) * Math.PI / 180, rr = r0 + (c[1] - r0) * Math.min(1, t * k);
+          push(cx + rr * Math.cos(ph), cy + rr * Math.sin(ph));
+        }
+      }
+    }
+    return 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L');
+  }
+  const rp = (r, deg, cx = CX, cy = CY) => [cx + r * Math.cos(deg * Math.PI / 180), cy + r * Math.sin(deg * Math.PI / 180)];
+
+  // ---------- Layouts ----------
+  // Straight street: road from y=Y0, lanes of LW px. Two-way 2 lanes: top lane goes left (west), bottom lane goes right (east).
+  const Y0 = 100, LW = 36;
+  const laneY = i => Y0 + LW * (i + 0.5);
+  function street(o = {}) {
+    const W = o.w || 400, n = o.lanes || 2, H = o.h || 260, y1 = Y0 + n * LW, th = o.th || 26, bh = o.bh || 26;
+    let g = `<rect class="gr" x="0" y="0" width="${W}" height="${H}"/>`;
+    const side = (kind, y, h) => kind === 'walk' ? `<rect class="walk" x="0" y="${y}" width="${W}" height="${h}"/>` : kind === 'shoulder' ? `<rect class="sh" x="0" y="${y}" width="${W}" height="${h}"/>` : '';
+    g += side(o.top || 'walk', Y0 - th, th) + side(o.bottom || 'walk', y1, bh);
+    g += `<rect class="rd" x="0" y="${Y0}" width="${W}" height="${n * LW}"/>`;
+    if ((o.top || 'walk') === 'walk') g += `<line class="curb" x1="0" y1="${Y0}" x2="${W}" y2="${Y0}"/>`;
+    if ((o.bottom || 'walk') === 'walk') g += `<line class="curb" x1="0" y1="${y1}" x2="${W}" y2="${y1}"/>`;
+    const lineAt = (y, kind, x1 = 0, x2 = W) => {
+      if (kind === 'dash') return `<line class="dl" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/>`;
+      if (kind === 'solid') return `<line class="ln" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/>`;
+      if (kind === 'double') return `<line class="ln" x1="${x1}" y1="${y - 3}" x2="${x2}" y2="${y - 3}"/><line class="ln" x1="${x1}" y1="${y + 3}" x2="${x2}" y2="${y + 3}"/>`;
+      if (kind === '1.11') return `<line class="ln" x1="${x1}" y1="${y - 3}" x2="${x2}" y2="${y - 3}"/><line class="dl" x1="${x1}" y1="${y + 3}" x2="${x2}" y2="${y + 3}"/>`;
+      if (kind === '1.8') return `<line class="w18" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/>`;
+      if (kind === '1.11r') return `<line class="dl" x1="${x1}" y1="${y - 3}" x2="${x2}" y2="${y - 3}"/><line class="ln" x1="${x1}" y1="${y + 3}" x2="${x2}" y2="${y + 3}"/>`;
+      return '';
+    };
+    if (o.oneway) { for (let i = 1; i < n; i++) g += lineAt(Y0 + i * LW, (o.lines && o.lines[i - 1]) || 'dash'); }
+    else {
+      const mid = Y0 + (n / 2) * LW;
+      g += lineAt(mid, o.center || 'dash');
+      for (let i = 1; i < n / 2; i++) { g += lineAt(Y0 + i * LW, 'dash'); g += lineAt(mid + i * LW, 'dash'); }
+    }
+    if (o.edge === 'shoulderLine') g += lineAt(Y0 + 1, 'solid') + lineAt(y1 - 1, 'solid');
+    if (o.median) { const m = Y0 + (n / 2) * LW; g += `<rect class="island" x="0" y="${m - 7}" width="${W}" height="14"/>` + (o.gap ? `<rect class="rd" x="${o.gap[0]}" y="${m - 9}" width="${o.gap[1] - o.gap[0]}" height="18"/>` : ''); }
+    return g;
+  }
+
+  // Ring: centre (200,200), island radius RI, outer radius RO, four arms of width AW, arm length to H.
+  function ring(o = {}) {
+    const RO = o.ro || 132, RI = o.ri || 64, AW = o.aw || 72, lanes = o.lanes || 2, H = o.h || 400;
+    let g = `<rect class="gr" x="0" y="0" width="400" height="${H}"/>`;
+    g += `<rect class="rd" x="${200 - AW / 2}" y="0" width="${AW}" height="${H}"/><rect class="rd" x="0" y="${200 - AW / 2}" width="400" height="${AW}"/>`;
+    g += `<circle class="rd" cx="200" cy="200" r="${RO}"/>`;
+    const e = RO + 2;
+    g += `<path class="dl" d="M200 0V${200 - e}M200 ${200 + e}V${H}M0 200H${200 - e}M${200 + e} 200H400"/>`;
+    if (o.inboundTwo) g += `<path class="dl" d="M${200 + AW / 4} ${200 + e}V${H}M${200 - AW / 4} ${200 + e}V${H}M${200 - AW / 4} ${200 - e}V0M${200 + AW / 4} ${200 - e}V0M0 ${200 + AW / 4}H${200 - e}M0 ${200 - AW / 4}H${200 - e}M${200 + e} ${200 - AW / 4}H400M${200 + e} ${200 + AW / 4}H400"/>`;
+    for (let i = 1; i < lanes; i++) g += `<circle cx="200" cy="200" r="${RI + i * (RO - RI) / lanes}" fill="none" class="dl"/>`;
+    g += `<circle class="island" cx="200" cy="200" r="${RI}"/>`;
+    return g;
+  }
+
+  // Ring route between arms. Arm angles: E 0, S 90, W 180, N -90. Traffic goes counter-clockwise on screen.
+  // o: off (entry lane offset from the arm axis), r (ring lane radius), out (exit lane offset), r2 (radius before the exit),
+  //    stop (stop on the ring at this angle instead of leaving), ro (outer ring radius), from0 (start distance from the centre)
+  const ARM = { E: 0, S: 90, W: 180, N: -90 };
+  function ringRoute(from, to, o = {}) {
+    const ro = o.ro || 132, off = o.off ?? 18, r = o.r ?? 115, out = o.out ?? 18, r2 = o.r2 ?? r, L0 = o.from0 ?? 200;
+    const t = ARM[from] * Math.PI / 180, ux = Math.cos(t), uy = Math.sin(t), rx = Math.sin(t), ry = -Math.cos(t);
+    const P = d => [CX + ux * d + rx * off, CY + uy * d + ry * off];
+    const ja = ARM[from] - Math.asin(Math.min(.95, off / r)) * 180 / Math.PI - 14;
+    const J = rp(r, ja), C = P(ro - 2);
+    const cmds = o.startA != null ? [['M', ...rp(o.r0 ?? r, o.startA)]] : [['M', ...P(L0)], ['L', ...P(ro + 8)], ['Q', C[0], C[1], J[0], J[1]]];
+    if (o.mid != null) cmds.push(['A', r, o.mid]);
+    if (o.stop != null) { cmds.push(['A', r2, o.stop, o.k || 2]); return cmds; }
+    const v = ARM[to] * Math.PI / 180, vx = Math.cos(v), vy = Math.sin(v), sx = -Math.sin(v), sy = Math.cos(v);
+    const Q = d => [CX + vx * d + sx * out, CY + vy * d + sy * out];
+    const xa = ARM[to] + Math.asin(Math.min(.95, out / r2)) * 180 / Math.PI + 14;
+    cmds.push(['A', r2, xa, o.k || (r2 === r ? 1 : 2)]);
+    const D = Q(ro - 2);
+    cmds.push(['Q', D[0], D[1], ...Q(ro + 8)], ['L', ...Q(o.to0 ?? 210)]);
+    return cmds;
+  }
+  // Distance along a route from its start to the point where it reaches radius rr from the centre (yield line).
+  function distTo(cmds, rr) {
+    const d = route(cmds), pts = d.slice(1).split(' L').map(p => p.split(' ').map(Number));
+    let L = 0;
+    for (let i = 1; i < pts.length; i++) { L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); if (Math.hypot(pts[i][0] - CX, pts[i][1] - CY) <= rr) return L; }
+    return L;
+  }
+
+  // Cumulative length of a route after each command (for multi-step demos and reversing ranges).
+  const plen = cmds => { const pts = route(cmds).slice(1).split(' L').map(p => p.split(' ').map(Number)); let L = 0; for (let i = 1; i < pts.length; i++) L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); return L; };
+  const cum = cmds => cmds.map((_, i) => plen(cmds.slice(0, i + 1)));
+
+  window.ENG = { route, rp, street, ring, laneY, Y0, LW, ringRoute, distTo, ARM, cum };
+})();
+
+</script>
+<script>
+// «Развороты и перестроения ПДД РК»: structures, U-turn bans, how to U-turn, lane changes.
+(() => {
+  const E = window.ENG;
+  const ST = o => () => E.street(o);
+  // U-turn of an eastbound car to the westbound lane (turns left, to the top).
+  const UE = (x0, y1, xt, y2, xe) => { const R = ((y1 - y2) / 2 + 8) * 1.25; return [['M', x0, y1], ['L', xt, y1], ['Q', xt + R, y1, xt + R, (y1 + y2) / 2], ['Q', xt + R, y2, xt, y2], ['L', xe, y2]]; };
+  // U-turn of a westbound car to the eastbound lane (turns left, to the bottom).
+  const UW = (x0, y1, xt, y2, xe) => { const R = ((y2 - y1) / 2 + 8) * 1.25; return [['M', x0, y1], ['L', xt, y1], ['Q', xt - R, y1, xt - R, (y1 + y2) / 2], ['Q', xt - R, y2, xt, y2], ['L', xe, y2]]; };
+  // Lane change: drive to x1, move from lane y0 to lane y1 over len px, go on to xe.
+  const LC = (x0, y0, x1, y1, xe, len = 90) => [['M', x0, y0], ['L', x1, y0], ['Q', x1 + len * .25, y0, x1 + len * .5, (y0 + y1) / 2], ['Q', x1 + len * .75, y1, x1 + len, y1], ['L', xe, y1]];
+  const sg = (k, x, y = 186, s = 22) => ({ k, x, y, s }); // sign on the right (bottom) sidewalk
+  const ONEWAY = [{ t: 'mark', x: 40, y: 118, deg: 90, k: 's' }, { t: 'mark', x: 40, y: 154, deg: 90, k: 's' }, { t: 'mark', x: 40, y: 190, deg: 90, k: 's' }];
+  const yardP = [['M', 40, 154], ['L', 238, 154], ['Q', 150, 154, 150, 204], ['L', 150, 228], ['L', 150, 198], ['Q', 150, 118, 92, 118], ['L', -30, 118]];
+  const yardC = E.cum(yardP);
+  const brakeP = [['M', -30, 154], ['L', 110, 154], ['Q', 140, 154, 160, 172], ['Q', 180, 190, 220, 190], ['L', 440, 190]];
+  const brakeC = E.cum(brakeP);
+
+  window.PAGE = {
+    key: 'razvoroty',
+    groups: [
+      { k: 'struct', t: 'Мосты, путепроводы, эстакады, тоннели', rules: [
+        'Мост перекрывает реку, канал или овраг. Путепровод проходит над другой дорогой или железной дорогой. Эстакада — длинный мост на опорах над улицей или местностью. Тоннель ведёт под землёй, сквозь гору или под водой.',
+        'На мостах, путепроводах, эстакадах и под ними нельзя разворачиваться (п. 58) и сдавать назад (п. 59).',
+        'Стоянка на этих сооружениях запрещена всегда (п. 88, пп. 2). Остановка запрещена, если в вашем направлении меньше трёх полос, а под сооружением при любом числе полос (п. 87, пп. 3).',
+        'В тоннеле запрещены разворот, задний ход и остановка (п. 58, 59, 87).'
+      ] },
+      { k: 'where', t: 'Где разворачиваться нельзя', rules: [
+        'Разворот запрещён (п. 58): на пешеходных переходах и на перекрёстках по линии тротуаров или обочин; в тоннелях; на мостах, путепроводах, эстакадах и под ними; на железнодорожных переездах; где дорогу видно меньше чем на 100 м; в местах остановочных пунктов.',
+        'Знак 3.19 запрещает разворот. Поворот налево он не запрещает.',
+        'Линии 1.1, 1.2 и 1.3 пересекать нельзя, значит, и разворачиваться через них. Линию 1.11 пересекают со стороны прерывистой.',
+        'На дороге в четыре полосы и больше на встречную выезжать нельзя. Разворачиваются на перекрёстках и там, где разрешают знаки и разметка (п. 61).',
+        'На автомагистрали разворот и въезд в технологические разрывы разделительной полосы запрещены (п. 118).'
+      ] },
+      { k: 'how', t: 'Как развернуться правильно', rules: [
+        'Заранее займите крайнее левое положение (п. 52) и включите левый указатель (п. 47).',
+        'Вне перекрёстка уступите встречным (п. 55).',
+        'Дорога узкая и из левого положения не развернуться: разворачивайтесь от правого края или с правой обочины, уступая и встречным, и попутным (п. 55).',
+        'На перекрёстке по зелёному уступите встречным, которые едут прямо и направо (п. 95). На равнозначном перекрёстке тоже (п. 104).',
+        'Знаки 4.1.1–4.1.6, 5.8.1, 5.8.2, разметка 1.18 и стрелка светофора, разрешающие поворот налево, разрешают и разворот (п. 25).',
+        'Вне перекрёстка можно развернуться через двор задним ходом, если там разворот не запрещён и вы никому не мешаете (п. 59). Сдавать назад в боковую дорогу нельзя: это перекрёсток.',
+        'Знак 5.11.1 «Место для разворота»: развернуться можно, налево нельзя.'
+      ] },
+      { k: 'lanes', t: 'Перестроение', rules: [
+        'Перестроение — смена полосы без смены направления (п. 2, пп. 41). Перед ним включите указатель (п. 47).',
+        'Уступите тем, кто едет попутно по своей полосе (п. 51).',
+        'Двое перестраиваются одновременно: уступает тот, у кого другой справа (п. 51).',
+        'Через прерывистую перестраиваться можно (п. 66), сплошную пересекать нельзя. Линию 1.11 пересекают со стороны прерывистой.',
+        'Полоса разгона: доедьте по ней и перестройтесь, уступая тем, кто едет по дороге. Полоса торможения: заранее перестройтесь на неё и тормозите только на ней (п. 57).',
+        'Перед поворотом займите крайнее положение: направо крайнюю правую полосу, налево крайнюю левую (п. 52).'
+      ] }
+    ],
+    scenes: [
+      // ---------- Сооружения ----------
+      { id: 'r-def-put', g: 'struct', t: 'Дорога над дорогой', bg: ST(),
+        feat: [{ t: 'overpass', x: 200, text: '?' }],
+        cars: [{ label: 'А', path: [['M', -20, 154], ['L', 430, 154]], d0: 70 }],
+        q: { type: 'pick', text: 'А проезжает над другой дорогой. Как называется это сооружение?', opts: ['Мост', 'Путепровод', 'Тоннель'], ans: 1 },
+        why: 'Путепровод — мост через другую дорогу или железную дорогу. Мостом называют сооружение над рекой, каналом или оврагом.',
+        ref: 'ПДД РК, п. 58, пп. 3; п. 87, пп. 3' },
+
+      { id: 'r-def-est', g: 'struct', t: 'Длинный мост на опорах', bg: ST({ top: 'none', bottom: 'none' }),
+        feat: [
+          { t: 'raw', svg: '<rect class="rd2" x="88" y="0" width="44" height="96"/><rect class="rd2" x="88" y="176" width="44" height="84"/><rect class="rd2" x="268" y="0" width="44" height="96"/><rect class="rd2" x="268" y="176" width="44" height="84"/>' },
+          { t: 'estakada', x1: 20, x2: 380, text: '?' },
+          { t: 'line', cls: 'rail2', x1: 0, y1: 98, x2: 400, y2: 98 }, { t: 'line', cls: 'rail2', x1: 0, y1: 174, x2: 400, y2: 174 }
+        ],
+        cars: [{ label: 'А', path: [['M', -20, 154], ['L', 430, 154]], d0: 70 }],
+        q: { type: 'pick', text: 'А едет по длинному мосту на опорах над улицами. Как он называется?', opts: ['Эстакада', 'Путепровод', 'Мост'], ans: 0 },
+        why: 'Эстакада тянется над местностью на длинном участке и стоит на опорах. Путепровод пересекает одну дорогу, мост перекрывает воду или овраг.',
+        ref: 'ПДД РК, п. 58, пп. 3; п. 87, пп. 3' },
+
+      { id: 'r-bridge-u', g: 'struct', t: 'Разворот на мосту', bg: ST(),
+        feat: [{ t: 'bridge', x1: 120, x2: 290 }],
+        cars: [{ label: 'А', path: UE(100, 154, 330, 118, -30), d0: 60 }],
+        res: [{ ok: false, p: UE(178, 154, 196, 118, 150), at: .5 }],
+        q: { type: 'yn', text: 'А на мосту. Можно развернуться прямо здесь?', ans: 1 },
+        why: 'Нельзя: на мостах разворот запрещён. А съезжает с моста и разворачивается там, где можно.',
+        ref: 'ПДД РК, п. 58, пп. 3' },
+
+      { id: 'r-under-u', g: 'struct', t: 'Разворот под путепроводом', bg: ST(),
+        feat: [{ t: 'deck', x: 200, top: true }],
+        cars: [{ label: 'А', path: UE(120, 154, 330, 118, -30), d0: 60 }],
+        res: [{ ok: false, p: UE(170, 154, 190, 118, 140), at: .5 }],
+        q: { type: 'yn', text: 'Над дорогой проходит путепровод. Можно развернуться под ним?', ans: 1 },
+        why: 'Нельзя: запрет действует и на сооружениях, и под ними. Отъедьте от путепровода и разворачивайтесь там.',
+        ref: 'ПДД РК, п. 58, пп. 3' },
+
+      { id: 'r-stop-bridge', g: 'struct', t: 'Остановиться на мосту', bg: ST(),
+        feat: [{ t: 'bridge', x1: 100, x2: 300 }],
+        cars: [{ label: 'А', path: [['M', -20, 154], ['L', 318, 154], ['Q', 336, 154, 348, 160], ['L', 374, 160]], d0: 120 }],
+        res: [{ ok: false, p: [['M', 150, 154], ['L', 186, 154], ['Q', 204, 154, 214, 160], ['L', 240, 160]], at: .95 }],
+        setup: 'Двухполосная дорога, по одной полосе в каждую сторону. Пассажир хочет сфотографировать реку.',
+        q: { type: 'yn', text: 'Можно остановиться у правого края на мосту?', ans: 1 },
+        why: 'Нельзя. На мосту в вашем направлении одна полоса, а остановка запрещена, если полос меньше трёх. А останавливается после моста.',
+        ref: 'ПДД РК, п. 87, пп. 3; п. 88, пп. 2' },
+
+      { id: 'r-stop-bridge3', g: 'struct', t: 'Мост, три полосы в одну сторону', bg: ST({ oneway: true, lanes: 3 }),
+        feat: [{ t: 'bridge', x1: 100, x2: 300, n: 3 }, ...ONEWAY],
+        cars: [{ label: 'А', path: [['M', -20, 190], ['L', 150, 190], ['Q', 172, 190, 184, 197], ['L', 232, 197]], d0: 60 }],
+        setup: 'Мост с тремя полосами для движения в одну сторону. А хочет высадить пассажира у правого края.',
+        q: { type: 'pick', text: 'Что разрешено на этом мосту?', opts: ['Остановка можно, стоянка нельзя', 'Нельзя ни остановиться, ни встать на стоянку', 'Можно и остановиться, и встать на стоянку'], ans: 0 },
+        why: 'Остановка на мосту запрещена, только если в вашем направлении меньше трёх полос. Здесь их три: высадить пассажира можно. Стоянка на мостах запрещена при любом числе полос.',
+        ref: 'ПДД РК, п. 87, пп. 3; п. 88, пп. 2' },
+
+      { id: 'r-stop-under', g: 'struct', t: 'Остановиться под путепроводом', bg: ST({ oneway: true, lanes: 3 }),
+        feat: [{ t: 'deck', x: 200, top: true }, ...ONEWAY],
+        cars: [{ label: 'А', path: [['M', -20, 190], ['L', 258, 190], ['Q', 280, 190, 292, 197], ['L', 350, 197]], d0: 60 }],
+        res: [{ ok: false, p: [['M', 120, 190], ['L', 160, 190], ['Q', 182, 190, 194, 197], ['L', 214, 197]], at: .95 }],
+        setup: 'Три полосы в одну сторону, над дорогой путепровод.',
+        q: { type: 'yn', text: 'Можно остановиться под путепроводом, раз полос три?', ans: 1 },
+        why: 'Нельзя. Под мостами, путепроводами и эстакадами остановка запрещена при любом числе полос. А встаёт за путепроводом.',
+        ref: 'ПДД РК, п. 87, пп. 3' },
+
+      { id: 'r-tunnel', g: 'struct', t: 'В тоннеле', bg: ST(),
+        feat: [{ t: 'tunnel', x1: 90, x2: 310, top: true }],
+        cars: [{ label: 'А', path: [['M', -20, 154], ['L', 430, 154]], d0: 140 }],
+        q: { type: 'pick', text: 'Что А может сделать в тоннеле?', opts: ['Развернуться', 'Остановиться у края', 'Ни то, ни другое'], ans: 2 },
+        why: 'В тоннеле запрещены разворот (п. 58), задний ход (п. 59) и остановка (п. 87). Проезжайте тоннель без остановки.',
+        ref: 'ПДД РК, п. 58, пп. 2; п. 59; п. 87, пп. 2' },
+
+      // ---------- Где нельзя ----------
+      { id: 'r-zebra', g: 'where', t: 'Разворот на пешеходном переходе', bg: ST(),
+        feat: [{ t: 'zebra', x: 200 }],
+        signs: [sg('5.16.1', 222, 186)],
+        cars: [{ label: 'А', path: UE(60, 154, 324, 118, -30), d0: 60 }],
+        res: [{ ok: false, p: UE(168, 154, 186, 118, 150), at: .5 }],
+        q: { type: 'yn', text: 'Можно развернуться прямо на переходе?', ans: 1 },
+        why: 'Нельзя: на пешеходных переходах разворот запрещён. А проезжает переход и разворачивается дальше.',
+        ref: 'ПДД РК, п. 58, пп. 1' },
+
+      { id: 'r-bus', g: 'where', t: 'Разворот на остановке', bg: ST(),
+        feat: [{ t: 'plat', x1: 160, x2: 280, y: 178, h: 12 }, { t: 'm117', x1: 150, x2: 290, y: 170 }],
+        signs: [sg('5.12', 298)],
+        cars: [{ label: 'А', path: UE(40, 154, 330, 118, -30), d0: 60 }],
+        res: [{ ok: false, p: UE(196, 154, 212, 118, 170), at: .5 }],
+        q: { type: 'yn', text: 'Можно развернуться у автобусной остановки?', ans: 1 },
+        why: 'Нельзя: в местах остановочных пунктов разворот запрещён. А проезжает остановку.',
+        ref: 'ПДД РК, п. 58, пп. 6' },
+
+      { id: 'r-hill', g: 'where', t: 'Разворот на подъёме', bg: ST(),
+        feat: [{ t: 'hill', x1: 140, x2: 280, text: 'вершина подъёма: видно меньше 100 м' }],
+        cars: [{ label: 'А', path: UE(40, 154, 334, 118, -30), d0: 60 }],
+        res: [{ ok: false, p: UE(186, 154, 204, 118, 160), at: .5 }],
+        q: { type: 'yn', text: 'Можно развернуться на вершине подъёма?', ans: 1 },
+        why: 'Нельзя: из-за подъёма дорогу видно меньше чем на 100 м. Встречный не успеет затормозить.',
+        ref: 'ПДД РК, п. 58, пп. 5' },
+
+      { id: 'r-rail', g: 'where', t: 'Разворот на переезде', bg: ST(),
+        feat: [{ t: 'rail', x: 196 }],
+        cars: [{ label: 'А', path: UE(40, 154, 330, 118, -30), d0: 60 }],
+        res: [{ ok: false, p: UE(180, 154, 196, 118, 150), at: .5 }],
+        q: { type: 'yn', text: 'Можно развернуться на железнодорожном переезде?', ans: 1 },
+        why: 'Нельзя: на переездах разворот и задний ход запрещены. А проезжает переезд и разворачивается дальше.',
+        ref: 'ПДД РК, п. 58, пп. 4; п. 59' },
+
+      { id: 'r-319', g: 'where', t: 'Знак 3.19 перед перекрёстком', bg: ST(),
+        feat: [{ t: 'tside', x: 220 }, { t: 'bside', x: 220 }],
+        signTop: ['3.19'],
+        signs: [sg('3.19', 140)],
+        cars: [{ label: 'А', path: [['M', -20, 154], ['L', 196, 154], ['Q', 238, 154, 238, 112], ['L', 238, -30]], d0: 60 }],
+        res: [{ ok: false, p: UE(150, 154, 210, 118, 120), at: .55 }],
+        q: { type: 'pick', text: 'Что можно А на этом перекрёстке?', opts: ['Повернуть налево', 'Развернуться', 'И то, и другое'], ans: 0 },
+        why: 'Знак 3.19 запрещает только разворот. Повернуть налево можно.',
+        ref: 'ПДД РК, знак 3.19' },
+
+      { id: 'r-solid', g: 'where', t: 'Разворот через сплошную', bg: ST({ center: 'none' }),
+        feat: [{ t: 'line', cls: 'ln', x1: 0, y1: 136, x2: 250, y2: 136 }, { t: 'line', cls: 'dl', x1: 262, y1: 136, x2: 400, y2: 136 }],
+        cars: [{ label: 'А', path: UE(40, 154, 316, 118, -30), d0: 60 }],
+        res: [{ ok: false, p: UE(140, 154, 160, 118, 110), at: .5 }],
+        q: { type: 'yn', text: 'Можно развернуться через сплошную линию 1.1?', ans: 1 },
+        why: 'Нельзя: линии 1.1–1.3 пересекать запрещено. А доезжает до прерывистой разметки и разворачивается там.',
+        ref: 'ПДД РК, приложение 2, линии 1.1–1.3; п. 62-1' },
+
+      { id: 'r-111', g: 'where', t: 'Разворот через линию 1.11', bg: ST({ center: '1.11' }),
+        cars: [
+          { label: 'А', path: UE(60, 154, 240, 118, -30), d0: 60 },
+          { label: 'Б', path: UW(400, 118, 170, 154, 430), d0: 40 }
+        ],
+        res: [{ ok: false, p: UW(360, 118, 170, 154, 220), at: .55 }],
+        setup: 'Посередине линия 1.11: со стороны А прерывистая, со стороны Б сплошная. Оба хотят развернуться.',
+        q: { type: 'pick', text: 'Кто может развернуться?', opts: ['Только А', 'Только Б', 'Оба'], ans: 0 },
+        demo: [['А']],
+        why: 'Линию 1.11 пересекают со стороны прерывистой. А разворачивается, Б со стороны сплошной разворачиваться нельзя.',
+        ref: 'ПДД РК, приложение 2, линия 1.11' },
+
+      { id: 'r-4lanes', g: 'where', t: 'Четыре полосы и двойная сплошная', vb: '0 0 400 300', bg: ST({ lanes: 4, center: 'double', h: 300 }),
+        cars: [{ label: 'А', path: [['M', 40, 190], ['L', 430, 190]], d0: 60 }],
+        res: [{ ok: false, p: UE(150, 190, 190, 154, 120), at: .5 }],
+        q: { type: 'yn', text: 'А в левой полосе. Можно развернуться через двойную сплошную?', ans: 1 },
+        why: 'Нельзя: линию 1.3 пересекать запрещено, а на дороге в четыре полосы и больше выезжать на встречную нельзя. Разворачивайтесь на перекрёстке или в месте со знаком 5.11.1.',
+        ref: 'ПДД РК, п. 61; линия 1.3' },
+
+      { id: 'r-motorway', g: 'where', t: 'Разрыв на автомагистрали', vb: '0 0 400 300', bg: ST({ lanes: 4, median: true, gap: [180, 236], h: 300, top: 'shoulder', bottom: 'shoulder', center: 'none' }),
+        signTop: ['5.1'],
+        cars: [{ label: 'А', path: [['M', 40, 190], ['L', 430, 190]], d0: 60 }],
+        res: [{ ok: false, p: UE(120, 190, 190, 154, 100), at: .5 }],
+        setup: 'Автомагистраль, в разделительной полосе технологический разрыв.',
+        q: { type: 'yn', text: 'Можно развернуться через разрыв?', ans: 1 },
+        why: 'Нельзя: на автомагистрали запрещены разворот и въезд в технологические разрывы. А едет до развязки.',
+        ref: 'ПДД РК, п. 118, пп. 4' },
+
+      // ---------- Как правильно ----------
+      { id: 'r-oncoming', g: 'how', t: 'Разворот вне перекрёстка', bg: ST(),
+        cars: [
+          { label: 'А', what: 'разворачивается', path: UE(150, 150, 196, 118, -30) },
+          { label: 'Б', what: 'встречный', path: [['M', 430, 118], ['L', -40, 118]], d0: 70 }
+        ],
+        q: { type: 'order', text: 'Кто проедет первым?', order: [['Б'], ['А']] },
+        why: 'Разворачиваясь вне перекрёстка, А уступает встречным. Б проезжает, А разворачивается.',
+        ref: 'ПДД РК, п. 52, 55' },
+
+      { id: 'r-shoulder', g: 'how', t: 'Узкая дорога: разворот с обочины', bg: ST({ top: 'shoulder', bottom: 'shoulder' }),
+        cars: [
+          { label: 'А', what: 'с обочины', path: [['M', 170, 186], ['L', 214, 186], ['Q', 268, 186, 268, 152], ['Q', 268, 118, 214, 118], ['L', -30, 118]] },
+          { label: 'Б', what: 'встречный', path: [['M', 430, 118], ['L', -40, 118]], d0: 40 },
+          { label: 'В', what: 'попутный', path: [['M', -30, 154], ['L', 440, 154]], d0: 40 }
+        ],
+        setup: 'Дорога узкая, из левого положения не развернуться. А разворачивается с правой обочины.',
+        q: { type: 'order', text: 'Кто проедет первым?', order: [['Б', 'В'], ['А']] },
+        why: 'С правой обочины разворачиваются, уступая и встречным, и попутным. Б и В проезжают, потом разворачивается А.',
+        ref: 'ПДД РК, п. 55' },
+
+      { id: 'r-yard', g: 'how', t: 'Развернуться через двор', bg: ST(),
+        feat: [{ t: 'yard', x: 150, w: 58 }],
+        cars: [{ label: 'А', path: yardP, rev: yardC[1], fwd: yardC[3], arrowLen: 120 }],
+        res: [{ ok: true, p: yardP }],
+        setup: 'А проезжает въезд во двор, сдаёт туда задним ходом и выезжает налево.',
+        q: { type: 'yn', text: 'Можно так развернуться?', ans: 0 },
+        demo: [{ ids: ['А'], to: yardC[1] }, { ids: ['А'], to: yardC[3], dur: 1900 }, { ids: ['А'], dur: 1900 }],
+        why: 'Можно. Въезд во двор не перекрёсток, задний ход здесь не запрещён, если вы никому не мешаете. Сдавая назад через тротуар, пропустите пешеходов. Выезжая налево, уступите всем, кто едет по дороге.',
+        ref: 'ПДД РК, п. 2 (пп. 33, 65), п. 49, 59' },
+
+      { id: 'r-side', g: 'how', t: 'Задним ходом в боковую дорогу', bg: ST(),
+        feat: [{ t: 'bside', x: 150 }],
+        cars: [{ label: 'А', path: [['M', 20, 154], ['L', 100, 154], ['Q', 132, 154, 132, 190], ['L', 132, 222], ['Q', 132, 250, 150, 250], ['Q', 168, 250, 168, 222], ['L', 168, 170], ['Q', 168, 118, 120, 118], ['L', -30, 118]], d0: 20, arrowLen: 150 }],
+        res: [{ ok: false, p: [['M', 250, 154], ['L', 196, 154], ['Q', 150, 154, 150, 200], ['L', 150, 240]], at: .55 }],
+        setup: 'А проехал примыкание и хочет сдать назад в боковую дорогу, чтобы развернуться.',
+        q: { type: 'yn', text: 'Можно сдать назад в боковую дорогу?', ans: 1 },
+        dur: 3000,
+        why: 'Нельзя: примыкание дороги — перекрёсток, а задний ход на перекрёстке запрещён. Сверните направо передним ходом, развернитесь на боковой дороге и выезжайте налево, уступая по правилам перекрёстка.',
+        ref: 'ПДД РК, п. 2 (пп. 33), п. 59' },
+
+      { id: 'r-green', g: 'how', t: 'Разворот на зелёный', bg: ST(),
+        feat: [{ t: 'tside', x: 200 }, { t: 'bside', x: 200 }, { t: 'light', x: 150, y: 196, c: 'g' }, { t: 'light', x: 250, y: 76, c: 'g' }],
+        cars: [
+          { label: 'А', what: 'разворачивается', path: UE(60, 152, 196, 118, -30), d0: 60 },
+          { label: 'Б', what: 'встречный прямо', path: [['M', 430, 118], ['L', -40, 118]], d0: 80 }
+        ],
+        q: { type: 'order', text: 'Кто проедет первым?', order: [['Б'], ['А']] },
+        why: 'Разворачиваясь на зелёный, А уступает встречным, которые едут прямо или направо. Б проезжает первым.',
+        ref: 'ПДД РК, п. 95' },
+
+      { id: 'r-5111', g: 'how', t: 'Знак 5.11.1 «Место для разворота»', vb: '0 0 400 300', bg: ST({ lanes: 4, median: true, gap: [196, 252], h: 300, center: 'none' }),
+        feat: [{ t: 'tside', x: 224, w: 56 }],
+        signTop: ['5.11.1'],
+        signs: [sg('5.11.1', 150, 258)],
+        cars: [{ label: 'А', path: UE(40, 190, 196, 154, -30), d0: 60 }],
+        res: [{ ok: false, p: [['M', 150, 190], ['L', 200, 190], ['Q', 238, 190, 238, 140], ['L', 238, -10]], at: .6 }],
+        q: { type: 'pick', text: 'Что можно А в этом разрыве?', opts: ['Только развернуться', 'Развернуться и повернуть налево', 'Только повернуть налево'], ans: 0 },
+        why: 'Знак 5.11.1 показывает место для разворота. Поворот налево здесь запрещён.',
+        ref: 'ПДД РК, знак 5.11.1' },
+
+      { id: 'r-413', g: 'how', t: 'Знак «Движение налево» и разворот', bg: ST(),
+        feat: [{ t: 'tside', x: 220 }, { t: 'bside', x: 220 }],
+        signTop: ['4.1.3'],
+        signs: [sg('4.1.3', 140)],
+        cars: [{ label: 'А', path: UE(60, 152, 216, 118, -30), d0: 60 }],
+        res: [{ ok: true, p: [['M', 150, 154], ['L', 196, 154], ['Q', 238, 154, 238, 112], ['L', 238, -10]] }],
+        q: { type: 'yn', text: 'Знак 4.1.3 разрешает только налево. Можно А развернуться на этом перекрёстке?', ans: 0 },
+        why: 'Можно. Знаки 4.1.1–4.1.6, разрешающие поворот налево, разрешают и разворот.',
+        ref: 'ПДД РК, знаки 4.1.1–4.1.6' },
+
+      { id: 'r-lanepos', g: 'how', t: 'Из какой полосы разворачиваться', vb: '0 0 400 300', bg: ST({ lanes: 4, center: 'double', h: 300 }),
+        feat: [{ t: 'tside', x: 280 }, { t: 'bside', x: 280, n: 4 }],
+        cars: [{ label: 'А', path: UE(100, 190, 262, 154, -30), d0: 40 }],
+        res: [{ ok: false, p: [['M', 140, 226], ['L', 262, 226], ['Q', 320, 226, 320, 190], ['Q', 320, 154, 262, 154], ['L', 200, 154]], at: .5 }],
+        q: { type: 'pick', text: 'Из какой полосы можно развернуться на этом перекрёстке?', opts: ['Только из крайней левой', 'Из любой полосы', 'Из правой, если она свободна'], ans: 0 },
+        why: 'Перед разворотом займите крайнее левое положение. Из правой полосы разворачиваться нельзя, даже если она свободна.',
+        ref: 'ПДД РК, п. 52' },
+
+      // ---------- Перестроение ----------
+      { id: 'p-yield', g: 'lanes', t: 'Перестроение влево', bg: ST({ oneway: true, lanes: 3 }), feat: ONEWAY,
+        cars: [
+          { label: 'А', what: 'перестраивается', path: LC(150, 154, 190, 118, 440) },
+          { label: 'Б', what: 'едет прямо', path: [['M', -30, 118], ['L', 440, 118]], d0: 80 }
+        ],
+        q: { type: 'order', text: 'Кто проедет первым?', order: [['Б'], ['А']] },
+        why: 'Перестраиваясь, А уступает тем, кто едет попутно по своей полосе. Б проезжает, А перестраивается за ним.',
+        ref: 'ПДД РК, п. 51' },
+
+      { id: 'p-sim', g: 'lanes', t: 'Одновременное перестроение', bg: ST({ oneway: true, lanes: 3 }), feat: ONEWAY,
+        cars: [
+          { label: 'А', what: 'из левой в среднюю', path: LC(120, 118, 160, 154, 440) },
+          { label: 'Б', what: 'из правой в среднюю', path: LC(120, 190, 160, 154, 440) }
+        ],
+        setup: 'А и Б одновременно перестраиваются в среднюю полосу.',
+        q: { type: 'order', text: 'Кто перестроится первым?', order: [['Б'], ['А']] },
+        why: 'При одновременном перестроении уступает тот, у кого другой справа. Б справа от А, поэтому Б перестраивается первым.',
+        ref: 'ПДД РК, п. 51' },
+
+      { id: 'p-signal', g: 'lanes', t: 'Указатель, когда сзади никого', bg: ST({ oneway: true, lanes: 3 }), feat: ONEWAY,
+        cars: [{ label: 'А', path: LC(100, 154, 170, 118, 440) }],
+        q: { type: 'yn', text: 'Рядом и сзади никого. Нужно включать указатель перед перестроением?', opts: ['Нужно', 'Не нужно'], ans: 0 },
+        why: 'Нужно. Сигнал подают перед любым манёвром, даже если вокруг пусто.',
+        ref: 'ПДД РК, п. 47, 48' },
+
+      { id: 'p-solid', g: 'lanes', t: 'Перестроение через сплошную', bg: ST({ oneway: true, lanes: 3, lines: ['dash', 'solid'] }), feat: ONEWAY,
+        cars: [{ label: 'А', path: [['M', -30, 154], ['L', 440, 154]], d0: 170 }],
+        res: [{ ok: false, p: LC(150, 154, 180, 190, 330), at: .45 }],
+        q: { type: 'yn', text: 'Между средней и правой полосой сплошная. Можно перестроиться вправо?', ans: 1 },
+        why: 'Нельзя: сплошную пересекать запрещено. Перестраиваются только через прерывистую.',
+        ref: 'ПДД РК, п. 66; линии 1.1–1.3' },
+
+      { id: 'p-111', g: 'lanes', t: 'Перестроение через 1.11', bg: ST({ oneway: true, lanes: 3, lines: ['dash', '1.11'] }), feat: ONEWAY,
+        cars: [
+          { label: 'А', what: 'средняя полоса', path: LC(130, 154, 170, 190, 440) },
+          { label: 'Б', what: 'правая полоса', path: LC(60, 190, 200, 154, 440) }
+        ],
+        res: [{ ok: false, p: LC(130, 154, 170, 190, 300), at: .4 }],
+        setup: 'Между средней и правой полосами линия 1.11: со стороны Б прерывистая, со стороны А сплошная.',
+        q: { type: 'pick', text: 'Кто может перестроиться через эту линию?', opts: ['Только А', 'Только Б', 'Оба'], ans: 1 },
+        demo: [['Б']],
+        why: 'Линию 1.11 пересекают со стороны прерывистой. Прерывистая со стороны Б, ему можно. А со стороны сплошной перестраиваться нельзя.',
+        ref: 'ПДД РК, приложение 2, линия 1.11' },
+
+      { id: 'p-accel', g: 'lanes', t: 'Полоса разгона', bg: ST({ oneway: true, lanes: 3, lines: ['dash', 'none'] }),
+        feat: [
+          { t: 'line', cls: 'w18', x1: 0, y1: 172, x2: 290, y2: 172 },
+          { t: 'raw', svg: '<rect class="walk" x="290" y="206" width="110" height="6"/><polygon class="walk" points="290,208 380,172 400,172 400,208"/><line class="curb" x1="290" y1="208" x2="380" y2="172"/><line class="curb" x1="380" y1="172" x2="400" y2="172"/>' },
+          { t: 'label', x: 110, y: 226, text: 'полоса разгона' },
+          { t: 'mark', x: 40, y: 118, deg: 90, k: 's' }, { t: 'mark', x: 40, y: 154, deg: 90, k: 's' }
+        ],
+        cars: [
+          { label: 'А', what: 'с полосы разгона', path: [['M', 60, 190], ['L', 200, 190], ['Q', 230, 190, 250, 172], ['Q', 270, 154, 310, 154], ['L', 440, 154]] },
+          { label: 'Б', what: 'едет по дороге', path: [['M', -30, 154], ['L', 440, 154]], d0: 50 }
+        ],
+        q: { type: 'order', text: 'Кто проедет первым?', order: [['Б'], ['А']] },
+        why: 'А едет по полосе разгона и перестраивается, уступая тем, кто едет по дороге. Б проезжает, А встраивается за ним.',
+        ref: 'ПДД РК, п. 57' },
+
+      { id: 'p-brake', g: 'lanes', t: 'Полоса торможения', bg: ST({ oneway: true, lanes: 3, lines: ['dash', 'none'] }),
+        feat: [
+          { t: 'raw', svg: '<rect class="walk" x="0" y="172" width="170" height="38"/><polygon class="rd" points="120,172 170,172 170,208"/><line class="curb" x1="0" y1="172" x2="120" y2="172"/><line class="curb" x1="120" y1="172" x2="170" y2="208"/>' },
+          { t: 'line', cls: 'w18', x1: 150, y1: 172, x2: 400, y2: 172 },
+          { t: 'label', x: 300, y: 226, text: 'полоса торможения' },
+          { t: 'mark', x: 40, y: 118, deg: 90, k: 's' }, { t: 'mark', x: 40, y: 154, deg: 90, k: 's' }
+        ],
+        cars: [{ label: 'А', path: brakeP, d0: 60 }],
+        setup: 'Впереди съезд направо. Перед ним начинается полоса торможения.',
+        q: { type: 'pick', text: 'Где А снижать скорость?', opts: ['На полосе торможения, после перестроения', 'На основной полосе, потом перестроиться', 'Где удобно'], ans: 0 },
+        demo: [{ ids: ['А'], to: brakeC[3], dur: 1000 }, { ids: ['А'], dur: 2800 }],
+        why: 'Перестройтесь на полосу торможения заранее и снижайте скорость только на ней. Сзади по основной полосе едут быстро.',
+        ref: 'ПДД РК, п. 57' },
+
+      { id: 'p-turnpos', g: 'lanes', t: 'Направо из левой полосы', vb: '0 0 400 300', bg: ST({ lanes: 4, center: 'double', h: 300 }),
+        feat: [{ t: 'bside', x: 320, n: 4 }],
+        cars: [{ label: 'А', path: [['M', 0, 190], ['L', 70, 190], ['Q', 92, 190, 115, 208], ['Q', 137, 226, 160, 226], ['L', 270, 226], ['Q', 302, 226, 302, 262], ['L', 302, 330]], d0: 30 }],
+        res: [{ ok: false, p: [['M', 200, 190], ['L', 262, 190], ['Q', 302, 190, 302, 250], ['L', 302, 290]], at: .5 }],
+        setup: 'А едет в левой полосе и хочет повернуть направо. Правая полоса свободна.',
+        q: { type: 'yn', text: 'Можно повернуть направо прямо из левой полосы?', ans: 1 },
+        why: 'Нельзя. Перед поворотом направо займите крайнее правое положение. А заранее перестраивается вправо и только потом поворачивает.',
+        ref: 'ПДД РК, п. 52' }
+    ]
+  };
+})();
+
+</script>
+<script>
+// Shared runtime for the PDD RK scene trainers: renders window.PAGE scenarios, checks answers, animates.
+(() => {
+  const P = window.PAGE, IMG = window.IMG || {}, E = window.ENG;
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COL = { 'А': '#2F80ED', 'Б': '#F2994A', 'В': '#27AE60', 'Г': '#A35BE0', 'Д': '#E5484D', 'П': '#E86FB0', 'С': '#E8EEF2', 'Т': '#D64545', '_': '#8C96A0' };
+  const pathOf = p => Array.isArray(p) ? E.route(p) : p;
+
+  // ---------- Vehicles (drawn heading up, centred) ----------
+  function vehSVG(kind, col) {
+    if (kind === 'bus') return `<rect x="-11" y="-32" width="22" height="64" rx="4" fill="${col}"/><rect x="-8" y="-28" width="16" height="56" rx="2" fill="#FFFFFF" fill-opacity=".3"/>`;
+    if (kind === 'moto') return `<rect x="-2.5" y="-13" width="5" height="26" rx="2.5" fill="#1F2328"/><ellipse cy="1" rx="6.5" ry="5" fill="${col}"/><circle cy="-1" r="3.4" fill="#E8B98A"/>`;
+    if (kind === 'bike') return `<rect x="-1.6" y="-13" width="3.2" height="26" rx="1.6" fill="#1F2328"/><ellipse cy="1" rx="5.5" ry="4.2" fill="${col}"/><circle cy="-1" r="3" fill="#E8B98A"/>`;
+    if (kind === 'ped') return `<ellipse rx="8" ry="5" fill="${col}"/><circle r="4" fill="#E8B98A"/>`;
+    if (kind === 'amb') return `<rect x="-10" y="-18" width="20" height="36" rx="5" fill="#FFFFFF" stroke="#B8C2C9"/><rect x="-7" y="-3" width="6" height="3.5" rx="1" fill="#2D6BFF" class="blink"/><rect x="1" y="-3" width="6" height="3.5" rx="1" fill="#2D6BFF"/>`;
+    return `<rect x="-10" y="-18" width="20" height="36" rx="5.5" fill="${col}"/><rect x="-8" y="-10" width="16" height="7" rx="2" fill="#0B1820" opacity=".55"/><rect x="-8" y="8" width="16" height="5" rx="2" fill="#0B1820" opacity=".45"/><circle cx="-6" cy="-17" r="1.8" fill="#FFF6C9"/><circle cx="6" cy="-17" r="1.8" fill="#FFF6C9"/>`;
+  }
+  // Truck: cab at the front (top), box behind.
+  function truckSVG(col) { return `<rect x="-11" y="-16" width="22" height="46" rx="2" fill="#8C96A0"/><rect x="-10" y="-31" width="20" height="16" rx="3" fill="${col}"/><rect x="-8" y="-28" width="16" height="5" rx="1.5" fill="#0B1820" opacity=".5"/>`; }
+  const HALF = { car: 18, truck: 31, bus: 32, moto: 13, bike: 13, ped: 6, amb: 18 };
+  const drawVeh = (kind, col) => kind === 'truck' ? truckSVG(col) : vehSVG(kind, col);
+
+  // ---------- Signs and features ----------
+  function sign(sg) {
+    const s = sg.s || 26, u = IMG[sg.k];
+    let g = `<line class="pole" x1="${sg.x}" y1="${sg.y + s / 2}" x2="${sg.x}" y2="${sg.y + s / 2 + (sg.pole ?? 10)}"/>`;
+    if (u) g += `<image href="${u}" x="${sg.x - s / 2}" y="${sg.y - s / 2}" width="${s}" height="${s}" preserveAspectRatio="xMidYMid meet"/>`;
+    let py = sg.y + s / 2 + 1;
+    (sg.plates || []).forEach(pk => {
+      const pu = IMG[pk], pw = s * 1.15, ph = s * 0.55;
+      if (pu) g += `<rect x="${sg.x - pw / 2}" y="${py}" width="${pw}" height="${ph}" fill="#fff"/><image href="${pu}" x="${sg.x - pw / 2}" y="${py}" width="${pw}" height="${ph}" preserveAspectRatio="xMidYMid meet"/>`;
+      py += ph + 1;
+    });
+    return g;
+  }
+  function feat(f, H) {
+    const Y0 = E.Y0;
+    switch (f.t) {
+      case 'zebra': {
+        let g = '';
+        if (f.h) { for (let x = f.x1; x < f.x2; x += 9) g += `<rect class="zebra" x="${x}" y="${f.y - 10}" width="5" height="20"/>`; return g; }
+        for (let y = f.y1 ?? Y0 + 3; y < (f.y2 ?? Y0 + 69); y += 9) g += `<rect class="zebra" x="${f.x - 10}" y="${y}" width="20" height="5"/>`;
+        return g;
+      }
+      case 'arc': { // thick zone along a ring between screen angles a1 < a2
+        if (f.a2 - f.a1 >= 360) return `<circle class="${f.ok ? 'zarc-ok' : 'zarc-no'}" style="stroke-width:${f.w || 16}px" cx="200" cy="200" r="${f.r}"/>`;
+        const [x1, y1] = E.rp(f.r, f.a1), [x2, y2] = E.rp(f.r, f.a2);
+        return `<path class="${f.ok ? 'zarc-ok' : 'zarc-no'}" style="stroke-width:${f.w || 16}px" d="M${x1.toFixed(1)} ${y1.toFixed(1)}A${f.r} ${f.r} 0 ${f.a2 - f.a1 > 180 ? 1 : 0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}"/>`;
+      }
+      case 'mark': { // lane arrow (marking 1.18) heading `deg` (0 = up on screen); kinds: s, r, l, sr, sl
+        const P = { s: 'M0 11V-9M-4 -4L0 -10L4 -4', r: 'M0 11V0Q0 -5 6 -5M3 -9L8 -5L3 -1', l: 'M0 11V0Q0 -5 -6 -5M-3 -9L-8 -5L-3 -1', sr: 'M0 11V-9M-4 -4L0 -10L4 -4M0 4Q0 -1 6 -1M3 -5L8 -1L3 3', sl: 'M0 11V-9M-4 -4L0 -10L4 -4M0 4Q0 -1 -6 -1M-3 -5L-8 -1L-3 3' };
+        return `<path class="mk" transform="translate(${f.x} ${f.y}) rotate(${f.deg || 0}) scale(${f.s || 1})" d="${P[f.k || 's']}"/>`;
+      }
+      case 'zone': return `<rect class="${f.ok ? 'zok' : 'zno'}" x="${f.x1}" y="${f.y1}" width="${f.x2 - f.x1}" height="${f.y2 - f.y1}"/>`;
+      case 'label': return `<text class="${f.cls || 'lbl'}" x="${f.x}" y="${f.y}" text-anchor="${f.a || 'middle'}">${esc(f.text)}</text>`;
+      case 'dim': return `<g class="dim"><line x1="${f.x1}" y1="${f.y}" x2="${f.x2}" y2="${f.y}"/><line x1="${f.x1}" y1="${f.y - 5}" x2="${f.x1}" y2="${f.y + 5}"/><line x1="${f.x2}" y1="${f.y - 5}" x2="${f.x2}" y2="${f.y + 5}"/><text x="${(f.x1 + f.x2) / 2}" y="${f.y - 5}" text-anchor="middle">${esc(f.text)}</text></g>`;
+      case 'bridge': { // water under our road; lane markings stay visible
+        const n = f.n || 2, y1 = Y0 + n * E.LW, w = f.x2 - f.x1;
+        return `<rect class="water" x="${f.x1}" y="0" width="${w}" height="${Y0 - 8}"/><rect class="water" x="${f.x1}" y="${y1 + 8}" width="${w}" height="${H - y1 - 8}"/>`
+          + `<rect class="walk" x="${f.x1}" y="${Y0 - 8}" width="${w}" height="8"/><rect class="walk" x="${f.x1}" y="${y1}" width="${w}" height="8"/>`
+          + `<line class="rail2" x1="${f.x1}" y1="${Y0 - 8}" x2="${f.x2}" y2="${Y0 - 8}"/><line class="rail2" x1="${f.x1}" y1="${y1 + 8}" x2="${f.x2}" y2="${y1 + 8}"/>`
+          + (f.lbl === false ? '' : `<text class="lbl" x="${(f.x1 + f.x2) / 2}" y="${f.ly ?? Y0 - 14}" text-anchor="middle">${esc(f.text || 'мост')}</text>`);
+      }
+      case 'overpass': { // our road passes over a lower road (путепровод)
+        const n = f.n || 2, y1 = Y0 + n * E.LW;
+        return `<rect class="gr" x="${f.x - 40}" y="0" width="80" height="${Y0 - 8}"/><rect class="gr" x="${f.x - 40}" y="${y1 + 8}" width="80" height="${H - y1 - 8}"/>`
+          + `<rect class="rd2" x="${f.x - 24}" y="0" width="48" height="${Y0 - 8}"/><rect class="rd2" x="${f.x - 24}" y="${y1 + 8}" width="48" height="${H - y1 - 8}"/>`
+          + `<rect class="walk" x="${f.x - 40}" y="${Y0 - 8}" width="80" height="8"/><rect class="walk" x="${f.x - 40}" y="${y1}" width="80" height="8"/>`
+          + `<line class="rail2" x1="${f.x - 40}" y1="${Y0 - 8}" x2="${f.x + 40}" y2="${Y0 - 8}"/><line class="rail2" x1="${f.x - 40}" y1="${y1 + 8}" x2="${f.x + 40}" y2="${y1 + 8}"/>`
+          + `<text class="lbl" x="${f.x}" y="${f.ly ?? H - 10}" text-anchor="middle">${esc(f.text || 'путепровод')}</text>`;
+      }
+      case 'deck': // another road crosses above ours (we are under the overpass)
+        return `<rect class="deck" x="${f.x - 26}" y="0" width="52" height="${H}"/><line class="rail2" x1="${f.x - 26}" y1="0" x2="${f.x - 26}" y2="${H}"/><line class="rail2" x1="${f.x + 26}" y1="0" x2="${f.x + 26}" y2="${H}"/><text class="lbl" x="${f.x}" y="14" text-anchor="middle">${esc(f.text || 'путепровод над дорогой')}</text>`;
+      case 'estakada':
+        return `<rect class="shadow" x="${f.x1}" y="${Y0 + (f.n || 2) * E.LW + 4}" width="${f.x2 - f.x1}" height="18"/>` + [...Array(Math.floor((f.x2 - f.x1) / 60) + 1)].map((_, i) => `<rect class="pier" x="${f.x1 + 10 + i * 60}" y="${Y0 + (f.n || 2) * E.LW + 6}" width="8" height="16"/>`).join('') + `<text class="lbl" x="${(f.x1 + f.x2) / 2}" y="${Y0 - 12}" text-anchor="middle">${esc(f.text || 'эстакада')}</text>`;
+      case 'tunnel': return `<rect class="tun" x="${f.x1}" y="${Y0 - 26}" width="${f.x2 - f.x1}" height="${(f.n || 2) * E.LW + 52}"/><rect class="portal" x="${f.x1 - 4}" y="${Y0 - 26}" width="8" height="${(f.n || 2) * E.LW + 52}"/><rect class="portal" x="${f.x2 - 4}" y="${Y0 - 26}" width="8" height="${(f.n || 2) * E.LW + 52}"/><text class="lbl" x="${(f.x1 + f.x2) / 2}" y="${Y0 - 32}" text-anchor="middle">тоннель</text>`;
+      case 'rail': { let g = ''; for (let y = 0; y < H; y += 8) g += `<line class="sleeper" x1="${f.x - 6}" y1="${y}" x2="${f.x + 20}" y2="${y}"/>`; return g + `<line class="railb" x1="${f.x}" y1="0" x2="${f.x}" y2="${H}"/><line class="railb" x1="${f.x + 14}" y1="0" x2="${f.x + 14}" y2="${H}"/>`; }
+      case 'tside': { const w = f.w || 72; return `<rect class="${f.cls || 'rd'}" x="${f.x - w / 2}" y="0" width="${w}" height="${Y0 + 1}"/>` + (f.cls ? '' : `<line class="dl" x1="${f.x}" y1="0" x2="${f.x}" y2="${Y0 - 6}"/>`) + (f.text ? `<text class="lbl" x="${f.x}" y="14" text-anchor="middle">${esc(f.text)}</text>` : ''); }
+      case 'bside': { const w = f.w || 72, y = Y0 + (f.n || 2) * E.LW; return `<rect class="${f.cls || 'rd'}" x="${f.x - w / 2}" y="${y - 1}" width="${w}" height="${H}"/>` + (f.cls ? '' : `<line class="dl" x1="${f.x}" y1="${y + 6}" x2="${f.x}" y2="${H}"/>`) + (f.text ? `<text class="lbl" x="${f.x}" y="${H - 8}" text-anchor="middle">${esc(f.text)}</text>` : ''); }
+      case 'yard': return `<rect class="lot" x="${f.x - (f.w || 60) / 2}" y="${Y0 + (f.n || 2) * E.LW}" width="${f.w || 60}" height="${H}"/><text class="lbl" x="${f.x}" y="${H - 8}" text-anchor="middle">${esc(f.text || 'двор')}</text>`;
+      case 'hill': return `<rect class="hill" x="${f.x1}" y="0" width="${f.x2 - f.x1}" height="${H}"/><text class="lbl" x="${(f.x1 + f.x2) / 2}" y="${H - 8}" text-anchor="middle">${esc(f.text || 'гребень подъёма, обзор < 100 м')}</text>`;
+      case 'plat': return `<rect class="plat" x="${f.x1}" y="${f.y}" width="${f.x2 - f.x1}" height="${f.h || 10}" rx="2"/>`;
+      case 'line': return `<line class="${f.cls || 'ln'}" x1="${f.x1}" y1="${f.y1}" x2="${f.x2}" y2="${f.y2}"/>`;
+      case 'm14': return `<line class="m14" x1="${f.x1}" y1="${f.y}" x2="${f.x2}" y2="${f.y}"/>`;
+      case 'm110': return `<line class="m110" x1="${f.x1}" y1="${f.y}" x2="${f.x2}" y2="${f.y}"/>`;
+      case 'm117': { let d = `M${f.x1} ${f.y}`; for (let x = f.x1 + 8, up = true; x <= f.x2; x += 8, up = !up) d += ` L${x} ${f.y + (up ? -8 : 0)}`; return `<path class="m117" d="${d}"/>`; }
+      case 'bays': { let g = ''; for (let x = f.x1; x <= f.x2; x += (f.step || 28)) g += `<line class="ln" x1="${x}" y1="${f.y1}" x2="${x}" y2="${f.y2}"/>`; return g; }
+      case 'grass': return `<rect class="gr2" x="${f.x1}" y="${f.y1}" width="${f.x2 - f.x1}" height="${f.y2 - f.y1}" rx="4"/>`;
+      case 'light': { const c = f.c, dim = '#3A3F44', b = f.blink ? ' class="blink"' : ''; return `<rect x="${f.x - 6}" y="${f.y - 15}" width="12" height="30" rx="3" fill="#1A1D20" stroke="#fff" stroke-width="1"/><circle cx="${f.x}" cy="${f.y - 8}" r="3.6" fill="${c === 'r' ? '#E5484D' : dim}"/><circle cx="${f.x}" cy="${f.y}" r="3.6" fill="${c === 'y' ? '#F5B83D' : dim}"${c === 'y' ? b : ''}/><circle cx="${f.x}" cy="${f.y + 8}" r="3.6" fill="${c === 'g' ? '#30C26B' : dim}"/>`; }
+      case 'clock': return `<g class="clock"><rect x="${f.x - 34}" y="${f.y - 14}" width="68" height="26" rx="6"/><text x="${f.x}" y="${f.y + 5}" text-anchor="middle" data-clock="1">${esc(f.text || '')}</text></g>`;
+      case 'raw': return f.svg;
+      default: return '';
+    }
+  }
+
+  // ---------- Card ----------
+  const ST = {};
+  const KEY = 'pdd-rk-' + P.key + '.v1';
+  let progress = {};
+  try { progress = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { progress = {}; }
+  const saveProgress = () => { try { localStorage.setItem(KEY, JSON.stringify(progress)); } catch (e) { /* ignore */ } };
+
+  function sceneSVG(s) {
+    const vb = s.vb || '0 0 400 260', H = +vb.split(' ')[3];
+    let bg = typeof s.bg === 'function' ? s.bg() : (s.bg || E.street());
+    const one = f => f.after ? `<g class="after">${feat(f, H)}</g>` : feat(f, H);
+    const feats = (s.feat || []).filter(f => !f.top).map(one).join('');
+    const tops = (s.feat || []).filter(f => f.top).map(one).join('');
+    const signs = (s.signs || []).map(sign).join('');
+    return `<svg class="sc" viewBox="${vb}" role="img" aria-label="${esc(s.t)}">${bg}${feats}<g class="l-res"></g><g class="l-arrows"></g>${signs}<g class="l-veh"></g><g class="l-top">${tops}</g><g class="l-bdg"></g><g class="l-paths"></g></svg>`;
+  }
+  function cardHTML(s) {
+    const g = P.groups.find(x => x.k === s.g);
+    const q = s.q || { type: 'show' };
+    let ask = '';
+    if (q.type === 'yn' || q.type === 'pick') ask = `<div class="opts${q.type === 'pick' ? ' col' : ''}">${(q.opts || ['Можно', 'Нельзя']).map((o, i) => `<button type="button" class="btn opt" data-o="${i}">${esc(o)}</button>`).join('')}</div>`;
+    if (q.type === 'order') ask = `<div class="who">${s.cars.filter(c => c.label && !c.dim).map(c => `<button type="button" data-p="${esc(c.label)}" aria-pressed="false"><i style="border-color:${c.col || COL[c.label] || '#2F80ED'}">${esc(c.label)}</i>${esc(c.what || '')}<b></b></button>`).join('')}</div><p class="hint">Ваш порядок: <span class="seq">нажмите участников по очереди</span></p><div class="act"><button type="button" class="btn primary" data-a="check" disabled>Проверить</button><button type="button" class="btn" data-a="reset">Сначала</button></div>`;
+    if (q.type === 'show') ask = `<div class="act"><button type="button" class="btn primary" data-a="show">Показать</button></div>`;
+    const answerLine = q.type === 'order' ? orderText(q) : q.type === 'show' ? '' : `Правильно: ${esc((q.opts || ['Можно', 'Нельзя'])[q.ans])}`;
+    return `<article class="card${q.type === 'show' ? ' shown' : ''}" id="card-${s.id}" data-id="${s.id}">
+      <div class="card-h"><h3>${esc(s.t)}</h3><span class="tag">${esc(g ? g.t : '')}<span class="tick" hidden>✓</span></span></div>
+      ${s.signTop ? `<div class="signtop">${s.signTop.map(e => { const ks = Array.isArray(e) ? e : [e]; return `<figure class="stk">${ks.map((k, i) => IMG[k] ? `<img class="${i ? 'pl' : 'sg'}" src="${IMG[k]}" alt="${i ? 'Табличка' : 'Знак'} ${esc(k)}">` : '').join('')}<figcaption>${esc(ks.join(' + '))}</figcaption></figure>`; }).join('')}</div>` : ''}
+      <div class="stage">${sceneSVG(s)}</div>
+      ${s.setup ? `<p class="setup">${esc(s.setup)}</p>` : ''}
+      ${q.text ? `<p class="qtext">${esc(q.text)}</p>` : ''}
+      ${ask}
+      <div class="result"${q.type === 'show' ? '' : ' hidden'}>${q.type === 'show' ? '' : '<p class="verdict"></p>'}${answerLine ? `<p class="answer">${answerLine}</p>` : ''}<p class="why">${esc(s.why || '')}</p>${s.ref ? `<p class="ref">${esc(s.ref)}</p>` : ''}${q.type === 'show' ? '' : '<div><button type="button" class="link-btn" data-a="replay">Показать ещё раз</button></div>'}</div>
+    </article>`;
+  }
+  function orderText(q) {
+    const join = a => a.length === 1 ? a[0] : a.slice(0, -1).join(', ') + ' и ' + a[a.length - 1];
+    let h = q.order.map((grp, i) => `<span class="n">${i + 1}</span>${esc(join(grp))}${grp.length > 1 ? ' одновременно' : ''}`).join(' → ');
+    if (q.stay && q.stay.length) h += `<br>Стоят: ${esc(join(q.stay))}`;
+    return h;
+  }
+
+  function el(n, a) { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); return e; }
+  function setupCard(s) {
+    const card = $('card-' + s.id), svg = card.querySelector('svg');
+    const L = { res: svg.querySelector('.l-res'), arrows: svg.querySelector('.l-arrows'), veh: svg.querySelector('.l-veh'), bdg: svg.querySelector('.l-bdg'), paths: svg.querySelector('.l-paths') };
+    const vb = (s.vb || '0 0 400 260').split(' ').map(Number);
+    const st = { s, card, svg, L, items: {}, seq: [], token: 0, W: vb[2], H: vb[3] };
+    const q = s.q || { type: 'show' };
+    const stay = new Set(q.stay || []);
+    (s.cars || []).forEach((c, idx) => {
+      const id = c.label || ('x' + idx), kind = c.kind || 'car', col = c.col || COL[c.label] || (c.dim ? COL._ : '#2F80ED');
+      const it = { c, id, kind, col };
+      if (c.path) {
+        const d = pathOf(c.path);
+        it.pe = el('path', { d, fill: 'none', stroke: 'none' }); L.paths.appendChild(it.pe);
+        it.len = it.pe.getTotalLength(); it.d1 = c.d1 != null ? c.d1 : it.len;
+        { // start no earlier than the point where the vehicle first fits inside the scene
+          const m = (HALF[kind] || 18) + 2;
+          let d = 0;
+          for (; d < it.len; d += 4) { const p = it.pe.getPointAtLength(d); if (p.x >= m && p.x <= st.W - m && p.y >= m && p.y <= st.H - m) break; }
+          it.d0 = Math.min(Math.max(c.d0 ?? 0, d < it.len ? d : 0), it.d1);
+        }
+        if (c.arrow !== false && !c.ghost && !c.dim) {
+          const pts = []; const a0 = it.d0 + (HALF[kind] || 18) + 4, a1 = Math.min(it.d1, it.d0 + (c.arrowLen || 9999));
+          for (let x = a0; x <= a1; x += 4) pts.push(it.pe.getPointAtLength(x));
+          if (pts.length > 1) {
+            const a = pts[pts.length - 1], b = pts[pts.length - 2], ang = Math.atan2(a.y - b.y, a.x - b.x);
+            L.arrows.appendChild(el('polyline', { points: pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '), class: 'arrow' + (kind === 'ped' ? ' dash' : ''), stroke: col }));
+            L.arrows.appendChild(el('polygon', { points: [[a.x + Math.cos(ang) * 6, a.y + Math.sin(ang) * 6], [a.x + Math.cos(ang + 2.4) * 9, a.y + Math.sin(ang + 2.4) * 9], [a.x + Math.cos(ang - 2.4) * 9, a.y + Math.sin(ang - 2.4) * 9]].map(p => p.map(v => v.toFixed(1)).join(',')).join(' '), fill: col, opacity: .9 }));
+          }
+        }
+      }
+      it.veh = el('g', { class: 'veh' + (c.ghost ? ' ghost' : ''), 'data-p': id }); it.veh.innerHTML = drawVeh(kind, col); L.veh.appendChild(it.veh);
+      it.bdg = el('g', { class: 'bdg' + (c.ghost ? ' ghost' : ''), 'data-p': id });
+      if (c.label && !c.dim) {
+        const tc = kind === 'amb' ? '#B8C2C9' : col;
+        it.bdg.innerHTML = `<circle r="9" fill="#fff" stroke="${tc}" stroke-width="3"/><text y="4" text-anchor="middle" font-family="Golos Text, Arial" font-weight="700" font-size="${c.label.length > 1 ? 8 : 11}" fill="#14202A">${esc(c.label)}</text>`
+          + `<g class="ans" transform="translate(14 -14)"><circle r="10" fill="#FFC72C" stroke="#14202A" stroke-width="1.5"/><text class="ans-t" y="4.5" text-anchor="middle" font-family="Fira Sans Extra Condensed, Arial" font-weight="700" font-size="13" fill="#14202A"></text></g>`
+          + `<g class="pk" transform="translate(-14 -14)"><circle r="9.5" fill="#0A87A8" stroke="#fff" stroke-width="1.5"/><text class="pk-t" y="4.5" text-anchor="middle" font-family="Fira Sans Extra Condensed, Arial" font-weight="700" font-size="12" fill="#fff"></text></g>`
+          + (stay.has(c.label) ? `<g class="xs" transform="translate(14 -14)"><circle r="10" fill="#C62A2F" stroke="#fff" stroke-width="1.5"/><path d="M-4 -4L4 4M4 -4L-4 4" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></g>` : '');
+        if (q.type === 'order') {
+          const gi = q.order.findIndex(g => g.includes(c.label));
+          if (gi >= 0) it.bdg.querySelector('.ans-t').textContent = gi + 1; else it.bdg.querySelector('.ans').remove();
+        } else { const a = it.bdg.querySelector('.ans'); if (a) a.remove(); }
+      }
+      L.bdg.appendChild(it.bdg);
+      st.items[id] = it;
+      home(it);
+    });
+    // Result overlays: green = correct manoeuvre, red dashed with a cross = forbidden one.
+    (s.res || []).forEach(r => {
+      const d = pathOf(r.p);
+      const pe = el('path', { d, class: 'resp ' + (r.ok ? 'okp' : 'nop') });
+      L.res.appendChild(pe);
+      if (!r.ok) {
+        const len = pe.getTotalLength(), m = pe.getPointAtLength(len * (r.at ?? 0.55));
+        L.res.appendChild(el('path', { d: `M${m.x - 7} ${m.y - 7}L${m.x + 7} ${m.y + 7}M${m.x + 7} ${m.y - 7}L${m.x - 7} ${m.y + 7}`, class: 'resx' }));
+      } else {
+        const len = pe.getTotalLength(), a = pe.getPointAtLength(len), b = pe.getPointAtLength(Math.max(0, len - 3)), ang = Math.atan2(a.y - b.y, a.x - b.x);
+        L.res.appendChild(el('polygon', { class: 'resh', points: [[a.x + Math.cos(ang) * 6, a.y + Math.sin(ang) * 6], [a.x + Math.cos(ang + 2.4) * 9, a.y + Math.sin(ang + 2.4) * 9], [a.x + Math.cos(ang - 2.4) * 9, a.y + Math.sin(ang - 2.4) * 9]].map(p => p.map(v => v.toFixed(1)).join(',')).join(' ') }));
+      }
+    });
+    card.querySelector('svg').addEventListener('click', e => { const t = e.target.closest('[data-p]'); if (t && q.type === 'order') pick(st, t.getAttribute('data-p')); });
+    card.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.p) pick(st, b.dataset.p);
+      if (b.dataset.o != null) answerOpt(st, +b.dataset.o);
+      const a = b.dataset.a;
+      if (a === 'check') checkOrder(st);
+      if (a === 'reset') resetCard(st);
+      if (a === 'replay' || a === 'show') play(st);
+    });
+    ST[s.id] = st;
+  }
+
+  function place(it, d) {
+    if (!it.pe) { const [x, y, deg] = it.c.at || [0, 0, 0]; it.veh.setAttribute('transform', `translate(${x} ${y}) rotate(${deg})`); it.bdg.setAttribute('transform', `translate(${x} ${y})`); return; }
+    const len = it.len, dd = Math.max(0, Math.min(len, d));
+    // Heading from a forward difference, or a backward one at the path end and just before a reversing point.
+    const q = it.pe.getPointAtLength(dd);
+    const back = dd + 2 > len || [it.c.rev, it.c.fwd].some(c => typeof c === 'number' && dd < c && dd + 2 > c);
+    const q1 = back ? it.pe.getPointAtLength(Math.max(0, dd - 2)) : q, qq = back ? q : it.pe.getPointAtLength(dd + 2);
+    let deg = Math.atan2(qq.y - q1.y, qq.x - q1.x) * 180 / Math.PI + 90;
+    let rv = it.c.rev;                   // reversing: true for the whole path, or a distance from which the car backs up
+    if (typeof rv === 'number') rv = dd >= rv && (it.c.fwd == null || dd < it.c.fwd);
+    if (rv) deg += 180;
+    if (it.kind === 'ped') deg = 0;
+    it.veh.setAttribute('transform', `translate(${q.x.toFixed(1)} ${q.y.toFixed(1)}) rotate(${deg.toFixed(1)})`);
+    it.bdg.setAttribute('transform', `translate(${q.x.toFixed(1)} ${q.y.toFixed(1)})`);
+  }
+  const home = it => { it.cur = it.d0 ?? 0; place(it, it.cur); it.veh.style.opacity = ''; it.bdg.style.opacity = ''; };
+
+  function markCard(id) { const c = $('card-' + id); const ok = progress[id] === 'ok'; c.classList.toggle('ok', ok); c.querySelector('.tick').hidden = !ok; }
+  function answerOpt(st, i) {
+    if (st.card.classList.contains('answered')) return;
+    const q = st.s.q, ok = i === q.ans;
+    st.card.querySelectorAll('.opt').forEach((b, k) => { b.disabled = true; if (k === q.ans) b.classList.add('right'); else if (k === i) b.classList.add('wrong'); });
+    progress[st.s.id] = ok ? 'ok' : 'bad'; saveProgress(); updateProgress();
+    reveal(st, ok ? 'Верно!' : 'Не так.', ok);
+  }
+  function reveal(st, msg, ok) {
+    const { card } = st;
+    card.classList.add('answered', ok ? 'r-ok' : 'r-bad');
+    const v = card.querySelector('.verdict'); if (v) v.textContent = msg;
+    card.querySelector('.result').hidden = false;
+    markCard(st.s.id);
+    play(st);
+  }
+  function updatePicks(st) {
+    const { card, seq } = st;
+    Object.values(st.items).forEach(it => { const pk = it.bdg.querySelector('.pk'); if (!pk) return; const i = seq.indexOf(it.id); pk.classList.toggle('on', i >= 0); if (i >= 0) pk.querySelector('.pk-t').textContent = i + 1; });
+    card.querySelectorAll('.who button').forEach(b => { const i = seq.indexOf(b.dataset.p); b.setAttribute('aria-pressed', String(i >= 0)); b.querySelector('b').textContent = i >= 0 ? i + 1 : ''; });
+    const s = card.querySelector('.seq'); if (s) s.textContent = seq.length ? seq.map((id, i) => `${i + 1}. ${id}`).join('  →  ') : 'нажмите участников по очереди';
+    const c = card.querySelector('[data-a="check"]'); if (c) c.disabled = seq.length === 0 || card.classList.contains('answered');
+  }
+  function pick(st, id) {
+    if (st.card.classList.contains('answered') || st.running) return;
+    if (st.seq.includes(id)) st.seq = st.seq.filter(x => x !== id); else st.seq.push(id);
+    updatePicks(st);
+    const movers = st.s.q.order.flat();
+    if (st.seq.length === movers.length && st.seq.every(x => movers.includes(x))) checkOrder(st);
+  }
+  function checkOrder(st) {
+    const q = st.s.q, seq = st.seq; if (!seq.length) return;
+    let ok = true, msg = 'Верно!';
+    const bad = seq.find(x => (q.stay || []).includes(x));
+    const movers = q.order.flat(), gi = id => q.order.findIndex(g => g.includes(id));
+    if (bad) { ok = false; msg = `Не так: ${bad} сейчас ехать нельзя.`; }
+    else if (seq.length !== movers.length || !movers.every(x => seq.includes(x))) { ok = false; msg = 'Не так: в ответе не все, кто едет.'; }
+    else for (let i = 1; i < seq.length; i++) if (gi(seq[i]) < gi(seq[i - 1])) { ok = false; msg = 'Не так: очередь другая.'; break; }
+    progress[st.s.id] = ok ? 'ok' : 'bad'; saveProgress(); updateProgress();
+    reveal(st, msg, ok);
+  }
+  function resetCard(st) {
+    st.token++; st.running = false; st.seq = [];
+    st.card.classList.remove('answered', 'r-ok', 'r-bad', 'done');
+    st.card.querySelector('.result').hidden = true;
+    st.card.querySelectorAll('.opt').forEach(b => { b.disabled = false; b.classList.remove('right', 'wrong'); });
+    Object.values(st.items).forEach(it => { home(it); const a = it.bdg.querySelector('.ans'); if (a) a.classList.remove('on'); });
+    updatePicks(st);
+  }
+
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  function play(st) {
+    const tok = ++st.token, s = st.s, q = s.q || { type: 'show' };
+    const items = Object.values(st.items);
+    items.forEach(home);
+    const clock = st.svg.querySelector('[data-clock]');
+    const clock0 = (s.feat || []).find(f => f.t === 'clock');
+    if (clock && clock0) clock.textContent = clock0.text || '';
+    let steps = s.demo || (q.order ? q.order.map(ids => ({ ids })) : [{ ids: Object.keys(st.items).filter(k => st.items[k].pe && !st.items[k].c.ghost && !st.items[k].c.dim) }]);
+    steps = steps.map(x => Array.isArray(x) ? { ids: x } : x);
+    st.card.classList.remove('done');
+    if (reduce) { steps.forEach(stp => (stp.ids || []).forEach(id => { const it = st.items[id]; if (it && it.pe) { it.cur = stp.to ?? it.d1; place(it, it.cur); } })); st.card.classList.add('done'); if (clock && steps.length) { const last = [...steps].reverse().find(x => x.clock); if (last) clock.textContent = last.clock; } return; }
+    st.running = true;
+    let gi = 0;
+    const DUR = s.dur || 1700;
+    const next = () => {
+      if (tok !== st.token) return;
+      if (gi >= steps.length) { st.running = false; st.card.classList.add('done'); return; }
+      const stp = steps[gi];
+      if (clock && stp.clock) clock.textContent = stp.clock;
+      const grp = (stp.ids || []).map(id => st.items[id]).filter(it => it && it.pe);
+      grp.forEach(it => { it.from = it.cur; it.goal = stp.to ?? it.d1; });
+      grp.forEach(it => { const a = it.bdg.querySelector('.ans'); if (a) a.classList.add('on'); });
+      const t0 = performance.now(), dur = grp.length ? (stp.dur || DUR) : (stp.dur || 600);
+      const frame = now => {
+        if (tok !== st.token) return;
+        const t = Math.min(1, (now - t0) / dur), e = ease(t);
+        grp.forEach(it => {
+          it.cur = it.from + e * (it.goal - it.from); place(it, it.cur);
+          const end = it.pe.getPointAtLength(it.goal), out = it.goal >= it.len - 1 && (end.x < -10 || end.x > st.W + 10 || end.y < -10 || end.y > st.H + 10);
+          if (out && t > .85) { const o = String(Math.max(0, 1 - (t - .85) / .15)); it.veh.style.opacity = o; it.bdg.style.opacity = o; }
+        });
+        if (t < 1) requestAnimationFrame(frame); else { gi++; setTimeout(next, stp.pause || 250); }
+      };
+      requestAnimationFrame(frame);
+    };
+    setTimeout(next, 250);
+  }
+
+  // ---------- Page ----------
+  let filter = 'all', todoOnly = false;
+  function updateProgress() {
+    const qs = P.scenes.filter(s => s.q && s.q.type !== 'show');
+    const n = qs.filter(s => progress[s.id] === 'ok').length;
+    $('okc').textContent = n; $('okt').textContent = qs.length; $('okbar').style.width = (qs.length ? 100 * n / qs.length : 0).toFixed(1) + '%';
+  }
+  function renderChips() {
+    const cnt = k => P.scenes.filter(s => s.g === k).length;
+    $('chips').innerHTML = `<button type="button" class="chip" data-f="all" aria-pressed="true">Все <span class="n">${P.scenes.length}</span></button>` + P.groups.map(g => `<button type="button" class="chip" data-f="${g.k}" aria-pressed="false">${esc(g.t)} <span class="n">${cnt(g.k)}</span></button>`).join('') + `<button type="button" class="chip todo" data-f="todo" aria-pressed="false">Ещё не решены</button>`;
+  }
+  function applyFilter() {
+    P.scenes.forEach(s => { $('card-' + s.id).hidden = !((filter === 'all' || s.g === filter) && (!todoOnly || progress[s.id] !== 'ok' || !s.q || s.q.type === 'show')); });
+    P.groups.forEach(g => { $('sec-' + g.k).hidden = !P.scenes.some(s => s.g === g.k && !$('card-' + s.id).hidden); });
+    $('chips').querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.f === 'todo' ? todoOnly : b.dataset.f === filter)));
+  }
+  function build() {
+    const n = P.scenes.length, m10 = n % 10, m100 = n % 100;
+    $('total').textContent = n + ' ' + (m10 === 1 && m100 !== 11 ? 'ситуация' : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? 'ситуации' : 'ситуаций');
+    $('list').innerHTML = P.groups.map(g => {
+      const items = P.scenes.filter(s => s.g === g.k);
+      return `<section class="sec" id="sec-${g.k}"><h2>${esc(g.t)} <small>${items.length}</small></h2>${g.rules && g.rules.length ? `<ol class="rules">${g.rules.map(r => `<li>${esc(r)}</li>`).join('')}</ol>` : ''}</section>` + items.map(cardHTML).join('');
+    }).join('');
+    P.scenes.forEach(setupCard);
+    P.scenes.forEach(s => markCard(s.id));
+    renderChips(); updateProgress(); applyFilter();
+  }
+  $('chips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; if (b.dataset.f === 'todo') todoOnly = !todoOnly; else filter = b.dataset.f; applyFilter(); });
+  $('resetp').addEventListener('click', () => { progress = {}; saveProgress(); P.scenes.forEach(s => { markCard(s.id); resetCard(ST[s.id]); }); updateProgress(); applyFilter(); });
+  window.addEventListener('beforeprint', () => P.scenes.forEach(s => { const st = ST[s.id]; st.token++; st.running = false; Object.values(st.items).forEach(home); }));
+  build();
+})();
+
+</script>
+
+</body>
+</html>

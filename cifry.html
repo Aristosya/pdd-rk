@@ -1,0 +1,1189 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Цифры ПДД РК</title>
+<meta name="description" content="Все числа из Правил дорожного движения Республики Казахстан: скорости, расстояния, возраст, люфт руля, тормоза и протектор. Фильтры, сортировка, режим самопроверки.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:wght@500;600;700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* Layout: asphalt hero with a lane line, sticky control strip, then a grid of fact cards
+   (sign or glyph + big condensed number + plain explanation + schematic + official quote). */
+:root {
+  --bg: #F2F5F7;
+  --surface: #FFFFFF;
+  --surface-2: #EAF0F3;
+  --ink: #14202A;
+  --ink-2: #33414D;
+  --muted: #5B6975;
+  --line: #D5DEE4;
+  --accent: #0A87A8;
+  --accent-text: #006C8A;
+  --accent-soft: #DCF1F6;
+  --danger: #C62A2F;
+  --warn: #E2A400;
+  --road: #2E363C;
+  --road-line: #EEF2F4;
+  --on-road: #F3F6F8;
+  --on-road-2: #AEBAC3;
+  --f-num: "Fira Sans Extra Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --f-body: "Golos Text", system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+  --r: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1317; --surface: #151D23; --surface-2: #1B252C; --ink: #E3EAEE; --ink-2: #C3CDD4;
+    --muted: #93A2AD; --line: #283540; --accent: #3BBFDB; --accent-text: #5CCBE3; --accent-soft: #0E3540;
+    --danger: #F0666B; --warn: #F2C94C; --road: #33404A; --road-line: #D9E1E6; --on-road: #F3F6F8; --on-road-2: #B5C2CB;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1317; --surface: #151D23; --surface-2: #1B252C; --ink: #E3EAEE; --ink-2: #C3CDD4;
+  --muted: #93A2AD; --line: #283540; --accent: #3BBFDB; --accent-text: #5CCBE3; --accent-soft: #0E3540;
+  --danger: #F0666B; --warn: #F2C94C; --road: #33404A; --road-line: #D9E1E6; --on-road: #F3F6F8; --on-road-2: #B5C2CB;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 15px/1.5 var(--f-body);
+  -webkit-text-size-adjust: 100%;
+}
+.wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+a { color: var(--accent-text); }
+
+/* Hero */
+.hero { background: var(--road); color: var(--on-road); position: relative; overflow: hidden; }
+.hero .wrap { padding-block: 28px 34px; display: grid; gap: 10px; }
+.kicker {
+  margin: 0; font: 600 12px/1.3 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--on-road-2);
+  display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center;
+}
+.kicker .kz { background: #00AFCA; color: #062A33; padding: 3px 8px; border-radius: 4px; letter-spacing: .06em; }
+.hero h1 {
+  margin: 0; font: 700 clamp(44px, 9vw, 92px)/.92 var(--f-num); letter-spacing: .005em; text-transform: uppercase;
+  text-wrap: balance;
+}
+.hero h1 span { color: #FFC72C; }
+.lead { margin: 0; max-width: 62ch; color: var(--on-road-2); font-size: 16px; }
+.lead b { color: var(--on-road); font-weight: 600; }
+.hero-links { margin: 0; display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; }
+.hero-links a { color: #7FDBEC; font-weight: 600; }
+.lane-line {
+  height: 6px; margin-top: 6px;
+  background: repeating-linear-gradient(90deg, var(--on-road) 0 56px, transparent 56px 96px);
+  opacity: .9;
+}
+
+/* Controls */
+.controls { background: var(--bg); border-bottom: 1px solid var(--line); z-index: 5; }
+.controls .wrap { padding-block: 12px; display: grid; gap: 10px; }
+@media (min-width: 760px) {
+  .controls { position: sticky; top: env(safe-area-inset-top, 0px); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+}
+.row1 { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.search {
+  flex: 1 1 260px; min-width: 0; display: flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; height: 42px;
+}
+.search svg { width: 18px; height: 18px; flex: none; stroke: var(--muted); fill: none; stroke-width: 2; }
+.search input { border: 0; background: transparent; outline: none; width: 100%; min-width: 0; height: 100%; font-size: 15px; }
+.search input::placeholder { color: var(--muted); }
+.search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.seg { display: inline-flex; flex-wrap: wrap; max-width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 2px; }
+.seg button {
+  border: 0; background: transparent; border-radius: 7px; padding: 0 10px; height: 34px; font-size: 13.5px; font-weight: 500;
+  color: var(--ink-2); white-space: nowrap;
+}
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.toggle {
+  height: 42px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface);
+  font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+}
+.toggle .sw { width: 30px; height: 18px; border-radius: 9px; background: var(--line); position: relative; transition: background .15s; }
+.toggle .sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--surface); transition: transform .15s; box-shadow: 0 1px 2px rgb(0 0 0 / .25); }
+.toggle[aria-pressed="true"] { border-color: var(--accent); }
+.toggle[aria-pressed="true"] .sw { background: var(--accent); }
+.toggle[aria-pressed="true"] .sw::after { transform: translateX(12px); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+@media (max-width: 759px) {
+  .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+}
+.chip {
+  flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; height: 34px; padding: 0 12px 0 10px;
+  display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); white-space: nowrap;
+}
+.chip svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.chip .n { font: 600 12px var(--f-num); color: var(--muted); font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
+.chip[aria-pressed="true"] .n { color: var(--accent-text); }
+.chip.all[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.chip.all[aria-pressed="true"] .n { color: var(--surface); opacity: .7; }
+
+/* Status line */
+.status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding-block: 14px 6px; font-size: 14px; color: var(--muted); }
+.status b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.status .sp { flex: 1 1 auto; }
+.link-btn { border: 0; background: transparent; color: var(--accent-text); font-weight: 600; padding: 4px 2px; font-size: 14px; }
+.link-btn:hover { text-decoration: underline; }
+.quizbar { display: inline-flex; gap: 10px; align-items: center; }
+
+.note {
+  margin: 8px 0 4px; padding: 12px 14px; border-radius: var(--r); background: var(--accent-soft); color: var(--ink);
+  font-size: 14px; display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; max-width: 860px;
+}
+.note svg { width: 22px; height: 22px; stroke: var(--accent-text); fill: none; stroke-width: 2; }
+.note p { margin: 0; }
+
+/* Grid */
+.grid {
+  display: grid; gap: 12px; padding-block: 8px 24px; align-items: start;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
+}
+.gh {
+  grid-column: 1 / -1; margin: 14px 0 0; padding-bottom: 6px; border-bottom: 2px dashed var(--line);
+  font: 700 15px/1.25 var(--f-num); letter-spacing: .07em; text-transform: uppercase; color: var(--muted);
+  display: flex; justify-content: space-between; gap: 12px; text-wrap: balance;
+}
+.gh:first-child { margin-top: 0; }
+.gh small { font: 600 13px var(--f-num); letter-spacing: 0; color: var(--muted); white-space: nowrap; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 10px; min-width: 0;
+}
+.card-top { display: grid; grid-template-columns: 56px 1fr; gap: 14px; align-items: center; }
+.pic { width: 56px; height: 56px; display: grid; place-items: center; }
+.pic svg { width: 56px; height: 56px; display: block; }
+.pic.glyph { background: var(--accent-soft); border-radius: 14px; color: var(--accent-text); }
+.pic.glyph svg { width: 28px; height: 28px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.val { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.q { font: 600 11px/1.2 var(--f-body); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); min-height: 13px; }
+.numline { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 6px; }
+.num { font: 700 42px/1 var(--f-num); font-variant-numeric: tabular-nums; color: var(--ink); letter-spacing: -.01em; }
+.unit { font: 600 19px/1 var(--f-num); color: var(--muted); }
+.mask {
+  display: none; height: 42px; min-width: 120px; border: 1.5px dashed var(--accent); background: var(--accent-soft); color: var(--accent-text);
+  border-radius: 10px; font: 600 14px var(--f-body); padding: 0 14px;
+}
+.title { margin: 0; font: 600 16.5px/1.3 var(--f-body); text-wrap: balance; }
+.body { display: flex; flex-direction: column; gap: 10px; }
+.plain { margin: 0; color: var(--ink-2); font-size: 14.5px; line-height: 1.5; }
+.mem { margin: 0; padding: 7px 10px; border-left: 3px solid #FFC72C; background: var(--surface-2); border-radius: 0 8px 8px 0; font-size: 13.5px; line-height: 1.45; color: var(--ink); }
+.mem b { font-weight: 600; }
+.fine { margin: 0; padding: 7px 10px; border-left: 3px solid var(--danger); background: var(--surface-2); border-radius: 0 8px 8px 0; font-size: 13.5px; line-height: 1.45; display: grid; gap: 2px; }
+.fine b { font-weight: 600; }
+.fine .art { color: var(--muted); font-size: 12.5px; }
+.scene { margin: 0; background: var(--surface-2); border-radius: 9px; padding: 8px 10px; }
+.scene svg { display: block; width: 100%; height: auto; max-height: 128px; }
+.meta { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 12.5px; color: var(--muted); }
+.ref { font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.cat { display: inline-flex; align-items: center; gap: 5px; }
+.cat::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+details { font-size: 13px; }
+summary { cursor: pointer; color: var(--accent-text); font-weight: 600; width: fit-content; padding: 2px 0; }
+blockquote {
+  margin: 6px 0 0; padding: 8px 10px; border-left: 3px solid var(--accent); background: var(--surface-2);
+  border-radius: 0 8px 8px 0; color: var(--ink-2); line-height: 1.5;
+}
+
+/* Quiz */
+body.quiz .card:not(.open) .q,
+body.quiz .card:not(.open) .numline,
+body.quiz .card:not(.open) .body { display: none; }
+body.quiz .card:not(.open) .mask { display: inline-flex; align-items: center; justify-content: center; }
+body.quiz .card.open { border-color: var(--accent); }
+.hide-btn { display: none; }
+body.quiz .card.open .hide-btn { display: inline; }
+
+.empty { text-align: center; padding: 40px 16px 60px; color: var(--muted); }
+.empty p { margin: 0 0 10px; font-size: 16px; }
+
+.foot { padding-block: 24px 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; display: grid; gap: 8px; }
+.foot p { margin: 0; max-width: 90ch; }
+.foot b { color: var(--ink-2); font-weight: 600; }
+
+/* Scenes */
+.sc .road { fill: var(--road); }
+.sc .lane { stroke: var(--road-line); stroke-width: 2; stroke-dasharray: 12 10; }
+.sc .solid { stroke: var(--road-line); stroke-width: 3; }
+.sc .walk { fill: var(--line); }
+.sc .plat { fill: var(--muted); }
+.sc .v1 { fill: var(--accent); }
+.sc .v2 { fill: var(--muted); }
+.sc .gl { fill: var(--surface); fill-opacity: .7; }
+.sc .hz { fill: #F5A623; }
+.sc .no { fill: var(--danger); fill-opacity: .22; stroke: var(--danger); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.sc .zone { fill: var(--accent); fill-opacity: .28; }
+.sc .bound { stroke: var(--ink); stroke-width: 1.3; stroke-dasharray: 3 3; fill: none; }
+.sc .zebra { fill: var(--road-line); }
+.sc .rail { stroke: var(--ink); stroke-width: 2.5; }
+.sc .sleeper { stroke: var(--muted); stroke-width: 4; }
+.sc .rope { stroke: var(--ink); stroke-width: 1.6; }
+.sc .bar { stroke: var(--ink); stroke-width: 4; }
+.sc .beam { fill: var(--warn); fill-opacity: .5; }
+.sc .ground { stroke: var(--muted); stroke-width: 2; }
+.sc .wheel { fill: var(--ink); }
+.sc .cargo { fill: var(--warn); }
+.sc .lamp { fill: var(--warn); }
+.sc .leg { stroke: var(--muted); stroke-width: 3; }
+.sc .rim { fill: none; stroke: var(--ink); stroke-width: 7; }
+.sc .hub { fill: var(--ink); }
+.sc .spoke { stroke: var(--ink); stroke-width: 5; }
+.sc .wedge { fill: var(--accent); fill-opacity: .25; stroke: var(--accent); stroke-width: 1.5; }
+.sc .blk { fill: var(--ink); }
+.sc .gauge { fill: var(--accent); }
+.sc .slope { fill: var(--line); stroke: var(--muted); stroke-width: 1.5; }
+.sc .skid { stroke: var(--ink); stroke-width: 3; stroke-opacity: .35; }
+.sc .haz { fill: var(--warn); fill-opacity: .4; }
+.sc .pole { stroke: var(--muted); stroke-width: 2.5; }
+.sc .dim line { stroke: var(--ink); stroke-width: 1.2; }
+.sc .dim polygon { fill: var(--ink); }
+.sc .dim text { fill: var(--ink); font: 600 13.5px var(--f-num); }
+.sc .dim.mute line { stroke: var(--muted); }
+.sc .dim.mute polygon { fill: var(--muted); }
+.sc .dim.mute text { fill: var(--muted); font-weight: 500; }
+.sc .dim.hl line { stroke: var(--accent-text); stroke-width: 1.6; }
+.sc .dim.hl polygon { fill: var(--accent-text); }
+.sc .dim.hl text { fill: var(--accent-text); font-weight: 700; }
+.sc .lbl { fill: var(--muted); font: 500 11px var(--f-body); }
+.sc .big { fill: var(--ink); font: 700 22px var(--f-num); }
+.sc .wl { fill: var(--accent-text); font: 700 16px var(--f-num); }
+.sc .hzt { fill: var(--ink); font: 700 18px var(--f-num); }
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle .sw, .toggle .sw::after { transition: none; }
+}
+
+/* Print: A4, two columns, answers visible */
+@media print {
+  :root:not(#x), :root[data-theme]:not(#x) {
+    --bg: #fff; --surface: #fff; --surface-2: #F1F4F6; --ink: #000; --ink-2: #1E2A33; --muted: #4B5863; --line: #C9D2D8;
+    --accent: #0A87A8; --accent-text: #00627D; --accent-soft: #E3F3F7; --danger: #C62A2F; --warn: #D79A00;
+    --road: #3A444B; --road-line: #F2F5F7; color-scheme: light;
+  }
+  @page { size: A4; margin: 11mm; }
+  body { font-size: 11px; }
+  .controls, .status, .note, .lane-line, .mask, details, .hide-btn, .hero-links { display: none; }
+  .hero { background: none; color: #000; }
+  .hero .wrap { padding: 0 0 6px; gap: 4px; }
+  .hero h1 { font-size: 28px; }
+  .hero h1 span { color: #000; }
+  .kicker, .lead { color: #333; font-size: 10.5px; }
+  .kicker .kz { background: none; padding: 0; color: #333; }
+  .lead b { color: #000; }
+  .wrap { max-width: none; padding: 0; }
+  .grid { grid-template-columns: 1fr 1fr; gap: 6px; padding: 0; }
+  .gh { margin-top: 6px; font-size: 11px; break-after: avoid; }
+  .card { break-inside: avoid; padding: 7px 9px; gap: 5px; border-radius: 6px; }
+  .card-top { grid-template-columns: 36px 1fr; gap: 8px; }
+  .pic, .pic svg { width: 36px; height: 36px; }
+  .pic.glyph svg { width: 20px; height: 20px; }
+  .num { font-size: 26px; }
+  .unit { font-size: 13px; }
+  .title { font-size: 12px; }
+  .plain { font-size: 10.5px; line-height: 1.4; }
+  .scene { padding: 3px 6px; }
+  .scene svg { max-height: 64px; }
+  .meta { font-size: 9.5px; }
+  body.quiz .card:not(.open) .q, body.quiz .card:not(.open) .body { display: block; }
+  body.quiz .card:not(.open) .numline { display: flex; }
+  .foot { font-size: 9.5px; padding: 8px 0 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker"><span class="kz">Казахстан</span><span>ПДД РК · приказ МВД № 534</span><span>сверено с adilet.zan.kz 22.10.2026</span></p>
+    <h1>Цифры <span>ПДД РК</span></h1>
+    <p class="lead">Скорости, расстояния, возраст, люфт руля, тормозной путь и протектор: <b id="total">все</b> из Правил, с пунктом и официальным текстом. Отфильтруйте тему, отсортируйте по числу или закройте ответы и проверьте себя.</p>
+    <p class="hero-links"><a href="./">Все тренажёры</a><a href="perekrestki.html">Перекрёстки →</a><a href="znaki.html">Знаки и разметка →</a><a href="kolca.html">Кольца →</a><a href="razvoroty.html">Развороты и перестроения →</a><a href="stoyanka.html">Стоянка и остановка →</a></p>
+    <div class="lane-line" aria-hidden="true"></div>
+  </div>
+</header>
+
+<section class="controls" aria-label="Фильтры и сортировка">
+  <div class="wrap">
+    <div class="row1">
+      <label class="search" for="q">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="q" type="search" placeholder="Поиск: переезд, трос, протектор, 12 лет" autocomplete="off" aria-label="Поиск по шпаргалке">
+      </label>
+      <div class="seg" role="group" aria-label="Сортировка">
+        <button type="button" id="sort-pdd" data-sort="pdd" aria-pressed="true">По пунктам ПДД</button>
+        <button type="button" id="sort-asc" data-sort="asc" aria-pressed="false">↑ Меньше</button>
+        <button type="button" id="sort-desc" data-sort="desc" aria-pressed="false">↓ Больше</button>
+        <button type="button" id="sort-twins" data-sort="twins" aria-pressed="false">Близнецы</button>
+      </div>
+      <button type="button" class="toggle" id="quiz" aria-pressed="false"><span class="sw" aria-hidden="true"></span>Проверь себя</button>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Темы"></div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="status" aria-live="polite">
+    <span id="count"></span>
+    <span class="quizbar" id="quizbar" hidden>
+      <button type="button" class="link-btn" id="shuffle">Перемешать</button>
+      <button type="button" class="link-btn" id="closeall">Закрыть ответы</button>
+    </span>
+    <span class="sp"></span>
+    <button type="button" class="link-btn" id="reset" hidden>Сбросить фильтры</button>
+    <button type="button" class="link-btn" id="print" hidden>Печать A4</button>
+  </div>
+  <aside class="note" id="note" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>
+    <p>Люфт педалей ПДД РК не нормируют. В Перечне неисправностей есть суммарный люфт руля, тормозной путь, стояночный тормоз, утечка воздуха из пневмопривода и протектор шин.</p>
+  </aside>
+  <main class="grid" id="grid"></main>
+  <div class="empty" id="empty" hidden>
+    <p>По этому запросу ничего нет.</p>
+    <button type="button" class="link-btn" id="reset2">Сбросить поиск и фильтры</button>
+  </div>
+</div>
+
+<footer class="wrap foot">
+  <p><b>Источник.</b> Приказ Министра внутренних дел РК от 30 июня 2023 года № 534: Правила дорожного движения, Основные положения по допуску транспортных средств к эксплуатации и Перечень неисправностей. Текст с изменениями по приказу № 305 от 27.04.2026, <a href="https://adilet.zan.kz/rus/docs/V2300033003" target="_blank" rel="noopener">adilet.zan.kz</a>.</p>
+  <p><b>Основа выборки:</b> <a href="http://zarul.kz/pdd/1" target="_blank" rel="noopener">zarul.kz/pdd</a>. Где сайт отстаёт от официального текста, шпаргалка берёт официальную редакцию: пункт 73 изменён 10.11.2025, запрет возить детей до 12 лет на заднем сиденье мотоцикла (п. 157) исключён с 05.04.2025.</p>
+  <p><b>Штрафы.</b> По Кодексу РК об административных правонарушениях, ст. 590–615 (редакция на 04.10.2026, <a href="https://adilet.zan.kz/rus/docs/K1400000235" target="_blank" rel="noopener">adilet.zan.kz</a>). МРП в 2026 году — 4 325 ₸ (Закон о республиканском бюджете № 239-VIII от 08.12.2025, ст. 7). Штраф указан только там, где статья однозначна. Повторное нарушение в течение года наказывается строже.</p>
+  <p>Знаки на конкретном участке задают свой лимит в пределах этих цифр. Перед экзаменом сверьтесь с действующей редакцией на adilet.zan.kz.</p>
+</footer>
+
+<script>
+(() => {
+  const CATS = [
+    ['speed', 'Скорость'],
+    ['overtake', 'Обгон и манёвры'],
+    ['stop', 'Остановка и стоянка'],
+    ['signs', 'Знаки и аварийка'],
+    ['light', 'Свет и видимость'],
+    ['tow', 'Буксировка'],
+    ['people', 'Пассажиры и дети'],
+    ['cargo', 'Груз'],
+    ['tech', 'Техсостояние'],
+    ['rail', 'Переезды и магистрали'],
+    ['bike', 'Велосипед, самокат, мопед'],
+    ['other', 'Термины и прочее']
+  ];
+  const CAT_LABEL = Object.fromEntries(CATS);
+
+  const CH = {
+    g1: 'Глава 1. Общие положения',
+    g2: 'Глава 2. Общие обязанности водителей',
+    g7: 'Глава 7. Аварийная сигнализация и знак аварийной остановки',
+    g8: 'Глава 8. Маневрирование',
+    g9: 'Глава 9. Расположение на проезжей части',
+    g10: 'Глава 10. Скорость движения',
+    g11: 'Глава 11. Обгон',
+    g12: 'Глава 12. Остановка и стоянка',
+    g15: 'Глава 15. Железнодорожные переезды',
+    g16: 'Глава 16. Автомагистрали',
+    g17: 'Глава 17. Жилые зоны',
+    g19: 'Глава 19. Световые приборы',
+    g20: 'Глава 20. Буксировка',
+    g22: 'Глава 22. Перевозка пассажиров',
+    g23: 'Глава 23. Перевозка грузов',
+    g24: 'Глава 24. Велосипеды, самокаты, мопеды, животные',
+    g25: 'Глава 25. Водители с инвалидностью',
+    g26: 'Глава 26. Движение в колонне',
+    z1: 'Приложение 1. Дорожные знаки',
+    op: 'Основные положения по допуску ТС',
+    pn: 'Перечень неисправностей'
+  };
+
+  // n: sort key, v: shown value, u: unit, q: qualifier, t: title, p: plain words,
+  // r: rule reference, x: official text, c: categories, s: sign, sc: scene, ch: chapter
+  const F = [
+    // Глава 1
+    { n: 5, v: '5', u: 'мин', q: 'до', t: 'Остановка или уже стоянка', ch: 'g1', c: ['stop', 'other'], s: 'noPark',
+      p: 'До 5 минут машина стоит на остановке. Дольше уже стоянка, если вы не сажаете пассажиров и не грузите вещи. От этого зависит, нарушаете вы знак 3.27 или 3.28.',
+      r: 'п. 2, пп. 7 и 58', x: 'остановка - преднамеренное прекращение движения транспортного средства на время до пяти минут либо на большее время, если это необходимо для посадки или высадки пассажиров, загрузки или разгрузки транспортного средства' },
+    { n: 300, v: '300', u: 'м', q: 'менее', t: 'Недостаточная видимость', ch: 'g1', c: ['light', 'other'],
+      p: 'Туман, дождь, снег, пыль или сумерки, и дорогу видно меньше чем на 300 м. Включайте фары и габариты. Задний противотуманный фонарь разрешён только в таких условиях.',
+      r: 'п. 2, пп. 21; п. 136', x: 'недостаточная видимость - видимость дороги менее 300 метров в условиях тумана, дождя, пыли, снегопада и тому подобного, а также в сумерки' },
+    { n: 100, v: '100', u: 'м', q: 'менее', t: 'Ограниченная видимость', ch: 'g1', c: ['light', 'overtake', 'other'],
+      p: 'Обзор закрывает подъём, поворот, деревья или здания, и вперёд видно меньше 100 м. Здесь запрещены обгон с выездом на встречку, разворот и остановка на проезжей части.',
+      r: 'п. 2, пп. 64', x: 'ограниченная видимость – видимость водителем дороги менее 100 метров в направлении движения, ограниченная рельефом местности, геометрическими параметрами дороги, растительностью, строениями, сооружениями или иными объектами, в том числе транспортными средствами' },
+    { n: 10, v: '10', u: 'м', q: 'от рельса', t: 'Граница железнодорожного переезда', ch: 'g1', c: ['rail', 'other'], s: 'rail', sc: 'rail:10',
+      p: 'Переезд начинается за 10 м до ближайшего рельса. Запреты «на переезде» действуют уже с этой линии.',
+      r: 'п. 2, пп. 57', x: 'железнодорожный переезд - пересечение дороги с железнодорожными путями на одном уровне. Границей переезда является участок дороги, ограниченный воображаемой линией на расстоянии 10 метров от ближайшего рельса' },
+    { n: 150, v: '150 / 400', u: 'м', q: 'виден за', t: 'Светоотражающий элемент', ch: 'g1', c: ['light', 'bike'],
+      p: 'Водитель должен заметить светоотражатель за 150 м при ближнем свете и за 400 м при дальнем. Велосипедисту и самокатчику он нужен в тёмное время на проезжей части.',
+      r: 'п. 2, пп. 18-1; п. 171', x: 'светоотражающий предмет – предмет, изготовленный из специальных материалов, обладающих способностью возвращать луч света обратно к источнику, обеспечивающий видимость водителя на расстоянии ста пятидесяти метров при включенном ближнем свете фар и четырехсот при включенном дальнем свете фар' },
+    { n: 50, v: '50', u: 'см³', q: 'до', t: 'Мопед: объём двигателя', ch: 'g1', c: ['bike', 'other'],
+      p: 'Мопед — это двигатель до 50 см³ или электромотор и скорость по паспорту не выше 50 км/ч. Скутер с объёмом больше 50 см³ по правилам считается мотоциклом.',
+      r: 'п. 2, пп. 50 и 51', x: 'мопед – двух- или трехколесное механическое транспортное средство, снабженное двигателем внутреннего сгорания с объемом двигателя, не превышающим пятидесяти кубических сантиметров, либо электрическим двигателем и имеющее максимальную конструктивную скорость не более пятидесяти километров в час' },
+    { n: 400, v: '400', u: 'кг', q: 'до', t: 'Трицикл и квадроцикл приравнены к мотоциклу', ch: 'g1', c: ['other', 'bike'],
+      p: 'Трёх- и четырёхколёсная техника массой без груза до 400 кг по правилам считается мотоциклом.',
+      r: 'п. 2, пп. 51', x: 'К мотоциклам приравниваются трех- и четырехколесные транспортные средства, вес которых без нагрузки не превышает четырехсот килограммов, скутеры с объемом цилиндра, превышающим пятьдесят кубических сантиметров' },
+    { n: 25, v: '25', u: 'км/ч', q: 'до', t: 'Электросамокат: скорость по паспорту', ch: 'g1', c: ['bike', 'speed'], s: 'bike',
+      p: 'Электросамокат по правилам — транспорт без сиденья с максимальной конструктивной скоростью до 25 км/ч.',
+      r: 'п. 2, пп. 67', x: 'электрический самокат – транспортное средство индивидуальной мобильности, имеющее два или три колеса, предназначенное для передвижения одного человека посредством использования электрического двигателя (электрических двигателей), не имеющее сиденья, с максимальной конструктивной скоростью не более двадцати пяти километров в час' },
+    { n: 3, v: '3', u: 'машины', q: 'от', t: 'Организованная колонна', ch: 'g1', c: ['other'],
+      p: 'Три и больше машин подряд в одной полосе, с включёнными фарами, за головной машиной с синим или сине-красным маячком.',
+      r: 'п. 2, пп. 63', x: 'организованная транспортная колонна - группа из трех и более механических транспортных средств, следующих непосредственно друг за другом по одной и той же полосе движения с постоянно включенными фарами в сопровождении головного транспортного средства с включенным проблесковым маячком синего цвета или маячками синего и красного цветов' },
+
+    // Глава 2
+    { n: 7, v: '7', u: 'лет', q: 'до', t: 'Легковой без техосмотра', ch: 'g2', c: ['tech', 'other'],
+      p: 'Легковой автомобиль (категория M1) не старше 7 лет, считая год выпуска, ездит без обязательного техосмотра. Правило не действует, если машина работает в бизнесе автоперевозок.',
+      r: 'п. 12, пп. 3', x: 'управлять неисправным транспортным средством, транспортным средством, не прошедшим обязательный технический осмотр, за исключением транспортных средств категорий M1, возраст которых не превышает семи лет, включая год выпуска, не используемых в предпринимательской деятельности в сфере автомобильного транспорта' },
+    { n: 50, v: '50', u: 'см', q: 'до', t: 'Груз на мотоцикле или мопеде', ch: 'g2', c: ['cargo', 'bike'],
+      p: 'Груз может выступать за габарит мотоцикла или мопеда максимум на 50 см по длине или ширине и не должен мешать управлению.',
+      r: 'п. 12, пп. 14', x: 'перевозить на мотоциклах или мопедах, а также на специальных приспособлениях груз, который выступает более чем на пятьдесят сантиметров по длине или ширине за их габариты, или груз, мешающий управлению' },
+
+    // Глава 7
+    { n: 15, v: '15', u: 'м', q: 'не ближе', t: 'Знак аварийной остановки в населённом пункте', ch: 'g7', c: ['signs'], s: 'emerg', sc: 'tri:15',
+      p: 'Ставьте треугольник минимум в 15 м от машины, со стороны наибольшей опасности. На повороте или в темноте отнесите дальше, чтобы водители успели его заметить.',
+      r: 'п. 45', x: 'Знак аварийной остановки (или мигающий красный фонарь) устанавливается на расстоянии, обеспечивающем в конкретной обстановке своевременное предупреждение других водителей об опасности на расстоянии не менее пятнадцати метров от транспортного средства в населенных пунктах и тридцати метров вне населенных пунктов.' },
+    { n: 30, v: '30', u: 'м', q: 'не ближе', t: 'Знак аварийной остановки за городом', ch: 'g7', c: ['signs'], s: 'emerg', sc: 'tri:30',
+      p: 'Вне населённого пункта минимум 30 м. Знак выставляют сразу после включения аварийки: при ДТП и при вынужденной остановке там, где стоять запрещено.',
+      r: 'п. 45', x: 'Знак аварийной остановки (или мигающий красный фонарь) устанавливается на расстоянии, обеспечивающем в конкретной обстановке своевременное предупреждение других водителей об опасности на расстоянии не менее пятнадцати метров от транспортного средства в населенных пунктах и тридцати метров вне населенных пунктов.' },
+    { n: 100, v: '100', u: 'м', q: 'обзор менее', t: 'Когда аварийный знак нужен даже с аварийкой', ch: 'g7', c: ['signs', 'light'], s: 'emerg',
+      p: 'Если вы вынужденно встали там, где дорогу видно меньше чем на 100 м хотя бы в одну сторону, выставьте знак аварийной остановки, даже когда аварийка мигает.',
+      r: 'п. 45, пп. 2', x: 'После включения аварийной световой сигнализации, а также при ее неисправности или отсутствии незамедлительно выставляет на проезжей части дороги со стороны наибольшей опасности знак аварийной остановки (или мигающий красный фонарь) при: ... вынужденной остановке в местах, где она запрещена, или местах с видимостью дороги менее ста метров хотя бы в одном направлении.' },
+
+    // Глава 8
+    { n: 100, v: '100', u: 'м', q: 'обзор менее', t: 'Разворот при плохом обзоре', ch: 'g8', c: ['overtake'],
+      p: 'Разворачиваться нельзя, если дорогу видно меньше чем на 100 м. Ещё разворот запрещён на переходах, в тоннелях, на мостах и под ними, на переездах и у остановок.',
+      r: 'п. 58', x: 'Разворот запрещается: 1) на пешеходных переходах и перекрестках по линии тротуаров или обочин; 2) в тоннелях; 3) на мостах, путепроводах, эстакадах и под ними; 4) на железнодорожных переездах; 5) в местах с видимостью дороги менее ста метров; 6) в местах расположения остановочных пунктов.' },
+
+    // Глава 9
+    { n: 4, v: '4', u: 'полосы', q: 'от', t: 'Встречка на широкой дороге', ch: 'g9', c: ['overtake'],
+      p: 'На двусторонней дороге с 4 и более полосами выезжать на встречную сторону нельзя. Налево и на разворот поворачивайте на перекрёстках и там, где это разрешено.',
+      r: 'п. 61', x: 'На дорогах с двусторонним движением, имеющих четыре полосы или более, запрещается выезд на сторону дороги, предназначенную для встречного движения.' },
+    { n: 3, v: '3', u: 'полосы', q: 'ровно', t: 'Трёхполосная дорога', ch: 'g9', c: ['overtake'],
+      p: 'На двусторонней дороге с 3 полосами в крайнюю левую не выезжайте: она для встречных машин.',
+      r: 'п. 62', x: 'На дорогах с двусторонним движением, имеющих три полосы, выезжать на крайнюю левую полосу, предназначенную для встречного движения запрещается.' },
+    { n: 80, v: '80', u: 'км/ч', q: 'лимит выше', t: 'Держитесь правее', ch: 'g9', c: ['overtake', 'speed'],
+      p: 'За городом и там, где разрешено быстрее 80 км/ч, держитесь ближе к правому краю. Левые полосы при свободных правых не занимайте.',
+      r: 'п. 63', x: 'Вне населенных пунктов, а также в населенных пунктах на дорогах, обозначенных знаками 5.1 и 5.3 согласно приложению 1 к настоящим Правилам, или где разрешено движение со скоростью более 80 км/ч, водители транспортных средств ведут их ближе к правому краю проезжей части дороги, при этом не занимая левые полосы движения при свободных правых.' },
+    { n: 3, v: '3', u: 'полосы', q: 'в одну сторону от', t: 'Крайняя левая полоса', ch: 'g9', c: ['overtake'],
+      p: 'Если в вашу сторону 3 полосы и больше, в крайнюю левую заезжайте только в плотном потоке, для обгона, поворота налево или разворота. Грузовику тяжелее 3,5 т туда можно только для поворота налево и разворота.',
+      r: 'п. 63', x: 'На любых дорогах, имеющих для движения в данном направлении три полосы и более, занимать крайнюю левую полосу разрешается только при интенсивном движении, когда заняты другие полосы, а также для обгона, поворота налево или разворота, а грузовым автомобилям с разрешенной максимальной массой более трех тысяч пятьсот килограмм - только для поворота налево или разворота.' },
+    { n: 40, v: '40', u: 'км/ч', q: 'не быстрее', t: 'Медленным — правая полоса', ch: 'g9', c: ['speed', 'overtake'],
+      p: 'Если вы едете не быстрее 40 км/ч или машина быстрее не может, держитесь крайней правой полосы. Левее можно для объезда, обгона и поворота налево.',
+      r: 'п. 64', x: 'Транспортные средства, скорость движения которых не превышает 40 км/ч или которые по техническим причинам не развивают такую скорость, двигаются по крайней правой полосе, предназначенной для движения данного транспортного средства в нужном ему направлении, кроме случаев объезда, обгона, перестроения перед поворотом налево, разворотом или остановкой (стоянкой) в разрешенных случаях на левой стороне дороги.' },
+    { n: 7, v: '7', u: 'м', q: 'длиннее', t: 'Длинная машина пропускает обгоняющих', ch: 'g9', c: ['overtake'],
+      p: 'За городом на двухполосной дороге машина или состав длиннее 7 м держит дистанцию, в которую обгоняющий может перестроиться перед ней.',
+      r: 'п. 70', x: 'Вне населенных пунктов на дорогах с двусторонним движением, имеющих две полосы, водители транспортных средств, для которых установлено ограничение скорости, а также транспортных средств (состава транспортных средств) длиной более семи метров поддерживают между своим и движущимся впереди транспортным средством такую дистанцию, чтобы обгоняющие их транспортные средства могли без помех перестроиться на ранее занимаемую ими полосу.' },
+
+    // Глава 10
+    { n: 60, v: '60', u: 'км/ч', q: 'не более', t: 'В населённом пункте', ch: 'g10', c: ['speed'], s: 'speed:60',
+      p: 'Базовый лимит в городе и посёлке для легковых и мотоциклов. Знаки могут поднять его, но максимум до 90 км/ч.',
+      r: 'п. 73, пп. 1', x: 'транспортных средств со скоростью не более 60 км/ч, за исключением специальных режимов движения, установленных соответствующими дорожными знаками, но не более 90 км/ч' },
+    { n: 90, v: '90', u: 'км/ч', q: 'не более', t: 'Максимум в городе по знаку', ch: 'g10', c: ['speed'], s: 'speed:90',
+      p: 'Даже если знаки разрешают ехать быстрее 60, в населённом пункте предел 90 км/ч.',
+      r: 'п. 73, пп. 1', x: 'транспортных средств со скоростью не более 60 км/ч, за исключением специальных режимов движения, установленных соответствующими дорожными знаками, но не более 90 км/ч' },
+    { n: 50, v: '50', u: 'км/ч', q: 'не более', t: 'Автобусы и грузовики в городе', ch: 'g10', c: ['speed'], s: 'speed:50',
+      p: 'В населённом пункте автобус и грузовой автомобиль едут не быстрее 50 км/ч.',
+      r: 'п. 73, пп. 2', x: 'автобусов, грузовых автомобилей со скоростью не более 50 км/ч' },
+    { n: 20, v: '20', u: 'км/ч', q: 'не более', t: 'Жилая зона и двор', ch: 'g10', c: ['speed', 'stop'], s: 'zone',
+      p: 'Во дворах и в зоне знака 5.38. Пешеходы здесь ходят и по проезжей части и имеют преимущество. Сигналить и стоять с работающим двигателем нельзя.',
+      r: 'п. 73, пп. 3; п. 122', x: 'транспортных средств в жилых зонах и дворовых территориях со скоростью не более 20 км/ч' },
+    { n: 140, v: '140', u: 'км/ч', q: 'не более', t: 'Легковые и мотоциклы на автомагистрали', ch: 'g10', c: ['speed', 'rail'], s: 'speed:140',
+      p: 'На автомагистрали скорость задаёт знак 3.24, но выше 140 км/ч он её поднять не может.',
+      r: 'п. 74, пп. 1', x: 'легковым автомобилям и мотоциклам на автомагистралях - со скоростью, не превышающей, установленной соответствующим дорожным знаком 3.24 согласно приложению 1 к настоящим Правилам, но не более 140 км/час, на дорогах, имеющих разделительную полосу, - не более 110 км/час, на остальных дорогах - не более 100 км/час' },
+    { n: 110, v: '110', u: 'км/ч', q: 'не более', t: 'Легковые на дороге с разделительной полосой', ch: 'g10', c: ['speed'], s: 'speed:110',
+      p: 'Загородная дорога, где встречные потоки разделяет газон, отбойник или бордюр. Разметка разделительной полосой не считается.',
+      r: 'п. 74, пп. 1', x: 'легковым автомобилям и мотоциклам ... на дорогах, имеющих разделительную полосу, - не более 110 км/час' },
+    { n: 100, v: '100', u: 'км/ч', q: 'не более', t: 'Легковые на остальных загородных дорогах', ch: 'g10', c: ['speed'], s: 'speed:100',
+      p: 'Обычная трасса без разделительной полосы. Лимит для легковых и мотоциклов.',
+      r: 'п. 74, пп. 1', x: 'легковым автомобилям и мотоциклам ... на остальных дорогах - не более 100 км/час' },
+    { n: 110, v: '110', u: 'км/ч', q: 'не более', t: 'Грузовики до 3,5 т и микроавтобусы на автомагистрали', ch: 'g10', c: ['speed', 'rail'], s: 'speed:110',
+      p: 'Касается грузовиков до 3,5 т, междугородних автобусов и микроавтобусов.',
+      r: 'п. 74, пп. 2', x: 'грузовым автомобилям с разрешенной максимальной массой не более трех тысяч пятьсот килограмм, междугородним автобусам, микроавтобусам на автомагистралях - не более 110 км/ч' },
+    { n: 100, v: '100', u: 'км/ч', q: 'не более', t: 'Грузовики до 3,5 т и микроавтобусы: разделительная полоса', ch: 'g10', c: ['speed'], s: 'speed:100',
+      p: 'Та же группа машин на загородной дороге с разделительной полосой.',
+      r: 'п. 74, пп. 2', x: '... на дорогах, имеющих разделительную полосу, - не более 100 км/час' },
+    { n: 90, v: '90', u: 'км/ч', q: 'не более', t: 'Грузовики до 3,5 т и микроавтобусы: обычная трасса', ch: 'g10', c: ['speed'], s: 'speed:90',
+      p: 'Та же группа машин на остальных дорогах вне населённых пунктов.',
+      r: 'п. 74, пп. 2', x: '... на остальных дорогах - не более 90 км/час' },
+    { n: 90, v: '90', u: 'км/ч', q: 'не более', t: 'Автобусы, легковые с прицепом, грузовики тяжелее 3,5 т на автомагистрали', ch: 'g10', c: ['speed', 'rail', 'people'], s: 'speed:90',
+      p: 'Сюда же относятся автобусы с организованными группами детей.',
+      r: 'п. 74, пп. 3', x: 'другим автобусам, в том числе осуществляющим организованные перевозки групп детей, легковым автомобилям при буксировке прицепа, грузовым автомобилям с разрешенной максимальной массой более трех тысяч пятьсот килограмм на автомагистралях - не более 90 км/ч' },
+    { n: 80, v: '80', u: 'км/ч', q: 'не более', t: 'Автобусы, с прицепом, тяжёлые грузовики: разделительная полоса', ch: 'g10', c: ['speed'], s: 'speed:80',
+      p: 'Та же группа машин на загородной дороге с разделительной полосой.',
+      r: 'п. 74, пп. 3', x: '... на дорогах, имеющих разделительную полосу, - не более 80 км/час' },
+    { n: 70, v: '70', u: 'км/ч', q: 'не более', t: 'Автобусы, с прицепом, тяжёлые грузовики: обычная трасса', ch: 'g10', c: ['speed'], s: 'speed:70',
+      p: 'Та же группа машин на остальных дорогах вне населённых пунктов.',
+      r: 'п. 74, пп. 3', x: '... на остальных дорогах - не более 70 км/час' },
+    { n: 60, v: '60', u: 'км/ч', q: 'не более', t: 'Люди в кузове грузовика', ch: 'g10', c: ['speed', 'people'], s: 'speed:60',
+      p: 'С пассажирами в кузове грузового автомобиля не быстрее 60 км/ч на любой дороге.',
+      r: 'п. 75, пп. 1', x: '60 км/ч - при перевозке пассажиров в кузове грузового автомобиля' },
+    { n: 50, v: '50', u: 'км/ч', q: 'не более', t: 'Буксировка', ch: 'g10', c: ['speed', 'tow'], s: 'speed:50',
+      p: 'Когда тянете другую машину, быстрее 50 км/ч ехать нельзя, в городе и за городом.',
+      r: 'п. 75, пп. 2', x: '50 км/ч - при буксировке механических транспортных средств' },
+
+    // Глава 11
+    { n: 100, v: '100', u: 'м', q: 'ближе', t: 'Обгон перед ж/д переездом', ch: 'g11', c: ['overtake', 'rail'], s: 'noOver', sc: 'rail:100',
+      p: 'Обгонять запрещено на самом переезде и ближе 100 м перед ним.',
+      r: 'п. 81, пп. 4', x: 'Обгон запрещен: ... 4) на железнодорожных переездах и ближе ста метров перед ними' },
+
+    // Глава 12
+    { n: 3.5, v: '3,5', u: 'т', q: 'тяжелее', t: 'Левая сторона дороги с односторонним движением', ch: 'g12', c: ['stop'],
+      p: 'В населённом пункте на дороге с односторонним движением машину можно поставить и слева. Грузовик тяжелее 3,5 т слева только останавливается под погрузку или разгрузку.',
+      r: 'п. 84', x: 'На левой стороне дороги остановка и стоянка допускаются в населенных пунктах на дорогах с одной полосой движения для каждого направления без трамвайных путей посередине и дорогах с односторонним движением (грузовым автомобилям с разрешенной максимальной массой более 3,5 тонн на левой стороне дорог с односторонним движением допускается лишь остановка для загрузки или разгрузки).' },
+    { n: 3, v: '3', u: 'полосы', q: 'менее', t: 'Остановка на мосту и эстакаде', ch: 'g12', c: ['stop'], s: 'noStop',
+      p: 'На мосту, эстакаде или путепроводе остановка запрещена, если в вашу сторону меньше 3 полос. Под ними останавливаться нельзя при любом числе полос, стоянка на них запрещена всегда.',
+      r: 'п. 87, пп. 3; п. 88, пп. 2', x: 'на эстакадах, мостах, путепроводах (если для движения в данном направлении имеется менее трех полос) и под ними (независимо от количества полос)' },
+    { n: 3, v: '3', u: 'м', q: 'менее', t: 'До сплошной линии разметки', ch: 'g12', c: ['stop'], s: 'noStop', sc: 'solid3',
+      p: 'Не останавливайтесь, если между вашей машиной и сплошной линией (или противоположным краем дороги, или машиной у того края) остаётся меньше 3 м и вы мешаете проезду.',
+      r: 'п. 87, пп. 4', x: 'в местах, где расстояние между остановившимся транспортным средством и сплошной линией разметки (кроме обозначающей край проезжей части дороги) или противоположным краем проезжей части дороги, или стоящим у противоположного края проезжей части дороги транспортным средством меньше трех метров, если это создает помехи движению транспортных средств' },
+    { n: 5, v: '5', u: 'м', q: 'ближе', t: 'Перед пешеходным переходом', ch: 'g12', c: ['stop'], s: 'cross', sc: 'zebra',
+      p: 'Остановка запрещена на пешеходном переходе и ближе 5 м перед ним. Правило про 5 м касается только места перед переходом.',
+      r: 'п. 87, пп. 5', x: 'на пешеходных переходах и ближе пяти метров перед ними' },
+    { n: 100, v: '100', u: 'м', q: 'обзор менее', t: 'У опасного поворота и за гребнем подъёма', ch: 'g12', c: ['stop'], s: 'noStop',
+      p: 'Не вставайте на проезжей части у опасного поворота или на переломе дороги, если её видно меньше чем на 100 м хотя бы в одну сторону.',
+      r: 'п. 87, пп. 6', x: 'на проезжей части дороги вблизи опасных поворотов и выпуклых переломов продольного профиля дороги при видимости дороги менее ста метров хотя бы в одном направлении' },
+    { n: 30, v: '30', u: 'м', q: 'ближе', t: 'От края пересекаемой дороги', ch: 'g12', c: ['stop'], s: 'noStop', sc: 'cross30',
+      p: 'Остановка запрещена на перекрёстке и ближе 30 м от края пересекаемой проезжей части. Исключение — сторона напротив примыкания на Т-образном перекрёстке со сплошной линией или разделительной полосой.',
+      r: 'п. 87, пп. 7', x: 'на пересечении проезжих частей дорог и ближе тридцати метров от края пересекаемой проезжей части дороги, за исключением стороны напротив бокового проезда трехсторонних пересечений (перекрестков), имеющих сплошную линию разметки или разделительную полосу' },
+    { n: 15, v: '15', u: 'м', q: 'ближе', t: 'У остановки автобуса или такси', ch: 'g12', c: ['stop'], s: 'bus', sc: 'bus15',
+      p: 'Ближе 15 м к остановочной площадке, а без площадки к табличке остановки, вставать нельзя. Автобусам категорий M2 и M3 можно.',
+      r: 'п. 87, пп. 7', x: 'на остановочных площадках и ближе пятнадцати метров к ним, а при их отсутствии - ближе пятнадцати метров от указателя остановки маршрутных транспортных средств или такси, за исключением транспортных средств категории М2 и М3' },
+    { n: 50, v: '50', u: 'м', q: 'ближе', t: 'Стоянка у ж/д переезда', ch: 'g12', c: ['stop', 'rail'], s: 'noPark', sc: 'rail:50',
+      p: 'Оставлять машину на стоянку ближе 50 м от переезда нельзя. Короткая остановка здесь разрешена, кроме самого переезда.',
+      r: 'п. 88, пп. 4', x: 'Стоянка запрещается: ... 4) ближе пятидесяти метров от железнодорожных переездов' },
+
+    // Глава 15
+    { n: 8, v: '8', u: 'км/ч', q: 'медленнее', t: 'Тихоходная техника на переезде', ch: 'g15', c: ['rail', 'speed'], s: 'rail',
+      p: 'Технику, которая едет медленнее 8 км/ч, и тракторные сани-волокуши через переезд перегоняют только с разрешения начальника дистанции пути.',
+      r: 'п. 115', x: 'перемещать через железнодорожный переезд в нетранспортном положении сельскохозяйственные, дорожные, строительные и другие машины и механизмы без разрешения начальника дистанции пути железной дороги, движение тихоходных машин, скорость которых менее 8 км/ч, а также тракторных саней-волокуш' },
+    { n: 1000, v: '1000', u: 'м', q: 'в обе стороны', t: 'Машина встала на переезде', ch: 'g15', c: ['rail'], s: 'rail',
+      p: 'Высадите пассажиров и освобождайте переезд. Если есть люди, отправьте двоих вдоль путей на 1000 м в обе стороны, одного — в сторону худшего обзора. Сигнал машинисту: круговое движение рукой.',
+      r: 'п. 117', x: 'при имеющейся возможности послать двух человек вдоль путей в обе стороны от переезда на одну тысячу метров (если одного, то в сторону худшей видимости пути), объяснив им правила подачи сигнала остановки машинисту приближающегося поезда (локомотива, дрезины)' },
+    { n: 4, v: '1 + 3', u: 'гудка', q: 'серия', t: 'Сигнал общей тревоги', ch: 'g15', c: ['rail'],
+      p: 'Один длинный и три коротких гудка, сериями. Подавайте его, оставаясь у машины, застрявшей на переезде.',
+      r: 'п. 117', x: 'Сигналом общей тревоги служат серии из одного длинного и трех коротких звуковых сигналов.' },
+
+    // Глава 16
+    { n: 40, v: '40', u: 'км/ч', q: 'не может ехать', t: 'Кому нельзя на автомагистраль', ch: 'g16', c: ['rail', 'speed'],
+      p: 'На автомагистраль нельзя пешеходам, велосипедам, мопедам, тракторам и любому транспорту, который не разгоняется до 40 км/ч. Учебная езда там тоже запрещена.',
+      r: 'п. 118, пп. 1', x: 'нахождение пешеходов, а также домашних животных вне транспортного средства, управлять велосипедами, мопедами, тракторами и самоходными машинами, а также иными транспортными средствами, скорость которых по технической характеристике или их состоянию меньше 40 км/ч' },
+    { n: 2, v: '2', u: 'полоса', q: 'не левее', t: 'Грузовики на автомагистрали', ch: 'g16', c: ['rail', 'overtake'],
+      p: 'Грузовик тяжелее 3,5 т на автомагистрали не заезжает левее второй полосы.',
+      r: 'п. 118, пп. 2', x: 'управлять грузовыми автомобилями с разрешенной максимальной массой более трех тысяч пятьсот килограмм далее второй полосы' },
+
+    // Глава 17
+    { n: 3.5, v: '3,5', u: 'т', q: 'тяжелее', t: 'Грузовики в жилой зоне', ch: 'g17', c: ['stop'], s: 'zone',
+      p: 'Грузовик тяжелее 3,5 т и автобус ставят в жилой зоне только на отведённые и обозначенные места.',
+      r: 'п. 122, пп. 5', x: 'стоянка грузовых автомобилей с разрешенной максимальной массой более трех тысяч пятьсот килограммов, автобусов вне специально выделенных и обозначенных знаками и (или) разметкой мест' },
+
+    // Глава 19
+    { n: 150, v: '150', u: 'м', q: 'не позже чем за', t: 'Переключитесь на ближний свет', ch: 'g19', c: ['light'], sc: 'head',
+      p: 'При встречном разъезде переключайте дальний на ближний минимум за 150 м до встречной машины. Если встречный водитель мигает фарами, переключайте раньше.',
+      r: 'п. 129, пп. 2', x: 'при встречном разъезде на расстоянии не менее чем за сто пятьдесят метров до транспортного средства, а также и при большем, если водитель встречного транспортного средства периодическим переключением света фар покажет необходимость этого' },
+
+    // Глава 20
+    { n: 4, v: '4–6', u: 'м', q: 'между машинами', t: 'Гибкая сцепка (трос)', ch: 'g20', c: ['tow'], sc: 'towFlex',
+      p: 'На тросе машины держат 4–6 м друг от друга. За рулём буксируемой машины должен сидеть водитель.',
+      r: 'п. 143', x: 'При буксировке на гибкой сцепке обеспечивается расстояние между буксирующим и буксируемым транспортными средствами в пределах четырех-шести метров, а при буксировке на жесткой сцепке - не более четырех метров.' },
+    { n: 4, v: '4', u: 'м', q: 'не более', t: 'Жёсткая сцепка', ch: 'g20', c: ['tow'], sc: 'towRigid',
+      p: 'На жёсткой сцепке расстояние между машинами не больше 4 м.',
+      r: 'п. 143', x: '... а при буксировке на жесткой сцепке - не более четырех метров.' },
+    { n: 0.5, v: '½', u: 'массы', q: 'легче', t: 'Буксировка машины без тормозов', ch: 'g20', c: ['tow'],
+      p: 'Машину с неработающими тормозами тянут, только если она легче половины буксировщика, и только на жёсткой сцепке или с частичной погрузкой.',
+      r: 'п. 145, пп. 3', x: 'транспортного средства с недействующей тормозной системой, если его фактическая масса более половины фактической массы буксирующего транспортного средства. При меньшей фактической массе буксировка такого транспортного средства допускается только на жесткой сцепке или методом частичной погрузки' },
+
+    // Глава 22
+    { n: 25, v: '25', u: 'лет', q: 'с', t: 'Возить людей в кузове грузовика', ch: 'g22', c: ['people'],
+      p: 'Водителю нужно 25 лет, категория C и стаж на ней больше 5 лет.',
+      r: 'п. 151', x: 'К перевозке пассажиров в кузове грузового автомобиля допускаются водители двадцатипятилетнего возраста, имеющие удостоверение на право управления транспортными средствами категории "С" (при перевозке более 8 человек, включая пассажиров в кабине, - категории "С" и "D") и стаж управления транспортными средствами данной категории более пяти лет.' },
+    { n: 8, v: '8', u: 'человек', q: 'больше', t: 'Много людей в кузове', ch: 'g22', c: ['people'],
+      p: 'Если в кузове и кабине больше 8 человек, водителю нужны категории C и D.',
+      r: 'п. 151', x: '(при перевозке более 8 человек, включая пассажиров в кабине, - категории "С" и "D")' },
+    { n: 21, v: '21', u: 'год', q: 'с', t: 'Водитель микроавтобуса D1 (9–16 мест)', ch: 'g22', c: ['people'],
+      p: 'Возить пассажиров на автобусе с 9–16 местами можно с 21 года, при стаже водителем от 3 лет, из них не меньше года на категории C1.',
+      r: 'п. 151', x: 'К перевозкам пассажиров автомобилями, предназначенными для перевозки пассажиров и имеющими более восьми, но не более шестнадцати сидячих мест, помимо сиденья водителя (подкатегория "D1"), допускаются лица, достигшие двадцатиоднолетнего возраста и имеющие стаж работы водителем не менее трех лет, в том числе стаж управления транспортными средствами, относящимися к категории "С1", не менее одного года.' },
+    { n: 23, v: '23', u: 'года', q: 'с', t: 'Водитель автобуса D', ch: 'g22', c: ['people'],
+      p: 'С 23 лет, при стаже водителем от 3 лет, из них не меньше года на подкатегории D1.',
+      r: 'п. 151', x: 'К перевозкам пассажиров автомобилями, предназначенными для перевозки пассажиров и имеющими более восьми сидячих мест, помимо сиденья водителя (категория "D"), допускаются лица, достигшие двадцатитрехлетнего возраста, имеющие стаж работы водителем не менее трех лет, в том числе стаж управления транспортными средствами, относящимися к подкатегории "D1", не менее одного года.' },
+    { n: 16, v: '16', u: 'лет', q: 'до', t: 'Ребёнок на мотоцикле или мопеде', ch: 'g22', c: ['people', 'bike'],
+      p: 'Детей младше 16 лет на заднее сиденье мотоцикла или мопеда не сажайте.',
+      r: 'п. 156, пп. 5', x: 'не достигших шестнадцатилетнего возраста, на заднем сидении мотоцикла или мопеда' },
+    { n: 12, v: '12', u: 'лет', q: 'до', t: 'Детское кресло', ch: 'g22', c: ['people'],
+      p: 'Ребёнка до 12 лет везите в детском удерживающем устройстве или пристёгнутым штатными ремнями. На переднем сиденье только в детском кресле. Старый запрет про мотоцикл для этого возраста отменён с 05.04.2025, теперь действует порог 16 лет.',
+      r: 'п. 157', x: 'Запрещается перевозить детей до 12 лет: ... при отсутствии специального детского удерживающего устройства или иных средств, позволяющих пристегнуть ребенка с помощью ремней безопасности, предусмотренных конструкцией транспортного средства, а на переднем сидении механического транспортного средства при отсутствии специального детского удерживающего устройства.' },
+    { n: 25, v: '25', u: 'лет', q: 'с', t: 'Водитель автобуса с группой детей', ch: 'g22', c: ['people'], s: 'kids',
+      p: 'С 25 лет и стажем водителем от 5 лет. На автобусе жёлтый маячок и знаки «Перевозка детей» спереди и сзади.',
+      r: 'п. 158', x: 'К перевозкам организованных групп детей допускаются водители в возрасте не менее двадцати пяти лет, имеющие водительское удостоверение соответствующей категории и стаж работы водителем не менее пяти лет.' },
+    { n: 2, v: '2', u: 'двери', q: 'от', t: 'Автобус для группы детей', ch: 'g22', c: ['people'], s: 'kids',
+      p: 'Организованную группу детей возят в автобусе минимум с двумя дверями. Детей в салоне не больше, чем посадочных мест.',
+      r: 'п. 158', x: 'Перевозка организованных групп детей осуществляется автобусами, имеющими не менее двух дверей ... Количество перевозимых детей в автобусе не должно превышать количества посадочных мест.' },
+    { n: 2, v: '2', u: 'автобуса', q: 'от', t: 'Колонна автобусов с детьми', ch: 'g22', c: ['people'], s: 'kids',
+      p: 'Колонну из двух и более автобусов с детьми за городом сопровождает полиция.',
+      r: 'п. 158', x: 'Колонны из двух и более автобусов, перевозящих детей на загородных дорогах, в обязательном порядке сопровождаются специальными автомобилями органов внутренних дел.' },
+
+    // Глава 23
+    { n: 1, v: '1', u: 'м', q: 'больше', t: 'Груз выступает спереди или сзади', ch: 'g23', c: ['cargo', 'signs'], s: 'oversize', sc: 'cargoBack',
+      p: 'Груз выступает больше чем на 1 м? Повесьте знак «Крупногабаритный груз». В темноте добавьте фонарь или световозвращатель: белый спереди, красный сзади.',
+      r: 'п. 163', x: 'Груз или выступающие за габариты части транспортного средства спереди и сзади более чем на один метр или сбоку более чем на сорок сантиметров от внешнего края габаритного огня обозначаются опознавательными знаками "Крупногабаритный груз", а в темное время суток и условиях недостаточной видимости, кроме того, спереди фонарем или световозвращателем белого цвета, сзади - фонарем или световозвращателем красного цвета.' },
+    { n: 40, v: '40', u: 'см', q: 'больше', t: 'Груз выступает сбоку', ch: 'g23', c: ['cargo', 'signs'], s: 'oversize', sc: 'cargoSide',
+      p: 'Сбоку предел 40 см от внешнего края габаритного огня. Дальше нужен тот же знак «Крупногабаритный груз».',
+      r: 'п. 163', x: '... или сбоку более чем на сорок сантиметров от внешнего края габаритного огня обозначаются опознавательными знаками "Крупногабаритный груз"' },
+
+    // Глава 24
+    { n: 16, v: '16', u: 'лет', q: 'с', t: 'Право управлять мопедом', ch: 'g24', c: ['bike'],
+      p: 'Садиться за руль мопеда можно с 16 лет.',
+      r: 'п. 165', x: 'Право управления мопедом предоставляется лицам, достигшим шестнадцатилетнего возраста.' },
+    { n: 14, v: '14', u: 'лет', q: 'с', t: 'Велосипед по проезжей части', ch: 'g24', c: ['bike'], s: 'bike',
+      p: 'До 14 лет на велосипеде нельзя ехать по краю проезжей части, по полосе для автобусов и по обочине.',
+      r: 'п. 166', x: 'Не допускается движение по правовому краю проезжей части, полосе маршрутных транспортных средств, обочине велосипедистов, не достигших четырнадцатилетнего возраста.' },
+    { n: 6, v: '6', u: 'км/ч', q: 'не более', t: 'Электросамокат по тротуару', ch: 'g24', c: ['bike', 'speed'], s: 'bike',
+      p: 'Без велодорожки самокат может ехать по тротуару со скоростью быстрого шага, до 6 км/ч, и не мешать пешеходам.',
+      r: 'п. 168-1', x: 'тротуару или пешеходной дорожке, со скоростью не более шести километров в час, не создавая опасности для движения пешеходов' },
+    { n: 18, v: '18', u: 'лет', q: 'с', t: 'Электросамокат по проезжей части', ch: 'g24', c: ['bike'], s: 'bike',
+      p: 'По краю проезжей части на самокате можно с 18 лет и только с водительскими правами любой категории. Шлем застёгнут.',
+      r: 'п. 168-1; п. 171, пп. 8', x: 'Не допускается движение по правому краю проезжей части дороги, в том числе по полосе для маршрутных транспортных средств, водителей электрических самокатов, не достигших восемнадцатилетнего возраста, без водительского удостоверения на право управления транспортным средством любой категории' },
+    { n: 50, v: '50', u: 'см', q: 'до', t: 'Груз на велосипеде или самокате', ch: 'g24', c: ['bike', 'cargo'],
+      p: 'Груз может выступать за габариты велосипеда или самоката не больше чем на 50 см по длине или ширине.',
+      r: 'п. 171, пп. 3', x: 'перевозить груз, кроме перевозки груза на велосипедах со специальными приспособлениями для их перевозки, а также груза, который не выступает более чем на пятьдесят сантиметров по длине или ширине за габариты, или груз, мешающий управлению' },
+    { n: 10, v: '10', u: 'в группе', q: 'до', t: 'Колонна велосипедистов', ch: 'g24', c: ['bike'], s: 'bike',
+      p: 'Колонну на проезжей части делят на группы: по 10 велосипедистов или всадников, по 5 повозок.',
+      r: 'п. 170', x: 'Колонны велосипедистов, гужевых повозок (саней), вьючных, упряженных или верховых животных при движении по проезжей части дороги должны быть разделены на группы по десять велосипедистов, верховых и вьючных животных и пять повозок (саней).' },
+    { n: 80, v: '80–100', u: 'м', q: 'между группами', t: 'Интервал между группами велосипедистов', ch: 'g24', c: ['bike', 'overtake'],
+      p: 'Между группами колонны оставляют 80–100 м, чтобы машины могли обгонять по одной группе.',
+      r: 'п. 170', x: 'Для облегчения обгона расстояние между группами должно составлять восемьдесят — сто метров.' },
+    { n: 10, v: '10–15', u: 'м', q: 'от стада', t: 'Сигнал при прогоне скота в темноте', ch: 'g24', c: ['bike', 'light'],
+      p: 'Погонщик стоит в 10–15 м от стада навстречу машинам и описывает круги факелом или фонарём.',
+      r: 'п. 174', x: 'Сигналом служит круговое движение руки с факелом или фонарем, при этом подающий сигнал находится на расстоянии десяти-пятнадцати метров от группы животных в сторону приближающегося транспортного средства.' },
+
+    // Глава 25
+    { n: 1.5, v: '1,5', u: 'м', q: 'от', t: 'Проход для пешеходов у машины со знаком инвалида', ch: 'g25', c: ['stop'],
+      p: 'Водитель с инвалидностью может встать на тротуаре под знаком запрета остановки, если пешеходам остаётся полоса не уже 1,5 м. На разметке, запрещающей остановку, это правило не работает.',
+      r: 'п. 178, пп. 1', x: 'останавливать и ставить транспортное средство в населенных пунктах в зоне действия дорожных знаков, запрещающих остановку или стоянку, при условии, что стоящее транспортное средство полностью располагается на тротуаре таким образом, чтобы для движения пешеходов оставалась свободная полоса шириной не менее полутора метров' },
+
+    // Глава 26
+    { n: 10, v: '10', u: 'машин', q: 'больше', t: 'Колонна с сопровождением', ch: 'g26', c: ['other'],
+      p: 'Колонну больше 10 машин сопровождают минимум две машины с синими или сине-красными маячками: ведущая и замыкающая.',
+      r: 'п. 181', x: 'При движении в колонне свыше десяти транспортных средств обеспечивается их сопровождение не менее двумя транспортными средствами с включенным проблесковым маячком синего цвета или маячками синего и красного цветов (ведущий и замыкающий).' },
+    { n: 5, v: '5', u: 'машин', q: 'до', t: 'Группы в колонне без сопровождения', ch: 'g26', c: ['other'],
+      p: 'Без сопровождения колонну делят на группы до 5 машин. Между группами оставляют место, чтобы их могли обогнать.',
+      r: 'п. 182', x: 'Колонна, движущаяся без сопровождения оперативными транспортными средствами, разделяется на группы (не более пяти транспортных средств в каждой), дистанция между которыми должна обеспечивать возможность обгона группы другими транспортными средствами.' },
+
+    // Приложение 1
+    { n: 150, v: '150–300', u: 'м', q: 'до опасного места', t: 'Предупреждающие знаки за городом', ch: 'z1', c: ['signs'], s: 'warn', sc: 'warn:150–300 м',
+      p: 'Треугольные знаки ставят за 150–300 м до опасного места. Если расстояние другое, его пишут на табличке 7.1.1.',
+      r: 'Прил. 1, гл. 1', x: 'Предупреждающие знаки 1.1, 1.2, 1.5-1.30 вне населенных пунктов устанавливаются на расстоянии 150 - 300 м, а в населенных пунктах и жилых зонах - на расстоянии 50 - 100 м до начала опасного участка. При необходимости знаки могут устанавливаться и на ином расстоянии, которое в этом случае указывается на табличке 7.1.1.' },
+    { n: 50, v: '50–100', u: 'м', q: 'до опасного места', t: 'Предупреждающие знаки в городе', ch: 'z1', c: ['signs'], s: 'warn', sc: 'warn:50–100 м',
+      p: 'В населённых пунктах и жилых зонах треугольный знак стоит за 50–100 м до опасного места.',
+      r: 'Прил. 1, гл. 1', x: '... а в населенных пунктах и жилых зонах - на расстоянии 50 - 100 м до начала опасного участка.' },
+    { n: 50, v: '50', u: 'м', q: 'не ближе', t: 'Повторный предупреждающий знак', ch: 'z1', c: ['signs', 'rail'], s: 'rail', sc: 'warnRepeat',
+      p: 'За городом знаки 1.1, 1.2, 1.9, 1.10, 1.21 и 1.23 ставят дважды. Второй стоит не ближе 50 м до опасного места.',
+      r: 'Прил. 1, гл. 1', x: 'Вне населенных пунктов знаки 1.1, 1.2, 1.9, 1.10, 1.21 и 1.23 повторяются. Второй знак устанавливается на расстоянии не менее 50 м до начала опасного участка.' },
+    { n: 10, v: '10–15', u: 'м', q: 'до работ', t: 'Знак «Дорожные работы» на короткие работы', ch: 'z1', c: ['signs'], s: 'works', sc: 'works',
+      p: 'При краткосрочных работах на проезжей части знак 1.23 ставят за 10–15 м до места работ, без таблички расстояния.',
+      r: 'Прил. 1, гл. 1', x: 'Знак 1.23 при проведении краткосрочных работ на проезжей части может быть установлен (без таблички 7.1.1) на расстоянии 10 - 15 м до места проведения работ.' },
+    { n: 30, v: '30', u: 'км/ч', q: 'медленнее', t: 'Кого можно обогнать под знаком 3.20', ch: 'z1', c: ['overtake', 'signs', 'speed'], s: 'noOver',
+      p: 'Под знаком «Обгон запрещён» можно обогнать одиночную машину, если она едет медленнее 30 км/ч. Знак действует до ближайшего перекрёстка.',
+      r: 'Прил. 1, знак 3.20', x: '3.20 "Обгон запрещен". Запрещается обгон всех транспортных средств, кроме одиночных, движущихся со скоростью менее 30 км/ч.' },
+    { n: 3.5, v: '3,5', u: 'т', q: 'тяжелее', t: 'Знак 3.22 касается грузовиков', ch: 'z1', c: ['overtake', 'signs'], s: 'noOverTruck',
+      p: '«Обгон грузовым автомобилям запрещён» относится к грузовикам тяжелее 3,5 т. Одиночную машину медленнее 30 км/ч им обгонять можно.',
+      r: 'Прил. 1, знак 3.22', x: '3.22 "Обгон грузовым автомобилям запрещен". Запрещается грузовым автомобилям с разрешенной максимальной массой более 3,5 т обгон всех транспортных средств, кроме одиночных, движущихся со скоростью менее 30 км/ч.' },
+    { n: 20, v: '20', u: 'км/ч', q: 'шаг до', t: 'Ступенчатое снижение скорости', ch: 'z1', c: ['signs', 'speed'], s: 'speed:70', sc: 'steps',
+      p: 'Если лимит падает больше чем на 20 км/ч, ставят несколько знаков 3.24 подряд, каждый ниже предыдущего максимум на 20 км/ч. Перед знаком населённого пункта ступени не нужны, если его видно за 150 м.',
+      r: 'Прил. 1, знак 3.24', x: 'Если вводимое на данном участке дороги ограничение максимальной скорости более чем на 20 км/ч отличается от допускаемой скорости движения на предшествующем участке, применяется ступенчатое ограничение скорости с шагом не более 20 км/ч путем последовательной установки знаков 3.24, удаленных друг от друга на расстоянии от 100 метров до 150 метров.' },
+    { n: 100, v: '100–150', u: 'м', q: 'между знаками', t: 'Расстояние между ступенями', ch: 'z1', c: ['signs', 'speed'], s: 'speed:50', sc: 'steps',
+      p: 'Знаки ступенчатого ограничения скорости стоят в 100–150 м друг от друга.',
+      r: 'Прил. 1, знак 3.24', x: '... путем последовательной установки знаков 3.24, удаленных друг от друга на расстоянии от 100 метров до 150 метров.' },
+    { n: 19, v: '19–21', u: 'ч', q: 'с … до', t: 'Перестановка машин под знаками 3.29 и 3.30', ch: 'z1', c: ['stop', 'signs'], s: 'noParkOdd',
+      p: 'Где висят оба знака «Стоянка запрещена по нечётным» и «по чётным числам», машину переставляют на другую сторону улицы с 19 до 21 часа.',
+      r: 'Прил. 1, знак 3.30', x: '3.30 "Стоянка запрещена по четным числам месяца". При одновременном применении знаков 3.29 и 3.30 время перестановки транспортных средств с одной стороны на другую - с 19 до 21 часа.' },
+
+    // Основные положения
+    { n: 10, v: '10', u: 'суток', q: 'не позже', t: 'Регистрация после покупки', ch: 'op', c: ['other'],
+      p: 'Поставить машину на учёт нужно, пока действует номер «Транзит», или в течение 10 суток с покупки или растаможки.',
+      r: 'ОП, п. 2', x: 'Механические транспортные средства и прицепы должны быть зарегистрированы в органах внутренних дел в течение срока действия регистрационного знака "Транзит" либо не позднее десяти суток с момента приобретения или таможенного декларирования.' },
+    { n: 300, v: '300', u: 'мм', q: 'от', t: 'Номер на кузове грузовика и автобуса', ch: 'op', c: ['other', 'cargo'],
+      p: 'Грузовики, прицепы и автобусы дублируют номер на задней стенке кузова. Высота цифр не меньше 300 мм, ширина не меньше 120 мм.',
+      r: 'ОП, п. 3', x: 'Цифры и буквы регистрационных знаков должны быть повторены на задней стенке кузовов грузовых автомобилей, прицепов (кроме прицепов к легковым автомобилям и мотоциклам) и автобусов. Высота цифр - не менее трехсот миллиметров, ширина - не менее ста двадцати миллиметров' },
+    { n: 30, v: '30–50', u: 'см', q: 'от пола', t: 'Высота сидений в кузове', ch: 'op', c: ['people'], sc: 'seats:0',
+      p: 'В кузове для людей сиденья крепят на высоте 30–50 см от пола. У сидений вдоль бортов нужны прочные спинки.',
+      r: 'ОП, п. 5', x: 'Грузовой автомобиль с бортовой платформой, используемый для перевозки пассажиров, оборудуется сиденьями, закрепленными на высоте тридцать-пятьдесят сантиметров от пола и не менее тридцати сантиметров от верхнего края борта' },
+    { n: 30, v: '30', u: 'см', q: 'не менее', t: 'От сиденья до верха борта', ch: 'op', c: ['people'], sc: 'seats:1',
+      p: 'Между сиденьем и верхним краем борта не меньше 30 см, чтобы пассажира не выбросило через борт.',
+      r: 'ОП, п. 5', x: '... и не менее тридцати сантиметров от верхнего края борта' },
+    { n: 80, v: '80', u: 'см', q: 'не менее', t: 'Борта, когда в кузове дети', ch: 'op', c: ['people'], sc: 'seats:2',
+      p: 'Если в кузове едут дети, высота бортов от пола не меньше 80 см.',
+      r: 'ОП, п. 5', x: 'а при перевозке детей, кроме того, борта должны иметь высоту не менее восьмидесяти сантиметров от уровня пола' },
+    { n: 20, v: '20', u: 'м', q: 'длиннее', t: 'Знак «Длинномерное транспортное средство»', ch: 'op', c: ['signs', 'cargo'], s: 'long',
+      p: 'Жёлто-красный знак нужен сзади, если машина с одним прицепом длиннее 20 м или прицепов два и больше.',
+      r: 'ОП, п. 9', x: '"Длинномерное транспортное средство" - ... сзади транспортных средств, длина которых (включая один прицеп) с грузом или без груза - более двадцати метров, и автопоездов с двумя и более прицепами.' },
+    { n: 2, v: '2', u: 'флажка', q: 'не менее', t: 'Флажки на буксирном тросе', ch: 'op', c: ['tow', 'signs'], s: 'flag',
+      p: 'На гибкий трос вешают минимум 2 флажка или щитка 200×200 мм в красно-белую диагональную полосу.',
+      r: 'ОП, п. 12', x: 'Предупредительные устройства для обозначения гибких связующих звеньев при буксировке механических транспортных средств должны выполняться в виде флажков или щитков размером 200x200 мм с нанесенными с обоих сторон по диагонали красными и белыми чередующимися полосами ... На гибкое связующее звено должны устанавливаться не менее двух предупредительных устройств.' },
+
+    // Перечень неисправностей
+    { n: 14.7, v: '14,7', u: 'м', q: 'не более', t: 'Тормозной путь легкового', ch: 'pn', c: ['tech'], sc: 'brake:14.7',
+      p: 'С 40 км/ч на сухом ровном асфальте легковой (M1) должен остановиться за 14,7 м, замедление не меньше 5,8 м/с². Легковой с прицепом тоже 14,7 м. Не укладывается — ездить нельзя.',
+      r: 'Перечень, гл. 1', x: 'Пассажирские и грузопассажирские автомобили М1 — тормозной путь не более 14,7 м, установившееся замедление не менее 5,8 м/с2. Испытания проводятся на горизонтальном участке дороги с ровным, сухим, чистым цементно- или асфальтобетонным покрытием при скорости в начале торможения 40 км/ч' },
+    { n: 18.3, v: '18,3', u: 'м', q: 'не более', t: 'Тормозной путь автобуса и грузовика', ch: 'pn', c: ['tech'], sc: 'brake:18.3',
+      p: 'Автобусы (M2, M3) и грузовики (N1–N3) с 40 км/ч останавливаются максимум за 18,3 м, замедление не меньше 5,0 м/с².',
+      r: 'Перечень, гл. 1', x: 'М2, М3 — 18,3 м, 5,0 м/с2; Грузовые автомобили N1 N2, N3 — 18,3 м, 5,0 м/с2' },
+    { n: 19.5, v: '19,5', u: 'м', q: 'не более', t: 'Тормозной путь грузовика с прицепом', ch: 'pn', c: ['tech'], sc: 'brake:19.5',
+      p: 'Грузовик с прицепом или полуприцепом с 40 км/ч останавливается максимум за 19,5 м.',
+      r: 'Перечень, гл. 1', x: 'Грузовые автомобили с прицепом (полуприцепом) N1 N 2, N3 — 19,5 м, 5,0 м/с2' },
+    { n: 0.05, v: '0,05', u: 'МПа', q: 'за 15 минут не более', t: 'Утечка воздуха из пневмотормозов', ch: 'pn', c: ['tech'],
+      p: 'При заглушенном двигателе давление в пневмоприводе тормозов за 15 минут может упасть не больше чем на 0,05 МПа (0,5 кгс/см²). Манометр должен работать.',
+      r: 'Перечень, п. 5', x: 'Нарушение герметичности пневматического и пневмогидравлического тормозных приводов вызывает падение давления воздуха при неработающем двигателе более чем на 0,05 МПа (0,5 кгс/см2) за 15 минут после полного приведения их в действие.' },
+    { n: 16, v: '16', u: '%', q: 'уклон до', t: 'Ручник: машина с полной нагрузкой', ch: 'pn', c: ['tech'], sc: 'slope:16',
+      p: 'Стояночный тормоз должен удержать полностью загруженную машину на уклоне до 16 %.',
+      r: 'Перечень, п. 7', x: 'Стояночная тормозная система не обеспечивает неподвижное состояние: 1) транспортных средств с полной нагрузкой - на уклоне до 16 % включительно' },
+    { n: 23, v: '23', u: '%', q: 'уклон до', t: 'Ручник: легковой или автобус без груза', ch: 'pn', c: ['tech'], sc: 'slope:23',
+      p: 'Легковой автомобиль или автобус в снаряжённом состоянии ручник держит на уклоне до 23 %.',
+      r: 'Перечень, п. 7', x: 'легковых автомобилей и автобусов в снаряженном состоянии - на уклоне до 23 % включительно' },
+    { n: 31, v: '31', u: '%', q: 'уклон до', t: 'Ручник: грузовик или автопоезд без груза', ch: 'pn', c: ['tech'], sc: 'slope:31',
+      p: 'Грузовик или автопоезд в снаряжённом состоянии ручник держит на уклоне до 31 %.',
+      r: 'Перечень, п. 7', x: 'грузовых автомобилей и автопоездов в снаряженном состоянии - на уклоне до 31 % включительно' },
+    { n: 10, v: '10', u: '°', q: 'не более', t: 'Люфт руля: легковые', ch: 'pn', c: ['tech'], sc: 'wheel:10',
+      p: 'Суммарный люфт рулевого управления у легковых и у грузовиков и автобусов на их базе до 10°. Больше — эксплуатация запрещена.',
+      r: 'Перечень, п. 8', x: 'Суммарный люфт в рулевом управлении превышает следующие значения: Легковые автомобили и созданные на их базе грузовые автомобили и автобусы — 10' },
+    { n: 20, v: '20', u: '°', q: 'не более', t: 'Люфт руля: автобусы', ch: 'pn', c: ['tech'], sc: 'wheel:20',
+      p: 'У автобусов суммарный люфт руля до 20°.',
+      r: 'Перечень, п. 8', x: 'Суммарный люфт (градусов), не более: Автобусы — 20' },
+    { n: 25, v: '25', u: '°', q: 'не более', t: 'Люфт руля: грузовые', ch: 'pn', c: ['tech'], sc: 'wheel:25',
+      p: 'У грузовых автомобилей суммарный люфт руля до 25°.',
+      r: 'Перечень, п. 8', x: 'Суммарный люфт (градусов), не более: Грузовые автомобили — 25' },
+    { n: 0.8, v: '0,8', u: 'мм', q: 'не менее', t: 'Протектор: мотоциклы и мопеды', ch: 'pn', c: ['tech', 'bike'], sc: 'tread:0.8',
+      p: 'Остаток рисунка протектора меньше 0,8 мм — шину меняйте, ездить нельзя.',
+      r: 'Перечень, п. 19', x: 'Шины легковых автомобилей имеют остаточную высоту рисунка протектора менее 1,6 мм, грузовых автомобилей - 1 мм, автобусов - 2 мм, мотоциклов и мопедов - 0,8 мм.' },
+    { n: 1, v: '1', u: 'мм', q: 'не менее', t: 'Протектор: грузовые', ch: 'pn', c: ['tech'], sc: 'tread:1',
+      p: 'У грузовиков остаток рисунка протектора не меньше 1 мм. У прицепа норма та же, что у тягача.',
+      r: 'Перечень, п. 19', x: '... грузовых автомобилей - 1 мм ... Для прицепов устанавливаются нормы остаточной высоты рисунка протектора шин, аналогичные нормам для шин транспортных средств-тягачей.' },
+    { n: 1.6, v: '1,6', u: 'мм', q: 'не менее', t: 'Протектор: легковые', ch: 'pn', c: ['tech'], sc: 'tread:1.6',
+      p: 'У легковых остаток рисунка протектора не меньше 1,6 мм. На одной оси шины одного размера, типа и рисунка.',
+      r: 'Перечень, п. 19 и 23', x: 'Шины легковых автомобилей имеют остаточную высоту рисунка протектора менее 1,6 мм' },
+    { n: 2, v: '2', u: 'мм', q: 'не менее', t: 'Протектор: автобусы', ch: 'pn', c: ['tech'], sc: 'tread:2',
+      p: 'У автобусов самая строгая норма: остаток рисунка протектора не меньше 2 мм.',
+      r: 'Перечень, п. 19', x: '... автобусов - 2 мм' },
+    { n: 2, v: '2', u: 'упора', q: 'не менее', t: 'Противооткатные упоры', ch: 'pn', c: ['tech'],
+      p: 'Грузовик тяжелее 3,5 т и автобус возят минимум 2 противооткатных упора. В любой машине нужны аптечка, огнетушитель и знак аварийной остановки.',
+      r: 'Перечень, п. 38', x: 'Отсутствуют: 1) на автобусе, легковом и грузовом автомобилях, колесных тракторах медицинская аптечка, огнетушитель (-и), знак аварийной остановки (мигающий красный фонарь). 2) на грузовых автомобилях с разрешенной максимальной массой свыше 3,5 т и автобусах противооткатные упоры (не менее двух)' }
+  ];
+
+  // ---------- Signs (fixed real-world colours, readable on both themes) ----------
+  const RED = '#D52B1E', BLUE = '#1E5AA8', YEL = '#FFC72C', BLK = '#14181B', WHT = '#FFFFFF';
+  let uid = 0;
+  const carRear = (x, y, col, k = 1) => `<g transform="translate(${x} ${y}) scale(${k})"><path d="M-11 3h22v-6l-3.5-5.5h-15L-11 -3z" fill="${col}"/><path d="M-7 -4h14l-2.2-3.4h-9.6z" fill="${WHT}"/><rect x="-10" y="3" width="5" height="4" fill="${col}"/><rect x="5" y="3" width="5" height="4" fill="${col}"/></g>`;
+  const truckRear = (x, y, col) => `<g transform="translate(${x} ${y})"><rect x="-11" y="-13" width="22" height="16" rx="1.5" fill="${col}"/><rect x="-11" y="3" width="6" height="5" fill="${col}"/><rect x="5" y="3" width="6" height="5" fill="${col}"/></g>`;
+  const ringed = (fill, inner) => `<circle cx="50" cy="50" r="44" fill="${fill}" stroke="${RED}" stroke-width="11"/>${inner}`;
+  const SIGNS = {
+    speed: v => ringed(WHT, `<text x="50" y="51" dy=".35em" text-anchor="middle" font-family="Fira Sans Extra Condensed, Arial Narrow, sans-serif" font-weight="700" font-size="${+v >= 100 ? 38 : 44}" fill="${BLK}">${v}</text>`),
+    noOver: () => ringed(WHT, carRear(35, 54, RED, 1.15) + carRear(65, 54, BLK, 1.15)),
+    noOverTruck: () => ringed(WHT, truckRear(35, 54, RED) + carRear(65, 54, BLK, 1.15)),
+    noStop: () => ringed(BLUE, `<path d="M26 26L74 74M74 26L26 74" stroke="${RED}" stroke-width="9"/>`),
+    noPark: () => ringed(BLUE, `<path d="M26 26L74 74" stroke="${RED}" stroke-width="9"/>`),
+    noParkOdd: () => ringed(BLUE, `<path d="M26 26L74 74" stroke="${RED}" stroke-width="9"/><rect x="30" y="38" width="7" height="26" fill="${WHT}"/>`),
+    warn: () => `<path d="M50 9L93 85H7z" fill="${WHT}" stroke="${RED}" stroke-width="9" stroke-linejoin="round"/><rect x="46" y="38" width="8" height="26" rx="2" fill="${BLK}"/><circle cx="50" cy="72" r="4.5" fill="${BLK}"/>`,
+    works: () => `<path d="M50 9L93 85H7z" fill="${WHT}" stroke="${RED}" stroke-width="9" stroke-linejoin="round"/><circle cx="47" cy="44" r="4.6" fill="${BLK}"/><path d="M46 50l-5 12M44 55l9 4M41 62l-6 10M41 62l6 10M52 58l9-8" stroke="${BLK}" stroke-width="4.2" stroke-linecap="round" fill="none"/><path d="M56 74h20l-6-9z" fill="${BLK}"/>`,
+    rail: () => `<path d="M50 9L93 85H7z" fill="${WHT}" stroke="${RED}" stroke-width="9" stroke-linejoin="round"/><path d="M31 54h38M31 66h38M33 49v24M44 49v24M56 49v24M67 49v24" stroke="${BLK}" stroke-width="3.5" fill="none"/>`,
+    emerg: () => `<path d="M50 11L91 83H9z" fill="none" stroke="${RED}" stroke-width="12" stroke-linejoin="round"/><path d="M50 33L72 72H28z" fill="none" stroke="#F26B3A" stroke-width="4" stroke-linejoin="round"/>`,
+    cross: () => `<rect x="6" y="6" width="88" height="88" rx="9" fill="${BLUE}"/><path d="M50 14L88 84H12z" fill="${WHT}"/><circle cx="52" cy="38" r="5" fill="${BLK}"/><path d="M51 44l-6 14M48 50l9 4M45 58l-6 12M45 58l6 12" stroke="${BLK}" stroke-width="4.2" stroke-linecap="round" fill="none"/><path d="M24 78h52" stroke="${BLK}" stroke-width="4" stroke-dasharray="6 4"/>`,
+    zone: () => `<rect x="6" y="14" width="88" height="72" rx="7" fill="${BLUE}"/><path d="M16 58L34 42L52 58V76H16z" fill="${WHT}"/><rect x="29" y="62" width="9" height="14" fill="${BLUE}"/><circle cx="68" cy="44" r="5" fill="${WHT}"/><path d="M68 50v14M68 64l-5 12M68 64l5 12M61 56h14" stroke="${WHT}" stroke-width="4" stroke-linecap="round"/><circle cx="82" cy="72" r="4.5" fill="${WHT}"/>`,
+    bike: () => `<circle cx="50" cy="50" r="46" fill="${BLUE}"/><g fill="none" stroke="${WHT}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="31" cy="60" r="12"/><circle cx="69" cy="60" r="12"/><path d="M31 60l12-20h16l10 20M43 40l9 20h-21M59 40l2-6h6M45 34h8"/></g>`,
+    bus: () => `<rect x="6" y="6" width="88" height="88" rx="9" fill="${BLUE}"/><rect x="18" y="30" width="64" height="34" rx="6" fill="${WHT}"/><rect x="24" y="36" width="14" height="12" rx="2" fill="${BLUE}"/><rect x="43" y="36" width="14" height="12" rx="2" fill="${BLUE}"/><rect x="62" y="36" width="14" height="12" rx="2" fill="${BLUE}"/><circle cx="32" cy="66" r="6" fill="${WHT}" stroke="${BLUE}" stroke-width="3"/><circle cx="68" cy="66" r="6" fill="${WHT}" stroke="${BLUE}" stroke-width="3"/>`,
+    kids: () => `<rect x="7" y="7" width="86" height="86" rx="4" fill="${YEL}" stroke="${RED}" stroke-width="8"/><circle cx="38" cy="34" r="6" fill="${BLK}"/><path d="M38 41v20M38 61l-6 14M38 61l6 14M29 50h18" stroke="${BLK}" stroke-width="5" stroke-linecap="round"/><circle cx="62" cy="40" r="5.5" fill="${BLK}"/><path d="M62 46v16M62 62l-5 13M62 62l5 13M54 54h16" stroke="${BLK}" stroke-width="4.6" stroke-linecap="round"/>`,
+    oversize: () => { const id = 'cp' + (++uid); return `<defs><clipPath id="${id}"><rect x="8" y="8" width="84" height="84" rx="3"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="3" fill="${WHT}"/><g clip-path="url(#${id})" stroke="${RED}" stroke-width="12"><path d="M-10 30L30 -10M-10 60L60 -10M-10 90L90 -10M10 110L110 10M40 110L110 40M70 110L110 70"/></g><rect x="8" y="8" width="84" height="84" rx="3" fill="none" stroke="#9AA4AB" stroke-width="1.5"/>`; },
+    long: () => `<rect x="4" y="33" width="92" height="34" rx="2" fill="${YEL}" stroke="${RED}" stroke-width="6"/>`,
+    flag: () => { const id = 'cp' + (++uid); return `<path d="M22 12v80" stroke="#7D8890" stroke-width="5" stroke-linecap="round"/><defs><clipPath id="${id}"><rect x="25" y="14" width="56" height="44"/></clipPath></defs><rect x="25" y="14" width="56" height="44" fill="${WHT}"/><g clip-path="url(#${id})" stroke="${RED}" stroke-width="9"><path d="M15 34L45 4M15 58L55 18M30 68L80 18M52 68L92 28"/></g><rect x="25" y="14" width="56" height="44" fill="none" stroke="#9AA4AB" stroke-width="1.5"/>`; }
+  };
+  const SIGN_NAME = {
+    speed: 'Знак 3.24 «Ограничение максимальной скорости»', noOver: 'Знак 3.20 «Обгон запрещён»', noOverTruck: 'Знак 3.22 «Обгон грузовым автомобилям запрещён»',
+    noStop: 'Знак 3.27 «Остановка запрещена»', noPark: 'Знак 3.28 «Стоянка запрещена»', noParkOdd: 'Знак 3.29 «Стоянка запрещена по нечётным числам месяца»',
+    warn: 'Предупреждающий знак', works: 'Знак 1.23 «Дорожные работы»', rail: 'Знак 1.1 «Железнодорожный переезд со шлагбаумом»',
+    emerg: 'Знак аварийной остановки', cross: 'Знак 5.16 «Пешеходный переход»', zone: 'Знак 5.38 «Жилая зона»', bike: 'Знак 4.5 «Велосипедная дорожка»',
+    bus: 'Остановка маршрутных транспортных средств', kids: 'Опознавательный знак «Перевозка детей»', oversize: 'Опознавательный знак «Крупногабаритный груз»',
+    long: 'Опознавательный знак «Длинномерное транспортное средство»', flag: 'Флажок на буксирном тросе'
+  };
+  function signSvg(spec) {
+    const [k, v] = spec.split(':');
+    const f = SIGNS[k];
+    if (!f) return '';
+    return `<svg viewBox="0 0 100 100" role="img" aria-label="${esc(SIGN_NAME[k] || '')}"><title>${esc(SIGN_NAME[k] || '')}</title>${f(v)}</svg>`;
+  }
+
+  // ---------- Category glyphs ----------
+  const GLYPH = {
+    speed: '<path d="M4 16a8 8 0 1 1 16 0"/><path d="M12 16l4.5-5"/><path d="M8 20h8"/>',
+    overtake: '<path d="M7 20V6M3 10l4-4 4 4"/><path d="M17 4v14M13 14l4 4 4-4"/>',
+    stop: '<circle cx="12" cy="12" r="9"/><path d="M10 17V7h3.2a3 3 0 0 1 0 6H10"/>',
+    signs: '<path d="M12 3.5l9 16H3z"/><path d="M12 10v4.5M12 17v.5"/>',
+    light: '<path d="M11 5.5C6.5 5.5 4 8.6 4 12s2.5 6.5 7 6.5z"/><path d="M14 8h6M14 12h6M14 16h6"/>',
+    tow: '<circle cx="6" cy="12" r="3"/><circle cx="18" cy="12" r="3"/><path d="M9 12h6"/>',
+    people: '<circle cx="9" cy="7" r="3"/><path d="M3.5 20c0-3.6 2.5-6.5 5.5-6.5s5.5 2.9 5.5 6.5"/><circle cx="17" cy="9" r="2.3"/><path d="M15.5 14c2.8 0 5 2.4 5 6"/>',
+    cargo: '<path d="M3 7.5l9-4 9 4v9l-9 4-9-4z"/><path d="M3 7.5l9 4 9-4M12 11.5v9"/>',
+    tech: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.2"/><path d="M3.4 10.5h6.4M14.2 10.5h6.4M12 14.2V21"/>',
+    rail: '<path d="M8 3v18M16 3v18M5 7h14M5 12h14M5 17h14"/>',
+    bike: '<circle cx="6" cy="16" r="3.6"/><circle cx="18" cy="16" r="3.6"/><path d="M6 16l4-8h5l3 8M10 8l2.5 8H6M15 8l1-2.5"/>',
+    other: '<path d="M5 4.5h11a2 2 0 0 1 2 2V20H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h11"/><path d="M9 8.5h5"/>'
+  };
+  const glyphSvg = k => `<svg viewBox="0 0 24 24" aria-hidden="true">${GLYPH[k] || GLYPH.other}</svg>`;
+
+  // ---------- Scenes ----------
+  const fmt = n => String(n).replace('.', ',');
+  const sc = (vb, body, label) => `<svg class="sc" viewBox="${vb}" role="img" aria-label="${esc(label)}">${body}</svg>`;
+  const road = (y, h, w = 320, lane = true) => `<rect class="road" x="0" y="${y}" width="${w}" height="${h}"/>` + (lane ? `<line class="lane" x1="0" y1="${y + h / 2}" x2="${w}" y2="${y + h / 2}"/>` : '');
+  function car(x, y, o = {}) {
+    const flip = o.flip ? ' scale(-1 1)' : '';
+    const hz = o.hz ? '<circle cx="18" cy="-8" r="2.4" class="hz"/><circle cx="18" cy="8" r="2.4" class="hz"/><circle cx="-18" cy="-8" r="2.4" class="hz"/><circle cx="-18" cy="8" r="2.4" class="hz"/>' : '';
+    return `<g transform="translate(${x} ${y})${flip}"><rect x="-20" y="-10" width="40" height="20" rx="6" class="${o.cls || 'v1'}"/><rect x="3" y="-8" width="8" height="16" rx="2" class="gl"/><rect x="-14" y="-7.5" width="6" height="15" rx="2" class="gl"/>${hz}</g>`;
+  }
+  const truck = (x, y) => `<g transform="translate(${x} ${y})"><rect x="-34" y="-11" width="48" height="22" rx="2" class="v2"/><rect x="16" y="-10" width="18" height="20" rx="4" class="v1"/><rect x="26" y="-8" width="5" height="16" rx="1.5" class="gl"/></g>`;
+  const busTop = (x, y) => `<g transform="translate(${x} ${y})"><rect x="-28" y="-10" width="56" height="20" rx="4" class="v1"/><rect x="-24" y="-7" width="46" height="14" rx="2" class="gl"/></g>`;
+  const noZone = (x1, x2, y1, y2) => `<rect class="no" x="${x1}" y="${y1}" width="${x2 - x1}" height="${y2 - y1}"/>`;
+  function dim(x1, x2, y, label, cls = '') {
+    return `<g class="dim ${cls}"><line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/><line x1="${x1}" y1="${y - 6}" x2="${x1}" y2="${y + 6}"/><line x1="${x2}" y1="${y - 6}" x2="${x2}" y2="${y + 6}"/><polygon points="${x1},${y} ${x1 + 7},${y - 3} ${x1 + 7},${y + 3}"/><polygon points="${x2},${y} ${x2 - 7},${y - 3} ${x2 - 7},${y + 3}"/><text x="${(x1 + x2) / 2}" y="${y - 5}" text-anchor="middle">${label}</text></g>`;
+  }
+  function vdim(x, y1, y2, label, anchor = 'start', cls = '') {
+    const a = Math.min(y1, y2), b = Math.max(y1, y2);
+    const tx = anchor === 'start' ? x + 8 : x - 8;
+    return `<g class="dim ${cls}"><line x1="${x}" y1="${a}" x2="${x}" y2="${b}"/><line x1="${x - 5}" y1="${a}" x2="${x + 5}" y2="${a}"/><line x1="${x - 5}" y1="${b}" x2="${x + 5}" y2="${b}"/><polygon points="${x},${a} ${x - 3},${a + 6} ${x + 3},${a + 6}"/><polygon points="${x},${b} ${x - 3},${b - 6} ${x + 3},${b - 6}"/><text x="${tx}" y="${(a + b) / 2 + 4.5}" text-anchor="${anchor}">${label}</text></g>`;
+  }
+  const miniFlag = (x, y) => `<g transform="translate(${x} ${y})"><rect x="-5" y="-12" width="10" height="10" fill="${WHT}" stroke="${RED}" stroke-width="1"/><path d="M-5 -6l6 -6M-2 -2l7 -7" stroke="${RED}" stroke-width="2.2"/></g>`;
+  const triTop = (x, y) => `<path d="M${x} ${y - 10}L${x + 9} ${y + 7}H${x - 9}z" fill="none" stroke="${RED}" stroke-width="3.2" stroke-linejoin="round"/>`;
+  const rails = (x) => {
+    let s = '';
+    for (let y = 2; y < 76; y += 8) s += `<line class="sleeper" x1="${x - 6}" y1="${y}" x2="${x + 20}" y2="${y}"/>`;
+    return s + `<line class="rail" x1="${x}" y1="0" x2="${x}" y2="76"/><line class="rail" x1="${x + 14}" y1="0" x2="${x + 14}" y2="76"/>`;
+  };
+  const signPost = (x, inner) => `<line class="pole" x1="${x}" y1="22" x2="${x}" y2="40"/><g transform="translate(${x - 12} ${-1}) scale(.24)">${inner}</g>`;
+
+  const SCENES = {
+    towFlex: () => sc('0 0 320 96', road(8, 56) + `<line class="rope" x1="80" y1="50" x2="230" y2="50"/>` + miniFlag(140, 50) + miniFlag(175, 50) + car(60, 50) + car(250, 50) + dim(80, 230, 88, '4–6 м') + `<line class="bound" x1="180" y1="78" x2="180" y2="94"/>`, 'Трос между машинами 4–6 м'),
+    towRigid: () => sc('0 0 320 96', road(8, 56) + `<line class="bar" x1="80" y1="50" x2="180" y2="50"/>` + car(60, 50) + car(200, 50) + dim(80, 180, 88, 'до 4 м'), 'Жёсткая сцепка до 4 м'),
+    tri: d => { const tx = 250 - d * 7; return sc('0 0 320 96', road(8, 56) + car(270, 50, { hz: true }) + triTop(tx, 50) + dim(tx, 250, 88, `не ближе ${d} м`), `Знак аварийной остановки не ближе ${d} м`); },
+    zebra: () => { let z = ''; for (let y = 12; y < 62; y += 8) z += `<rect class="zebra" x="236" y="${y}" width="30" height="4.5"/>`; return sc('0 0 320 96', road(8, 56, 320, false) + `<line class="lane" x1="0" y1="36" x2="230" y2="36"/><line class="lane" x1="272" y1="36" x2="320" y2="36"/>` + z + noZone(166, 236, 37, 63) + car(138, 50) + dim(166, 236, 88, '5 м'), 'Остановка ближе 5 м до перехода запрещена'); },
+    cross30: () => sc('0 0 320 96', road(8, 56, 250) + `<rect class="road" x="250" y="0" width="56" height="96"/><line class="lane" x1="278" y1="0" x2="278" y2="96"/>` + noZone(130, 250, 37, 63) + car(100, 50) + dim(130, 250, 88, '30 м'), 'Остановка ближе 30 м от пересекаемой дороги запрещена'),
+    bus15: () => sc('0 0 320 104', road(8, 56) + `<rect class="walk" x="0" y="64" width="320" height="14"/><rect class="plat" x="138" y="62" width="54" height="8" rx="2"/>` + noZone(78, 138, 37, 63) + noZone(192, 252, 37, 63) + busTop(165, 50) + dim(78, 138, 96, '15 м') + dim(192, 252, 96, '15 м'), 'Остановка ближе 15 м от остановки автобуса запрещена'),
+    solid3: () => sc('0 0 320 104', road(6, 92, 320, false) + `<line class="solid" x1="0" y1="40" x2="320" y2="40"/><text class="lbl" x="8" y="33" fill="var(--road-line)" style="fill:var(--road-line)">сплошная</text>` + car(210, 80, { hz: true }) + car(80, 56, { cls: 'v2' }) + vdim(252, 40, 70, 'меньше 3 м'), 'Между машиной и сплошной меньше 3 м'),
+    rail: d => {
+      let body = road(8, 56) + rails(276);
+      if (d === '10') body += `<rect class="zone" x="236" y="8" width="40" height="56"/><line class="bound" x1="236" y1="4" x2="236" y2="70"/>` + car(180, 50) + dim(236, 276, 88, '10 м');
+      if (d === '100') body += noZone(116, 276, 9, 35) + car(60, 50) + truck(170, 50) + dim(116, 276, 88, 'обгон запрещён: 100 м');
+      if (d === '50') body += noZone(116, 276, 37, 63) + car(82, 50) + dim(116, 276, 88, 'стоянка запрещена: 50 м');
+      return sc('0 0 320 96', body, `Железнодорожный переезд, ${d} м`);
+    },
+    head: () => sc('0 0 320 100', road(8, 64) + `<polygon class="beam" points="60,50 150,45 150,67 60,62"/><polygon class="beam" points="260,18 170,13 170,35 260,30"/>` + car(40, 56) + car(280, 24, { flip: true }) + dim(60, 260, 92, 'не позже чем за 150 м'), 'Переключение на ближний свет за 150 м'),
+    cargoBack: () => sc('0 0 320 100', `<line class="ground" x1="0" y1="91" x2="320" y2="91"/><rect class="v2" x="100" y="62" width="117" height="9"/><rect class="v1" x="215" y="36" width="47" height="44" rx="5"/><rect class="gl" x="238" y="42" width="18" height="14" rx="2"/><rect class="cargo" x="30" y="51" width="185" height="10" rx="2"/>` + `<g transform="translate(26 47)"><rect width="12" height="12" fill="${WHT}" stroke="${RED}"/><path d="M0 6l6-6M3 12l9-9" stroke="${RED}" stroke-width="2.5"/></g>` + `<circle class="wheel" cx="124" cy="81" r="9"/><circle class="wheel" cx="192" cy="81" r="9"/><circle class="wheel" cx="240" cy="81" r="9"/>` + `<line class="bound" x1="100" y1="22" x2="100" y2="62"/>` + dim(30, 100, 30, 'больше 1 м'), 'Груз выступает сзади больше чем на 1 м'),
+    cargoSide: () => sc('0 0 320 100', `<rect class="v2" x="60" y="40" width="162" height="36" rx="2"/><rect class="v1" x="222" y="42" width="40" height="32" rx="5"/><rect class="gl" x="247" y="46" width="8" height="24" rx="2"/><circle class="lamp" cx="64" cy="42" r="3"/><rect class="cargo" x="110" y="20" width="80" height="22" rx="2"/>` + `<line class="bound" x1="30" y1="40" x2="300" y2="40"/>` + vdim(205, 20, 40, 'больше 40 см'), 'Груз выступает сбоку больше чем на 40 см'),
+    seats: k => {
+      const cls = i => (String(i) === String(k) ? 'hl' : 'mute');
+      return sc('0 0 352 110', `<rect class="v2" x="30" y="96" width="242" height="6"/><rect class="v2" x="262" y="16" width="10" height="82"/><rect class="v1" x="132" y="54" width="90" height="7" rx="2"/><line class="leg" x1="142" y1="61" x2="142" y2="96"/><line class="leg" x1="212" y1="61" x2="212" y2="96"/>`
+        + vdim(110, 96, 56, '30–50 см', 'end', cls(0)) + vdim(240, 54, 16, 'от 30 см', 'end', cls(1)) + vdim(287, 96, 16, 'от 80 см', 'start', cls(2)), 'Сиденья и борта в кузове');
+    },
+    wheel: d => {
+      const a = (+d / 2) * Math.PI / 180, R = 56, cx = 160, cy = 64;
+      const x1 = cx - R * Math.sin(a), y1 = cy - R * Math.cos(a), x2 = cx + R * Math.sin(a);
+      return sc('0 0 320 112', `<path class="wedge" d="M${cx} ${cy}L${x1.toFixed(1)} ${y1.toFixed(1)}A${R} ${R} 0 0 1 ${x2.toFixed(1)} ${y1.toFixed(1)}Z"/><circle class="rim" cx="${cx}" cy="${cy}" r="38"/><line class="spoke" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy + 38}"/><line class="spoke" x1="${cx}" y1="${cy}" x2="${cx - 33}" y2="${cy - 19}"/><line class="spoke" x1="${cx}" y1="${cy}" x2="${cx + 33}" y2="${cy - 19}"/><circle class="hub" cx="${cx}" cy="${cy}" r="10"/><text class="wl" x="${(x2 + 8).toFixed(1)}" y="${(y1 + 12).toFixed(1)}">${d}°</text><text class="lbl" x="224" y="96">суммарный люфт</text>`, `Люфт руля ${d} градусов`);
+    },
+    tread: mm => {
+      const h = +mm * 16, base = 78;
+      let blocks = '';
+      for (let i = 0; i < 5; i++) blocks += `<rect class="blk" x="${20 + i * 46}" y="${base - h}" width="34" height="${h}"/>`;
+      return sc('0 0 320 100', `<rect class="v2" x="20" y="${base}" width="218" height="14" rx="2"/>` + blocks + `<rect class="gauge" x="58" y="14" width="4" height="${base - 14}"/><rect class="gauge" x="38" y="${base - h - 4}" width="44" height="4"/>` + vdim(262, base - h, base, `${fmt(mm)} мм`), `Остаток протектора ${fmt(mm)} мм`);
+    },
+    slope: p => {
+      const rise = 280 * +p / 100, ang = Math.atan(+p / 100) * 180 / Math.PI;
+      return sc('0 0 320 108', `<polygon class="slope" points="20,100 300,100 300,${(100 - rise).toFixed(1)}"/><g transform="translate(160 ${(100 - rise / 2).toFixed(1)}) rotate(${(-ang).toFixed(2)})"><rect class="v1" x="-26" y="-20" width="52" height="14" rx="4"/><path class="v1" d="M-14 -20l6 -10h18l6 10z"/><circle class="wheel" cx="-15" cy="-5" r="6"/><circle class="wheel" cx="15" cy="-5" r="6"/></g><text class="big" x="292" y="94" text-anchor="end">${p} %</text>`, `Уклон ${p} процентов`);
+    },
+    brake: m => {
+      const xs = 20 + +m * 13.5;
+      return sc('0 0 320 92', road(14, 50) + `<line class="bound" x1="20" y1="10" x2="20" y2="68"/><text class="lbl" x="25" y="10">начало торможения, 40 км/ч</text><line class="skid" x1="22" y1="33" x2="${xs - 30}" y2="33"/><line class="skid" x1="22" y1="45" x2="${xs - 30}" y2="45"/>` + car(xs - 20, 39) + dim(20, xs, 86, `${fmt(m)} м`), `Тормозной путь ${fmt(m)} м`);
+    },
+    warn: label => sc('0 0 320 104', road(40, 44) + signPost(50, SIGNS.warn()) + `<rect class="haz" x="262" y="40" width="54" height="44"/><text class="hzt" x="289" y="68" text-anchor="middle">!</text>` + dim(50, 262, 98, label), `Предупреждающий знак за ${label} до опасного места`),
+    warnRepeat: () => sc('0 0 320 108', road(40, 30) + signPost(40, SIGNS.rail()) + signPost(190, SIGNS.rail()) + `<rect class="haz" x="262" y="40" width="54" height="30"/>` + rails(282).replace(/y2="76"/g, 'y2="70"') + dim(40, 262, 86, '150–300 м', 'mute') + dim(190, 262, 104, 'от 50 м', 'hl'), 'Повторный знак не ближе 50 м'),
+    works: () => sc('0 0 320 104', road(40, 44) + signPost(190, SIGNS.works()) + `<rect class="haz" x="262" y="40" width="54" height="44"/><text class="hzt" x="289" y="68" text-anchor="middle">!</text>` + dim(190, 262, 98, '10–15 м'), 'Знак дорожных работ за 10–15 м'),
+    steps: () => sc('0 0 320 104', road(46, 40) + [[50, 90], [160, 70], [270, 50]].map(([x, v]) => `<line class="pole" x1="${x}" y1="30" x2="${x}" y2="46"/><g transform="translate(${x - 15} 0) scale(.3)">${SIGNS.speed(v)}</g>`).join('') + dim(50, 160, 98, '100–150 м') + dim(160, 270, 98, '100–150 м'), 'Ступенчатое снижение скорости по 20 км/ч')
+  };
+  function sceneSvg(spec) {
+    const i = spec.indexOf(':');
+    const k = i < 0 ? spec : spec.slice(0, i);
+    const arg = i < 0 ? undefined : spec.slice(i + 1);
+    return SCENES[k] ? SCENES[k](arg) : '';
+  }
+
+  // ---------- State ----------
+  // «Как запомнить»: one line that ties a number to its neighbours. Keyed by card title.
+  const MEM = [
+    ['Город 60, двор 20, автобус и грузовик 50. Знаком в городе лимит поднимают, но не выше 90.',
+      ['В населённом пункте', 'Максимум в городе по знаку', 'Автобусы и грузовики в городе', 'Жилая зона и двор']],
+    ['Лесенка за городом: магистраль, дорога с разделительной полосой, обычная трасса. Легковые 140–110–100, грузовики до 3,5 т и микроавтобусы 110–100–90, автобусы, легковые с прицепом и тяжёлые грузовики 90–80–70.',
+      ['Легковые и мотоциклы на автомагистрали', 'Легковые на дороге с разделительной полосой', 'Легковые на остальных загородных дорогах',
+       'Грузовики до 3,5 т и микроавтобусы на автомагистрали', 'Грузовики до 3,5 т и микроавтобусы: разделительная полоса', 'Грузовики до 3,5 т и микроавтобусы: обычная трасса',
+       'Автобусы, легковые с прицепом, грузовики тяжелее 3,5 т на автомагистрали', 'Автобусы, с прицепом, тяжёлые грузовики: разделительная полоса', 'Автобусы, с прицепом, тяжёлые грузовики: обычная трасса']],
+    ['Люди в кузове — 60, как общий лимит в городе. Буксировка — 50, как грузовик в городе.', ['Люди в кузове грузовика', 'Буксировка']],
+    ['300 м — погода: туман, дождь, снег, сумерки. 100 м — рельеф и препятствия: подъём, поворот, деревья.', ['Недостаточная видимость', 'Ограниченная видимость']],
+    ['Число 100 — про обзор. Видно меньше 100 м: не разворачивайтесь, не вставайте у поворота, а при вынужденной остановке выставьте аварийный знак.',
+      ['Когда аварийный знак нужен даже с аварийкой', 'Разворот при плохом обзоре', 'У опасного поворота и за гребнем подъёма']],
+    ['Переезд: 10 м — граница, 50 м — нет стоянки, 100 м — нет обгона. Чем опаснее манёвр, тем дальше от рельсов.',
+      ['Граница железнодорожного переезда', 'Стоянка у ж/д переезда', 'Обгон перед ж/д переездом']],
+    ['За городом вдвое дальше: 15 м в городе, 30 м на трассе.', ['Знак аварийной остановки в населённом пункте', 'Знак аварийной остановки за городом']],
+    ['Остановка: 3 м до сплошной, 5 м до перехода, 15 м до остановки автобуса, 30 м до перекрёстка.',
+      ['До сплошной линии разметки', 'Перед пешеходным переходом', 'У остановки автобуса или такси', 'От края пересекаемой дороги']],
+    ['Пять минут — граница: меньше — остановка, больше — стоянка, если вы не сажаете людей и не грузите вещи.', ['Остановка или уже стоянка']],
+    ['4 полосы — на встречку нельзя совсем. 3 полосы — нельзя в крайнюю левую. 3 полосы в одну сторону — левая только для обгона и поворота.',
+      ['Встречка на широкой дороге', 'Трёхполосная дорога', 'Крайняя левая полоса']],
+    ['40 км/ч — граница «тихохода»: такие держатся правой полосы и не выезжают на автомагистраль.', ['Медленным — правая полоса', 'Кому нельзя на автомагистраль']],
+    ['3,5 т отделяет лёгкий грузовик от тяжёлого: от неё зависят скорость, полоса на магистрали, обгон под знаком 3.22 и стоянка.',
+      ['Левая сторона дороги с односторонним движением', 'Грузовики на автомагистрали', 'Грузовики в жилой зоне', 'Знак 3.22 касается грузовиков']],
+    ['150 м — дистанция ближнего света: переключайтесь за 150 м, и светоотражатель при ближнем свете виден за те же 150 м.', ['Переключитесь на ближний свет', 'Светоотражающий элемент']],
+    ['Трос 4–6 м, жёсткая сцепка до 4 м: жёсткая никогда не длиннее троса.', ['Гибкая сцепка (трос)', 'Жёсткая сцепка']],
+    ['Возраст: 12 — кресло, 14 — велосипед по дороге, 16 — мопед и пассажир мотоцикла, 18 — самокат по дороге.',
+      ['Детское кресло', 'Велосипед по проезжей части', 'Ребёнок на мотоцикле или мопеде', 'Право управлять мопедом', 'Электросамокат по проезжей части']],
+    ['D1 с 21, D с 23, дети и люди в кузове с 25. Стаж: от 3 лет для D1 и D, от 5 лет для детей, больше 5 лет для кузова.',
+      ['Водитель микроавтобуса D1 (9–16 мест)', 'Водитель автобуса D', 'Водитель автобуса с группой детей', 'Возить людей в кузове грузовика']],
+    ['Без знака груз выступает спереди и сзади до 1 м, сбоку до 40 см. Больше — щиток «Крупногабаритный груз».', ['Груз выступает спереди или сзади', 'Груз выступает сбоку']],
+    ['50 см — предел для двухколёсных: мотоцикл, мопед, велосипед, самокат.', ['Груз на мотоцикле или мопеде', 'Груз на велосипеде или самокате']],
+    ['Кузов: сиденья 30–50 см от пола, до верха борта не меньше 30 см, с детьми борт от 80 см.', ['Высота сидений в кузове', 'От сиденья до верха борта', 'Борта, когда в кузове дети']],
+    ['Колонна — от 3 машин. Больше 10 — сопровождение. Без сопровождения — группы до 5.', ['Организованная колонна', 'Колонна с сопровождением', 'Группы в колонне без сопровождения']],
+    ['Группы по 10 велосипедистов или 5 повозок, между группами 80–100 м.', ['Колонна велосипедистов', 'Интервал между группами велосипедистов']],
+    ['Треугольники: за городом за 150–300 м, в городе за 50–100 м, второй знак за городом не ближе 50 м.',
+      ['Предупреждающие знаки за городом', 'Предупреждающие знаки в городе', 'Повторный предупреждающий знак']],
+    ['Ступени знака 3.24: шаг до 20 км/ч, знаки через 100–150 м.', ['Ступенчатое снижение скорости', 'Расстояние между ступенями']],
+    ['Тормозной путь с 40 км/ч: легковой 14,7 м (почти 15), автобус и грузовик 18,3, с прицепом 19,5.',
+      ['Тормозной путь легкового', 'Тормозной путь автобуса и грузовика', 'Тормозной путь грузовика с прицепом']],
+    ['Ручник: с полным грузом 16 %, пустой легковой или автобус 23 %, пустой грузовик 31 %.',
+      ['Ручник: машина с полной нагрузкой', 'Ручник: легковой или автобус без груза', 'Ручник: грузовик или автопоезд без груза']],
+    ['Люфт руля 10–20–25: легковой, автобус, грузовик.', ['Люфт руля: легковые', 'Люфт руля: автобусы', 'Люфт руля: грузовые']],
+    ['Протектор по возрастанию: мото 0,8, грузовик 1, легковой 1,6, автобус 2. Строже всех автобус: он везёт людей.',
+      ['Протектор: мотоциклы и мопеды', 'Протектор: грузовые', 'Протектор: легковые', 'Протектор: автобусы']],
+    ['Самокат: по паспорту до 25 км/ч, по тротуару до 6 км/ч — со скоростью пешехода.', ['Электросамокат: скорость по паспорту', 'Электросамокат по тротуару']],
+    ['Мопед — два «пятидесяти»: 50 см³ и 50 км/ч.', ['Мопед: объём двигателя']],
+    ['Дети в автобусе: минимум 2 двери. Колонна из 2 автобусов и больше за городом — с полицией.', ['Автобус для группы детей', 'Колонна автобусов с детьми']]
+  ];
+  const MEMMAP = {};
+  MEM.forEach(([text, titles]) => titles.forEach(t => { MEMMAP[t] = text; }));
+
+  // Fines under the Code of Administrative Offences of Kazakhstan (КоАП РК), only where the article is unambiguous.
+  // МРП for 2026: 4 325 тенге (Law No. 239-VIII of 08.12.2025, art. 7).
+  const MRP = 4325;
+  const tenge = m => (m * MRP).toLocaleString('ru-RU').replace(/ /g, ' ') + ' ₸';
+  const mrp = m => `${m} МРП (${tenge(m)})`;
+  const FINE_KINDS = {
+    speed: { lines: ['+10–20 км/ч: ' + mrp(5), '+20–40 км/ч: ' + mrp(10), '+40–60 км/ч: ' + mrp(20), '+60 км/ч и больше: ' + mrp(40)], art: 'ст. 592 КоАП РК' },
+    park: { lines: [mrp(5), 'на тротуаре или газоне, а также если мешаете проезду: ' + mrp(10)], art: 'ст. 597 ч. 1–3 КоАП РК' },
+    parkBlock: { lines: [mrp(10) + ': остановка мешает проезду'], art: 'ст. 597 ч. 3 КоАП РК' },
+    parkWalk: { lines: [mrp(10) + ': стоянка на тротуаре с нарушением правил'], art: 'ст. 597 ч. 2 КоАП РК' },
+    oncoming: { lines: ['лишение прав на 6 месяцев'], art: 'ст. 596 ч. 3 КоАП РК' },
+    position: { lines: [mrp(15)], art: 'ст. 596 ч. 2 КоАП РК' },
+    overtake: { lines: [mrp(15) + ' за нарушение правил обгона', 'с выездом на встречку, где запрещено: лишение прав на 6 месяцев'], art: 'ст. 596 ч. 2 и 3 КоАП РК' },
+    lights: { lines: [mrp(5)], art: 'ст. 602 ч. 1-1 КоАП РК' },
+    carry: { lines: [mrp(5)], art: 'ст. 593 ч. 1 КоАП РК' },
+    tech5: { lines: [mrp(5)], art: 'ст. 590 ч. 5 КоАП РК' },
+    tech15: { lines: [mrp(15) + ': тормоза или рулевое управление неисправны'], art: 'ст. 590 ч. 6 КоАП РК' },
+    noTO: { lines: [mrp(5) + ': ездить без обязательного техосмотра, когда он нужен'], art: 'ст. 590 ч. 9 КоАП РК' },
+    noReg: { lines: [mrp(10) + ': ездить на незарегистрированной машине'], art: 'ст. 590 ч. 2 КоАП РК' },
+    rider: { lines: [mrp(2)], art: 'ст. 615 ч. 1 КоАП РК' }
+  };
+  const FINES = [
+    ['speed', ['В населённом пункте', 'Максимум в городе по знаку', 'Автобусы и грузовики в городе', 'Жилая зона и двор',
+      'Легковые и мотоциклы на автомагистрали', 'Легковые на дороге с разделительной полосой', 'Легковые на остальных загородных дорогах',
+      'Грузовики до 3,5 т и микроавтобусы на автомагистрали', 'Грузовики до 3,5 т и микроавтобусы: разделительная полоса', 'Грузовики до 3,5 т и микроавтобусы: обычная трасса',
+      'Автобусы, легковые с прицепом, грузовики тяжелее 3,5 т на автомагистрали', 'Автобусы, с прицепом, тяжёлые грузовики: разделительная полоса', 'Автобусы, с прицепом, тяжёлые грузовики: обычная трасса',
+      'Люди в кузове грузовика', 'Буксировка']],
+    ['park', ['Перед пешеходным переходом', 'От края пересекаемой дороги', 'У остановки автобуса или такси', 'Стоянка у ж/д переезда', 'Остановка на мосту и эстакаде',
+      'У опасного поворота и за гребнем подъёма', 'Левая сторона дороги с односторонним движением', 'Грузовики в жилой зоне', 'Перестановка машин под знаками 3.29 и 3.30']],
+    ['parkBlock', ['До сплошной линии разметки']],
+    ['parkWalk', ['Проход для пешеходов у машины со знаком инвалида']],
+    ['oncoming', ['Встречка на широкой дороге', 'Трёхполосная дорога']],
+    ['position', ['Крайняя левая полоса', 'Медленным — правая полоса', 'Держитесь правее', 'Грузовики на автомагистрали']],
+    ['overtake', ['Обгон перед ж/д переездом', 'Кого можно обогнать под знаком 3.20']],
+    ['lights', ['Переключитесь на ближний свет', 'Знак аварийной остановки в населённом пункте', 'Знак аварийной остановки за городом', 'Когда аварийный знак нужен даже с аварийкой', 'Недостаточная видимость']],
+    ['carry', ['Детское кресло', 'Ребёнок на мотоцикле или мопеде', 'Груз выступает спереди или сзади', 'Груз выступает сбоку', 'Груз на мотоцикле или мопеде', 'Много людей в кузове']],
+    ['tech5', ['Протектор: мотоциклы и мопеды', 'Протектор: грузовые', 'Протектор: легковые', 'Протектор: автобусы', 'Противооткатные упоры']],
+    ['tech15', ['Тормозной путь легкового', 'Тормозной путь автобуса и грузовика', 'Тормозной путь грузовика с прицепом', 'Ручник: машина с полной нагрузкой',
+      'Ручник: легковой или автобус без груза', 'Ручник: грузовик или автопоезд без груза', 'Утечка воздуха из пневмотормозов', 'Люфт руля: легковые', 'Люфт руля: автобусы', 'Люфт руля: грузовые']],
+    ['noTO', ['Легковой без техосмотра']],
+    ['noReg', ['Регистрация после покупки']],
+    ['rider', ['Электросамокат по тротуару', 'Электросамокат по проезжей части', 'Груз на велосипеде или самокате', 'Колонна велосипедистов']]
+  ];
+  const FINEMAP = {};
+  FINES.forEach(([kind, titles]) => titles.forEach(t => { FINEMAP[t] = FINE_KINDS[kind]; }));
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch])); }
+  const norm = s => String(s).toLowerCase().replace(/ё/g, 'е');
+  F.forEach((f, i) => {
+    f.i = i;
+    f.key = 'f' + i;
+    f.mem = MEMMAP[f.t] || '';
+    f.fine = FINEMAP[f.t] || null;
+    f.twin = f.v + '|' + f.u;
+    f._s = norm([f.t, f.p, f.x, f.v, f.u, f.q, f.r, f.mem, f.fine ? 'штраф ' + f.fine.lines.join(' ') + ' ' + f.fine.art : '', CH[f.ch], f.c.map(c => CAT_LABEL[c]).join(' ')].join(' '));
+  });
+
+  const state = { cats: new Set(), q: '', sort: 'pdd', quiz: false, open: new Set(), perm: null };
+  const KEY = 'pdd-rk-cifry.v1';
+  try {
+    const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (saved) {
+      (saved.cats || []).filter(c => CAT_LABEL[c]).forEach(c => state.cats.add(c));
+      if (['pdd', 'asc', 'desc', 'twins'].includes(saved.sort)) state.sort = saved.sort;
+      state.quiz = !!saved.quiz;
+    }
+  } catch (e) { /* storage unavailable */ }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify({ cats: [...state.cats], sort: state.sort === 'shuffle' ? 'pdd' : state.sort, quiz: state.quiz })); } catch (e) { /* ignore */ }
+  }
+
+  const $ = id => document.getElementById(id);
+  const grid = $('grid'), chips = $('chips');
+  const plural = (n, [one, few, many]) => {
+    const m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return one;
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+    return many;
+  };
+  $('total').textContent = `${F.length} ${plural(F.length, ['число', 'числа', 'чисел'])}`;
+
+  function renderChips() {
+    const count = c => F.filter(f => f.c.includes(c)).length;
+    chips.innerHTML = `<button type="button" class="chip all" data-cat="" aria-pressed="${state.cats.size === 0}">Все темы <span class="n">${F.length}</span></button>`
+      + CATS.map(([k, label]) => `<button type="button" class="chip" data-cat="${k}" aria-pressed="${state.cats.has(k)}">${glyphSvg(k)}${label} <span class="n">${count(k)}</span></button>`).join('');
+  }
+
+  function card(f) {
+    const pic = f.s ? `<div class="pic">${signSvg(f.s)}</div>` : `<div class="pic glyph">${glyphSvg(f.c[0])}</div>`;
+    const scene = f.sc ? `<figure class="scene">${sceneSvg(f.sc)}</figure>` : '';
+    const open = state.open.has(f.key) ? ' open' : '';
+    return `<article class="card${open}" data-key="${f.key}">
+      <div class="card-top">${pic}<div class="val"><span class="q">${esc(f.q || '')}</span><span class="numline"><span class="num">${esc(f.v)}</span><span class="unit">${esc(f.u)}</span></span><button type="button" class="mask" data-act="open">Показать ответ</button></div></div>
+      <h3 class="title">${esc(f.t)}</h3>
+      <div class="body"><p class="plain">${esc(f.p)}</p>${f.mem ? `<p class="mem"><b>Как запомнить:</b> ${esc(f.mem)}</p>` : ''}${f.fine ? `<div class="fine"><b>Штраф</b>${f.fine.lines.map(l => `<span>${esc(l)}</span>`).join('')}<span class="art">${esc(f.fine.art)}</span></div>` : ''}${scene}<details><summary>Текст пункта</summary><blockquote>${esc(f.x)}</blockquote></details></div>
+      <div class="meta"><span class="ref">${esc(f.r)} ${f.ch === 'op' || f.ch === 'pn' || f.ch === 'z1' ? '' : 'ПДД'}</span><span class="cat">${esc(CAT_LABEL[f.c[0]])}</span><button type="button" class="link-btn hide-btn" data-act="close">Скрыть</button></div>
+    </article>`;
+  }
+
+  function visible() {
+    const q = norm(state.q.trim());
+    const words = q.split(/\s+/).filter(Boolean);
+    let list = F.filter(f => (state.cats.size === 0 || f.c.some(c => state.cats.has(c))) && words.every(w => f._s.includes(w)));
+    if (state.sort === 'asc') list = list.slice().sort((a, b) => a.n - b.n || a.i - b.i);
+    else if (state.sort === 'desc') list = list.slice().sort((a, b) => b.n - a.n || a.i - b.i);
+    else if (state.sort === 'shuffle' && state.perm) list = list.slice().sort((a, b) => state.perm[a.i] - state.perm[b.i]);
+    else if (state.sort === 'twins') {
+      // Only numbers that appear on two or more cards: the ones students mix up.
+      const cnt = {};
+      list.forEach(f => { cnt[f.twin] = (cnt[f.twin] || 0) + 1; });
+      list = list.filter(f => cnt[f.twin] > 1).sort((a, b) => a.n - b.n || a.u.localeCompare(b.u) || a.i - b.i);
+    }
+    return list;
+  }
+
+  function render() {
+    const list = visible();
+    let html = '', last = null;
+    const counts = {};
+    const gk = state.sort === 'pdd' ? (f => f.ch) : state.sort === 'twins' ? (f => f.twin) : null;
+    if (gk) list.forEach(f => { counts[gk(f)] = (counts[gk(f)] || 0) + 1; });
+    for (const f of list) {
+      if (gk && gk(f) !== last) {
+        const head = state.sort === 'pdd' ? CH[f.ch] : `${f.v} ${f.u}`;
+        const small = state.sort === 'pdd' ? counts[f.ch] : `${counts[f.twin]} ${plural(counts[f.twin], ['правило', 'правила', 'правил'])}`;
+        html += `<h2 class="gh">${esc(head)}<small>${small}</small></h2>`;
+        last = gk(f);
+      }
+      html += card(f);
+    }
+    grid.innerHTML = html;
+    $('empty').hidden = list.length > 0;
+    document.body.classList.toggle('quiz', state.quiz);
+    $('quiz').setAttribute('aria-pressed', String(state.quiz));
+    $('quizbar').hidden = !state.quiz;
+    document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sort === state.sort)));
+    chips.querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat ? state.cats.has(b.dataset.cat) : state.cats.size === 0)));
+    const filtered = state.cats.size > 0 || state.q.trim() !== '';
+    $('reset').hidden = !filtered;
+    if (state.quiz) {
+      const opened = list.filter(f => state.open.has(f.key)).length;
+      $('count').innerHTML = `Открыто <b>${opened}</b> из <b>${list.length}</b>`;
+    } else {
+      if (state.sort === 'twins') {
+        const groups = new Set(list.map(f => f.twin)).size;
+        $('count').innerHTML = `Числа, которые повторяются: <b>${groups}</b> ${plural(groups, ['число', 'числа', 'чисел'])} на <b>${list.length}</b> ${plural(list.length, ['карточке', 'карточках', 'карточках'])}`;
+      } else {
+        $('count').innerHTML = filtered ? `Показано <b>${list.length}</b> из <b>${F.length}</b>` : `<b>${F.length}</b> ${plural(F.length, ['цифра', 'цифры', 'цифр'])}`;
+      }
+    }
+    const techish = state.cats.has('tech') || /педал|люфт|тормоз/.test(norm(state.q));
+    $('note').hidden = !techish;
+  }
+
+  // ---------- Events ----------
+  chips.addEventListener('click', e => {
+    const b = e.target.closest('.chip');
+    if (!b) return;
+    const c = b.dataset.cat;
+    if (!c) state.cats.clear();
+    else if (state.cats.has(c)) state.cats.delete(c);
+    else state.cats.add(c);
+    save(); render();
+  });
+  document.querySelector('.seg').addEventListener('click', e => {
+    const b = e.target.closest('button[data-sort]');
+    if (!b) return;
+    state.sort = b.dataset.sort;
+    save(); render();
+  });
+  let t;
+  $('q').addEventListener('input', e => {
+    clearTimeout(t);
+    t = setTimeout(() => { state.q = e.target.value; render(); }, 120);
+  });
+  $('quiz').addEventListener('click', () => {
+    state.quiz = !state.quiz;
+    state.open.clear();
+    if (!state.quiz && state.sort === 'shuffle') state.sort = 'pdd';
+    save(); render();
+  });
+  $('shuffle').addEventListener('click', () => {
+    const idx = F.map((_, i) => i);
+    for (let i = idx.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+    state.perm = {};
+    idx.forEach((v, pos) => { state.perm[v] = pos; });
+    state.sort = 'shuffle';
+    state.open.clear();
+    render();
+  });
+  $('closeall').addEventListener('click', () => { state.open.clear(); render(); });
+  const resetAll = () => { state.cats.clear(); state.q = ''; $('q').value = ''; save(); render(); };
+  $('reset').addEventListener('click', resetAll);
+  $('reset2').addEventListener('click', resetAll);
+  grid.addEventListener('click', e => {
+    const b = e.target.closest('[data-act]');
+    if (!b || !state.quiz) return;
+    const key = b.closest('.card').dataset.key;
+    if (b.dataset.act === 'open') state.open.add(key); else state.open.delete(key);
+    render();
+  });
+  // window.print() is blocked inside embedded frames, so the button shows only at the top level.
+  if (window.self === window.top) {
+    $('print').hidden = false;
+    $('print').addEventListener('click', () => window.print());
+  }
+
+  renderChips();
+  render();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Перекрёстки ПДД РК</title>
+<meta name="description" content="Тренажёр очереди проезда перекрёстков по ПДД Республики Казахстан: равнозначные, неравнозначные, регулируемые, трамвай, кольцо, разделительная полоса.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:wght@500;600;700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* Layout: asphalt hero, sticky filter strip, grid of scenario cards.
+   Each card: top-view intersection (SVG) + tap-in-order quiz + animated answer + rule reference. */
+:root {
+  --bg: #F2F5F7;
+  --surface: #FFFFFF;
+  --surface-2: #EAF0F3;
+  --ink: #14202A;
+  --ink-2: #33414D;
+  --muted: #5B6975;
+  --line: #D5DEE4;
+  --accent: #0A87A8;
+  --accent-text: #006C8A;
+  --accent-soft: #DCF1F6;
+  --ok: #1E8C4E;
+  --ok-soft: #E1F4E8;
+  --bad: #C62A2F;
+  --bad-soft: #FBE6E6;
+  --road: #3A434A;
+  --road-line: #EEF2F4;
+  --ground: #D7E2D2;
+  --curb: #B9C6CE;
+  --on-road: #F3F6F8;
+  --on-road-2: #AEBAC3;
+  --f-num: "Fira Sans Extra Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --f-body: "Golos Text", system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1317; --surface: #151D23; --surface-2: #1B252C; --ink: #E3EAEE; --ink-2: #C3CDD4; --muted: #93A2AD;
+    --line: #283540; --accent: #3BBFDB; --accent-text: #5CCBE3; --accent-soft: #0E3540;
+    --ok: #4CC97F; --ok-soft: #12321F; --bad: #F0666B; --bad-soft: #3A1719;
+    --road: #3C464E; --road-line: #D9E1E6; --ground: #22302A; --curb: #4A5862; --on-road: #F3F6F8; --on-road-2: #B5C2CB;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1317; --surface: #151D23; --surface-2: #1B252C; --ink: #E3EAEE; --ink-2: #C3CDD4; --muted: #93A2AD;
+  --line: #283540; --accent: #3BBFDB; --accent-text: #5CCBE3; --accent-soft: #0E3540;
+  --ok: #4CC97F; --ok-soft: #12321F; --bad: #F0666B; --bad-soft: #3A1719;
+  --road: #3C464E; --road-line: #D9E1E6; --ground: #22302A; --curb: #4A5862; --on-road: #F3F6F8; --on-road-2: #B5C2CB;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--f-body); -webkit-text-size-adjust: 100%; }
+.wrap {
+  max-width: 1240px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+a { color: var(--accent-text); }
+
+/* Hero */
+.hero { background: #2B3339; color: var(--on-road); }
+.hero .wrap { padding-block: 28px 30px; display: grid; gap: 10px; }
+.kicker { margin: 0; font: 600 12px/1.3 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--on-road-2); display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.kicker .kz { background: #00AFCA; color: #062A33; padding: 3px 8px; border-radius: 4px; }
+.hero h1 { margin: 0; font: 700 clamp(44px, 9vw, 92px)/.92 var(--f-num); text-transform: uppercase; text-wrap: balance; }
+.hero h1 span { color: #FFC72C; }
+.lead { margin: 0; max-width: 64ch; color: var(--on-road-2); font-size: 16px; }
+.lead b { color: var(--on-road); font-weight: 600; }
+.hero-links { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; }
+.hero-links a { color: #7FDBEC; font-weight: 600; }
+.lane-line { height: 6px; margin-top: 4px; background: repeating-linear-gradient(90deg, var(--on-road) 0 56px, transparent 56px 96px); opacity: .9; }
+
+/* Controls */
+.controls { background: var(--bg); border-bottom: 1px solid var(--line); z-index: 5; }
+.controls .wrap { padding-block: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+@media (min-width: 760px) {
+  .controls { position: sticky; top: env(safe-area-inset-top, 0px); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+}
+.chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 auto; min-width: 0; }
+@media (max-width: 759px) { .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; } }
+.chip { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; height: 34px; padding: 0 12px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+.chip .n { font: 600 12px var(--f-num); color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.chip[aria-pressed="true"] .n { color: var(--surface); opacity: .7; }
+.chip.todo[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
+.progress { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); white-space: nowrap; }
+.progress b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.bar { width: 90px; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--ok); width: 0; transition: width .3s; }
+.link-btn { border: 0; background: transparent; color: var(--accent-text); font-weight: 600; padding: 4px 2px; font-size: 14px; }
+.link-btn:hover { text-decoration: underline; }
+
+/* Legend */
+.legend { margin: 18px 0 6px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 16px; }
+.legend summary { cursor: pointer; font-weight: 600; padding: 10px 0; }
+.legend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 10px 18px; padding: 4px 0 14px; }
+.lg { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; font-size: 13.5px; color: var(--ink-2); }
+.lg svg { width: 44px; height: 44px; }
+.how { margin: 0 0 12px; font-size: 14px; color: var(--ink-2); max-width: 80ch; }
+
+/* Sections */
+.list { display: grid; gap: 14px; padding-block: 10px 30px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 450px), 1fr)); align-items: start; }
+.sec { grid-column: 1 / -1; margin-top: 18px; display: grid; gap: 10px; }
+.sec:first-child { margin-top: 4px; }
+.sec h2 { margin: 0; font: 700 clamp(26px, 4vw, 34px)/1.05 var(--f-num); text-transform: uppercase; letter-spacing: .01em; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.sec h2 small { font: 600 15px var(--f-num); color: var(--muted); letter-spacing: 0; }
+.rules { margin: 0; padding: 12px 16px 12px 34px; background: var(--accent-soft); border-radius: var(--r); display: grid; gap: 4px; max-width: 980px; font-size: 14.5px; }
+.rules li::marker { color: var(--accent-text); font-weight: 700; }
+
+/* Card */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card.ok { border-color: var(--ok); }
+.card-h { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; }
+.card-h h3 { margin: 0; font: 600 17px/1.3 var(--f-body); text-wrap: balance; }
+.tag { font: 600 11px/1 var(--f-body); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.tag .tick { color: var(--ok); margin-left: 6px; }
+.stage { position: relative; width: 100%; max-width: 460px; margin: 0 auto; }
+.stage svg { display: block; width: 100%; height: auto; border-radius: 10px; touch-action: manipulation; }
+.setup { margin: 0; font-size: 14px; color: var(--ink-2); }
+.who { display: flex; flex-wrap: wrap; gap: 6px; }
+.who button { border: 1px solid var(--line); background: var(--surface-2); border-radius: 9px; padding: 5px 10px 5px 6px; font-size: 13.5px; display: inline-flex; align-items: center; gap: 7px; }
+.who button i { width: 20px; height: 20px; border-radius: 50%; display: inline-grid; place-items: center; font: 700 11px var(--f-body); font-style: normal; color: #14202A; border: 2.5px solid; background: #fff; }
+.who button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.who button b { font: 700 12px var(--f-num); color: var(--accent-text); min-width: 10px; }
+.hint { margin: 0; font-size: 13.5px; color: var(--muted); }
+.seq { font-weight: 600; color: var(--ink); }
+.act { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { height: 38px; padding: 0 14px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; font-size: 14px; }
+.btn.primary { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.btn:disabled { opacity: .45; cursor: default; }
+.result { border-radius: 10px; padding: 12px 14px; background: var(--surface-2); display: grid; gap: 6px; font-size: 14.5px; }
+.result p { margin: 0; }
+.verdict { font-weight: 700; }
+.card.r-ok .result { background: var(--ok-soft); }
+.card.r-ok .verdict { color: var(--ok); }
+.card.r-bad .result { background: var(--bad-soft); }
+.card.r-bad .verdict { color: var(--bad); }
+.answer { font: 600 15px/1.4 var(--f-body); }
+.answer .n { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #FFC72C; color: #14202A; font: 700 12px var(--f-num); margin-right: 4px; vertical-align: 1px; }
+.why { color: var(--ink-2); }
+.ref { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+/* Scene */
+.sc .ground { fill: var(--ground); }
+.sc .rd { fill: var(--road); }
+.sc .gnd-c { fill: var(--ground); }
+.sc .curb { fill: none; stroke: var(--curb); stroke-width: 2; }
+.sc .lane { stroke: var(--road-line); stroke-width: 2; stroke-dasharray: 12 10; fill: none; }
+.sc .stop { stroke: var(--road-line); stroke-width: 4; }
+.sc .zebra { fill: var(--road-line); }
+.sc .island { fill: var(--ground); stroke: var(--curb); stroke-width: 3; }
+.sc .median { fill: var(--ground); stroke: var(--curb); stroke-width: 2; }
+.sc .rail-o { fill: none; stroke: #9AA5AD; stroke-width: 11; }
+.sc .rail-i { fill: none; stroke: var(--road); stroke-width: 7; }
+.sc .mainhl { fill: #FFC72C; fill-opacity: .2; display: none; }
+.card.answer .sc .mainhl { display: inline; }
+.sc .veh, .sc .bdg { cursor: pointer; }
+.sc .ans, .sc .pk, .sc .xs { display: none; }
+.sc .ans.on, .card.answer .sc .ans { display: inline; }
+.card.answer .sc .xs { display: inline; }
+.sc .pk.on { display: inline; }
+.card.answer .sc .pk.on { display: none; }
+.sc .arrow { fill: none; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; opacity: .9; }
+.sc .arrow.dash { stroke-dasharray: 2 6; }
+.sc .blink { animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: .15; } }
+.sc .snow { fill: #FFFFFF; fill-opacity: .55; }
+@media (prefers-reduced-motion: reduce) { .sc .blink { animation: none; } .bar i { transition: none; } }
+
+.foot { padding-block: 24px 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; display: grid; gap: 8px; }
+.foot p { margin: 0; max-width: 90ch; }
+.foot b { color: var(--ink-2); }
+
+@media print {
+  :root:not(#x), :root[data-theme]:not(#x) {
+    --bg: #fff; --surface: #fff; --surface-2: #F1F4F6; --ink: #000; --ink-2: #1E2A33; --muted: #4B5863; --line: #C9D2D8;
+    --accent-soft: #EEF7FA; --road: #4A545B; --road-line: #F2F5F7; --ground: #E3EBDF; --curb: #B9C6CE; color-scheme: light;
+  }
+  @page { size: A4; margin: 10mm; }
+  body { font-size: 10.5px; }
+  .controls, .legend, .who, .hint, .act, .verdict, .replay, .lane-line, .hero-links { display: none; }
+  .hero { background: none; color: #000; }
+  .hero .wrap { padding: 0 0 4px; gap: 3px; }
+  .hero h1 { font-size: 26px; }
+  .hero h1 span { color: #000; }
+  .kicker, .lead { color: #333; font-size: 10px; }
+  .kicker .kz { background: none; padding: 0; color: #333; }
+  .wrap { max-width: none; padding: 0; }
+  .list { grid-template-columns: 1fr 1fr; gap: 6px; padding: 0; }
+  .sec { margin-top: 4px; break-after: avoid; }
+  .sec h2 { font-size: 16px; }
+  .rules { font-size: 9.5px; padding: 6px 8px 6px 22px; }
+  .card { break-inside: avoid; padding: 6px 8px; gap: 4px; border-radius: 6px; }
+  .card-h h3 { font-size: 11.5px; }
+  .stage { max-width: 62mm; }
+  .setup { font-size: 9.5px; }
+  .result { display: grid !important; padding: 5px 7px; font-size: 9.5px; gap: 2px; background: #F1F4F6 !important; }
+  .answer { font-size: 10.5px; }
+  .ref { font-size: 9px; }
+  .sc .ans, .sc .xs, .sc .mainhl { display: inline !important; }
+  .sc .pk { display: none !important; }
+  .foot { font-size: 9px; padding: 6px 0 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker"><span class="kz">Казахстан</span><span>Тренажёр очереди проезда</span><span>сверено с adilet.zan.kz 22.10.2026</span></p>
+    <h1>Перекрёстки <span>ПДД РК</span></h1>
+    <p class="lead"><b id="total">39 ситуаций</b>: равнозначные, неравнозначные, регулируемые, трамвай, кольцо, разделительная полоса. Нажимайте участников в том порядке, в каком они проедут, и смотрите, как они едут по очереди. К каждому ответу приложен пункт ПДД.</p>
+    <p class="hero-links"><a href="./">Все тренажёры</a><a href="cifry.html">Цифры ПДД РК →</a><a href="znaki.html">Знаки и разметка →</a><a href="kolca.html">Кольца →</a><a href="razvoroty.html">Развороты и перестроения →</a><a href="stoyanka.html">Стоянка и остановка →</a></p>
+    <div class="lane-line" aria-hidden="true"></div>
+  </div>
+</header>
+
+<section class="controls" aria-label="Фильтры">
+  <div class="wrap">
+    <div class="chips" id="chips" role="group" aria-label="Тип перекрёстка"></div>
+    <div class="progress"><span>Верно: <b id="okc">0</b> из <b id="okt">0</b></span><span class="bar" aria-hidden="true"><i id="okbar"></i></span><button type="button" class="link-btn" id="resetp">Сбросить</button></div>
+  </div>
+</section>
+
+<div class="wrap">
+  <details class="legend" id="legend">
+    <summary>Как читать схему</summary>
+    <p class="how">Вид сверху, движение правостороннее. Стрелка показывает, куда едет участник. Нажмите на машину или на кнопку с её буквой: так вы назначаете очередь. Кому сейчас ехать нельзя (красный, жест регулировщика), не нажимайте. Те, кто едет одновременно, могут стоять в вашем ответе в любом порядке между собой.</p>
+    <div class="legend-grid" id="legend-grid"></div>
+  </details>
+  <main class="list" id="list"></main>
+</div>
+
+<footer class="wrap foot">
+  <p><b>Источник.</b> Правила дорожного движения РК, приказ Министра внутренних дел от 30 июня 2023 года № 534, с изменениями по приказу № 305 от 27.04.2026: глава 5 (сигналы светофора и регулировщика), глава 6 (спецсигналы), глава 13 (проезд перекрёстков), Приложение 1 (знаки приоритета). Текст: <a href="https://adilet.zan.kz/rus/docs/V2300033003" target="_blank" rel="noopener">adilet.zan.kz</a>.</p>
+  <p><b>Кольцо и островок.</b> Отдельного пункта о круговом движении в ПДД РК нет. Кольцо без знаков приоритета и светофоров — равнозначный перекрёсток (п. 103), со знаком 2.4 на въезде главное кольцо. Пересечения проезжих частей, разделённых островком, тренажёр считает отдельными перекрёстками, как требуют на экзамене.</p>
+</footer>
+
+<script>
+(() => {
+  // ---------- Geometry ----------
+  const ANG = { S: 0, W: 90, N: 180, E: 270 };
+  function rot(x, y, a) {
+    const r = a * Math.PI / 180, c = Math.cos(r), s = Math.sin(r), dx = x - 200, dy = y - 200;
+    return [200 + dx * c - dy * s, 200 + dx * s + dy * c];
+  }
+  const rotPath = (d, a) => !a ? d : d.replace(/(-?\d+(?:\.\d+)?)[ ,]+(-?\d+(?:\.\d+)?)/g, (m, x, y) => {
+    const [X, Y] = rot(+x, +y, a); return `${X.toFixed(1)} ${Y.toFixed(1)}`;
+  });
+  // Paths for a participant approaching from the south (bottom), heading north. Others are rotations.
+  const SP = {
+    st: 'M225 420 L225 -80',
+    r: 'M225 420 L225 268 Q225 225 268 225 L480 225',
+    l: 'M225 420 L225 262 C225 240 200 228 186 214 C172 200 160 178 130 175 L-80 175',
+    u: 'M225 420 L225 232 C225 186 175 186 175 232 L175 480'
+  };
+  const MOVE = { st: 'прямо', r: 'направо', l: 'налево', u: 'разворот' };
+  const BOX = { cross: [150, 250, 150, 250, 40], t: [150, 250, 150, 250, 40], ring: [95, 305, 95, 305, 30], divided: [150, 250, 115, 285, 30] };
+
+  // ---------- Fixed real-world colours (signs, lights, vehicles) ----------
+  const RED = '#D52B1E', BLUE = '#1E5AA8', YEL = '#FFC72C', BLK = '#14181B', WHT = '#FFFFFF';
+  const COL = { 'А': '#2F80ED', 'Б': '#F2994A', 'В': '#27AE60', 'Г': '#A35BE0', 'Т': '#D64545', 'Т1': '#D64545', 'Т2': '#B83A8F', 'С': '#E8EEF2', 'П': '#E86FB0', '_': '#8C96A0' };
+
+  const SIGN = {
+    '2.1': () => `<path d="M50 3L97 50L50 97L3 50Z" fill="${WHT}" stroke="${BLK}" stroke-width="3"/><path d="M50 18L82 50L50 82L18 50Z" fill="${YEL}"/>`,
+    '2.4': () => `<path d="M7 12H93L50 91Z" fill="${WHT}" stroke="${RED}" stroke-width="10" stroke-linejoin="round"/>`,
+    '2.5': () => `<path d="M31 3H69L97 31V69L69 97H31L3 69V31Z" fill="${RED}" stroke="${WHT}" stroke-width="4"/><text x="50" y="59" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="25" fill="${WHT}">STOP</text>`,
+    '4.3': () => `<circle cx="50" cy="50" r="46" fill="${BLUE}"/><g fill="none" stroke="${WHT}" stroke-width="7" stroke-linecap="round"><path d="M30 34A26 26 0 0 1 64 27"/><path d="M73 45A26 26 0 0 1 60 74"/><path d="M42 75A26 26 0 0 1 25 52"/></g><g fill="${WHT}"><path d="M64 18L75 30L60 34Z"/><path d="M70 74L56 80L57 66Z"/><path d="M17 50L27 41L32 55Z"/></g>`
+  };
+  const signG = (k, x, y, s = .26) => `<g transform="translate(${x - 50 * s} ${y - 50 * s}) scale(${s})">${SIGN[k]()}</g>`;
+  // Plate 7.13 is read from its sign's side (the edge nearest the sign is "up"), and the plate sits on the
+  // approach-rotated side of its sign. Drawing the arms in map orientation therefore gives each driver
+  // their own view: own road at the bottom.
+  function plateG(at, arms, main, x, y, s = .2) {
+    const V = { S: [0, 1], N: [0, -1], W: [-1, 0], E: [1, 0] };
+    const line = (k, w) => { const [vx, vy] = V[k]; return `<line x1="50" y1="50" x2="${50 + vx * 40}" y2="${50 + vy * 40}" stroke="${BLK}" stroke-width="${w}" stroke-linecap="round"/>`; };
+    return `<g transform="translate(${x - 50 * s} ${y - 50 * s}) scale(${s})"><rect x="2" y="2" width="96" height="96" rx="6" fill="${WHT}" stroke="${BLK}" stroke-width="4"/>${arms.filter(k => !main.includes(k)).map(k => line(k, 6)).join('')}${main.map(k => line(k, 14)).join('')}</g>`;
+  }
+  function lightG(x, y, o) {
+    const dim = '#3A3F44';
+    if (o.t) {
+      // Tram light (p. 30): three upper signals (left, straight, right) and one lower, moon-white.
+      const lit = k => o.t.includes(k) ? '#F4EFD8' : dim;
+      return `<rect x="${x - 12}" y="${y - 11}" width="24" height="22" rx="4" fill="#1A1D20" stroke="#5C656C" stroke-width="1"/>`
+        + `<circle cx="${x - 6.5}" cy="${y - 4.5}" r="3.4" fill="${lit('l')}"/><circle cx="${x}" cy="${y - 4.5}" r="3.4" fill="${lit('m')}"/><circle cx="${x + 6.5}" cy="${y - 4.5}" r="3.4" fill="${lit('r')}"/><circle cx="${x}" cy="${y + 5}" r="3.4" fill="${lit('b')}"/>`;
+    }
+    const c = o.c;
+    const red = c === 'r' ? '#E5484D' : dim, yel = (c === 'y' || c === 'yb') ? '#F5B83D' : dim, grn = c === 'g' ? '#30C26B' : dim;
+    let g = `<rect x="${x - 6.5}" y="${y - 16}" width="13" height="32" rx="3.5" fill="#1A1D20" stroke="#5C656C" stroke-width="1"/>`
+      + `<circle cx="${x}" cy="${y - 9}" r="3.8" fill="${red}"/><circle cx="${x}" cy="${y}" r="3.8" fill="${yel}"${c === 'yb' ? ' class="blink"' : ''}/><circle cx="${x}" cy="${y + 9}" r="3.8" fill="${grn}"/>`
+      + (o.contour === 'st' ? `<path d="M${x} ${y + 11.8}V${y + 6.4}M${x - 1.9} ${y + 8.2}L${x} ${y + 6.3}L${x + 1.9} ${y + 8.2}" stroke="#0E2014" stroke-width="1.3" fill="none"/>` : '');
+    if (o.arrow) {
+      const on = o.arrow === 'on';
+      g += `<rect x="${x + 6}" y="${y + 3}" width="11" height="12" rx="2.5" fill="#1A1D20" stroke="#5C656C" stroke-width="1"/><circle cx="${x + 11.5}" cy="${y + 9}" r="3.8" fill="${on ? '#30C26B' : dim}"/>${on ? `<path d="M${x + 9.2} ${y + 9}h4.3m-1.6 -1.8l1.8 1.8l-1.8 1.8" stroke="#0E2014" stroke-width="1.3" fill="none"/>` : ''}`;
+    }
+    if (o.plus) g += `<rect x="${x + 6}" y="${y - 15}" width="11" height="12" rx="2.5" fill="#1A1D20" stroke="#5C656C" stroke-width="1"/><path d="M${x + 11.5} ${y - 12.5}v7M${x + 8} ${y - 9}h7" stroke="#30C26B" stroke-width="2.4"/>`;
+    return g;
+  }
+  function regulatorG(face, pose) {
+    const navy = '#1B2A6B';
+    let arms = '';
+    if (pose === 'side') arms = `<path d="M-12 0H-31M12 0H31" stroke="${navy}" stroke-width="5" stroke-linecap="round"/>`;
+    if (pose === 'right') arms = `<path d="M-12 0V22" stroke="${navy}" stroke-width="5" stroke-linecap="round"/><path d="M-12 22V34" stroke="${WHT}" stroke-width="3.5" stroke-linecap="round"/><path d="M-12 30V34" stroke="${RED}" stroke-width="3.5" stroke-linecap="round"/>`;
+    // Arm raised straight up: seen from above, the baton tip shows over the right shoulder.
+    const over = pose === 'up' ? `<circle cx="-12" cy="0" r="6" fill="${WHT}" stroke="${navy}" stroke-width="2"/><circle cx="-12" cy="0" r="2.6" fill="${RED}"/>` : '';
+    return `<g transform="translate(200 200) rotate(${ANG[face]})"><circle r="30" fill="${WHT}" fill-opacity=".14"/>${arms}<ellipse rx="14" ry="7.5" fill="${navy}"/><circle r="6.5" fill="${WHT}" stroke="${navy}" stroke-width="2"/><path d="M-4 5L4 5L0 11Z" fill="${navy}"/>${over}</g>`;
+  }
+
+  // Vehicles are drawn heading up, centred on the origin.
+  const HALF = { car: 18, tram: 32, amb: 19, ped: 6, bike: 14 };
+  function vehicleSVG(p) {
+    const c = COL[p.id] || '#2F80ED';
+    if (p.kind === 'bike') return `<rect x="-1.8" y="-14" width="3.6" height="28" rx="1.8" fill="#1F2328"/><ellipse cy="1" rx="7.5" ry="4.5" fill="${c}"/><circle cy="-1" r="3.6" fill="#E8B98A"/>`;
+    if (p.kind === 'tram') return `<rect x="-11" y="-32" width="22" height="64" rx="6" fill="${c}"/><rect x="-7.5" y="-28" width="15" height="56" rx="3" fill="${WHT}" fill-opacity=".28"/><path d="M-6 -4H6M0 -4V4" stroke="${BLK}" stroke-width="1.5" opacity=".6"/>`;
+    if (p.kind === 'amb') return `<rect x="-10.5" y="-19" width="21" height="38" rx="5" fill="${WHT}" stroke="#B8C2C9" stroke-width="1"/><rect x="-10.5" y="2" width="21" height="4" fill="${RED}"/><rect x="-8" y="-11" width="16" height="6" rx="2" fill="#0B1820" opacity=".5"/><rect x="-7" y="-3" width="6" height="3.5" rx="1" fill="#2D6BFF" class="blink"/><rect x="1" y="-3" width="6" height="3.5" rx="1" fill="#2D6BFF"/><path d="M0 9v7M-3.5 12.5h7" stroke="${RED}" stroke-width="2.2"/>`;
+    if (p.kind === 'ped') return `<ellipse rx="9" ry="5.5" fill="${c}"/><circle r="4.5" fill="#E8B98A"/>`;
+    return `<rect x="-10" y="-18" width="20" height="36" rx="5.5" fill="${c}"/><rect x="-8" y="-10" width="16" height="7" rx="2" fill="#0B1820" opacity=".55"/><rect x="-8" y="8" width="16" height="5" rx="2" fill="#0B1820" opacity=".45"/><circle cx="-6" cy="-17" r="1.8" fill="#FFF6C9"/><circle cx="6" cy="-17" r="1.8" fill="#FFF6C9"/>`;
+  }
+
+  // ---------- Layouts ----------
+  function roadsSVG(s) {
+    const L = s.lay;
+    let g = `<rect class="ground" x="0" y="0" width="400" height="400"/>`;
+    const fillet = (cx, cy, sx, sy) => `<rect class="rd" x="${Math.min(cx, cx + sx * 16)}" y="${Math.min(cy, cy + sy * 16)}" width="16" height="16"/><circle class="gnd-c" cx="${cx + sx * 16}" cy="${cy + sy * 16}" r="16"/>`;
+    if (L === 'cross' || L === 't') {
+      g += `<rect class="rd" x="0" y="150" width="400" height="100"/>`;
+      g += L === 'cross' ? `<rect class="rd" x="150" y="0" width="100" height="400"/>` : `<rect class="rd" x="150" y="150" width="100" height="250"/>`;
+      if (L === 'cross') g += fillet(150, 150, -1, -1) + fillet(250, 150, 1, -1);
+      g += fillet(150, 250, -1, 1) + fillet(250, 250, 1, 1);
+      g += `<path class="lane" d="M0 200H142M258 200H400M200 258V400${L === 'cross' ? 'M200 0V142' : ''}"/>`;
+      g += `<path class="stop" d="M200 258H250M142 200V250M258 150V200${L === 'cross' ? 'M150 142H200' : ''}"/>`;
+    }
+    if (L === 'ring') {
+      g += `<rect class="rd" x="0" y="150" width="400" height="100"/><rect class="rd" x="150" y="0" width="100" height="400"/><circle class="rd" cx="200" cy="200" r="102"/>`;
+      g += `<path class="lane" d="M0 200H92M308 200H400M200 308V400M200 0V92"/>`;
+      g += `<circle class="island" cx="200" cy="200" r="55"/>`;
+    }
+    if (L === 'divided') {
+      g += `<rect class="rd" x="0" y="115" width="400" height="170"/><rect class="rd" x="150" y="0" width="100" height="400"/>`;
+      g += `<rect class="median" x="-4" y="165" width="154" height="70" rx="10"/><rect class="median" x="250" y="165" width="154" height="70" rx="10"/>`;
+      g += `<path class="lane" d="M200 0V107M200 293V400"/>`;
+      g += `<path class="stop" d="M200 293H250M150 107H200M200 172H250M150 228H200M142 235V285M258 115V165"/>`;
+    }
+    return g;
+  }
+  function extrasSVG(s) {
+    let g = '';
+    if (s.main) {
+      const R = { W: [0, 150, 150, 100], E: [250, 150, 150, 100], N: [150, 0, 100, 150], S: [150, 250, 100, 150] };
+      g += `<g class="mainhl"><rect x="150" y="150" width="100" height="100"/>${s.main.map(k => `<rect x="${R[k][0]}" y="${R[k][1]}" width="${R[k][2]}" height="${R[k][3]}"/>`).join('')}</g>`;
+    }
+    if (s.crosswalk === 'E') { for (let y = 154; y < 248; y += 12) g += `<rect class="zebra" x="264" y="${y}" width="26" height="6"/>`; }
+    if (s.bikepath === 'W') g += `<rect x="100" y="0" width="24" height="400" fill="#B5523B" fill-opacity=".85"/><path d="M100 150V250M124 150V250" stroke="#FFFFFF" stroke-width="1.6" stroke-dasharray="5 4"/>`;
+    // Parked or queued vehicles that take no part in the question.
+    (s.decor || []).forEach(d => { g += `<g transform="translate(${d.x} ${d.y}) rotate(${d.r || 0})">${vehicleSVG({ id: '_' })}</g>`; });
+    if (s.dirt) {
+      g += `<rect x="150" y="252" width="100" height="148" fill="#8A6A45"/>`;
+      for (let i = 0; i < 40; i++) { const x = 155 + (i * 37) % 90, y = 258 + (i * 53) % 136; g += `<circle cx="${x}" cy="${y}" r="${1 + (i % 3)}" fill="#6E5235"/>`; }
+    }
+    if (s.snow) {
+      g += `<rect class="snow" x="0" y="150" width="400" height="100"/><rect class="snow" x="150" y="0" width="100" height="400"/>`;
+      for (let i = 0; i < 70; i++) { const x = (i * 61) % 400, y = (i * 97) % 400; g += `<circle cx="${x}" cy="${y}" r="${1.2 + (i % 3) * .8}" fill="#FFFFFF" opacity=".9"/>`; }
+    }
+    return g;
+  }
+  // Positions for an approach from the south, rotated for the others: right-hand roadside, before the junction.
+  const SIGN_POS = [276, 304], LIGHT_POS = [276, 268];
+  function controlsSVG(s) {
+    let g = '';
+    const at = (k, p) => rot(p[0], p[1], ANG[k]);
+    if (s.signs) Object.entries(s.signs).forEach(([k, list]) => {
+      list.forEach((sg, i) => { const [x, y] = at(k, [SIGN_POS[0], SIGN_POS[1] + i * 28]); g += signG(sg, x, y); });
+      if (s.plate) { const [x, y] = at(k, [SIGN_POS[0], SIGN_POS[1] + list.length * 25]); g += plateG(k, s.plate.arms, s.plate.main, x, y); }
+    });
+    (s.signsAt || []).forEach(o => { o.list.forEach((sg, i) => { g += signG(sg, o.x, o.y - i * 28); }); });
+    if (s.lights) Object.entries(s.lights).forEach(([k, o]) => { const [x, y] = at(k, LIGHT_POS); g += lightG(x, y, o); });
+    (s.lightsAt || []).forEach(o => { g += lightG(o.x, o.y, o); });
+    if (s.reg) g += regulatorG(s.reg.face, s.reg.pose);
+    return g;
+  }
+
+  // ---------- Scenarios ----------
+  const GROUPS = [
+    { k: 'eq', t: 'Равнозначные', rules: [
+      'Знаков приоритета нет, светофор не работает, у дорог одинаковое покрытие: дороги равнозначные. Знак 1.6 предупреждает о таком перекрёстке.',
+      'Уступите тому, кто приближается справа (п. 103).',
+      'Поворачивая налево или разворачиваясь, уступите встречным, которые едут прямо или направо (п. 104).',
+      'Встречные, которые оба поворачивают налево, разъезжаются правыми бортами и едут одновременно (п. 95-1).',
+      'Трамвай едет раньше безрельсовых при любом направлении. Трамваи между собой решают по помехе справа (п. 103).'] },
+    { k: 'un', t: 'Неравнозначные', rules: [
+      'Главную дорогу обозначают знаки 2.1, 2.3.1–2.3.3 и 5.1. Дорога с твёрдым покрытием главнее грунтовой и без знаков (п. 2, пп. 9).',
+      'Со второстепенной уступите всем на главной, куда бы они ни ехали, в том числе разворачивающимся и трамваю (п. 101).',
+      'По главной между собой: налево и на разворот уступают встречным, которые едут прямо и направо (п. 104).',
+      'Главная поворачивает (табличка 7.13): кто едет по главной, решает между собой по помехе справа. Кто по второстепенным, тоже (п. 102).',
+      'Знак 2.5: остановитесь у стоп-линии, дальше уступайте, как при знаке 2.4.'] },
+    { k: 'rg', t: 'Регулируемые', rules: [
+      'Сигналы светофора важнее знаков приоритета, регулировщик важнее светофора (п. 38).',
+      'На зелёный налево и на разворот уступают встречным, которые едут прямо и направо (п. 95).',
+      'По стрелке дополнительной секции при красном или жёлтом уступите всем с других направлений (п. 96).',
+      'На общий зелёный трамвай едет раньше безрельсовых в любом направлении. По стрелке дополнительной секции трамвай уступает (п. 97).',
+      'Загорелся зелёный: сначала пропустите тех, кто заканчивает проезд, и пешеходов (п. 99).',
+      'Жёлтый мигающий или выключенный светофор: перекрёсток нерегулируемый, очередь задают знаки (п. 94).',
+      'Регулировщик, руки в стороны или опущены: с боков трамваю прямо, остальным прямо и направо, с груди и спины стоят все. Правая рука вперёд: с левого бока трамваю налево, остальным в любую сторону, с груди всем только направо, с правого бока и спины стоят все. Рука вверх: стоят все, кроме тех, кто уже не может остановиться (п. 33, 37).',
+      'Выключенная дополнительная секция запрещает движение в её направлении (п. 25). За перекрёстком затор: не въезжайте даже на зелёный (п. 92).'] },
+    { k: 'sp', t: 'Особые случаи', rules: [
+      'Машине с синим маячком и сиреной уступают все. Ей можно ехать на красный (п. 40, 41).',
+      'Кольцо без знаков приоритета и светофоров — равнозначный перекрёсток: помеха справа, въезжающий едет первым, машины на кольце уступают (п. 103). На въезде знак 2.4: уступите тем, кто на кольце.',
+      'Поворачивая, пропустите пешеходов на дороге, на которую поворачиваете (п. 91).',
+      'Проезжие части разделены островком: каждое пересечение — отдельный перекрёсток со своими знаками и светофорами (п. 98). Выезжая из разрыва налево, уступите встречным, которые едут прямо и направо (п. 104).',
+      'Не видно покрытия и знаков нет: считайте, что вы на второстепенной (п. 105).'] }
+  ];
+
+  const ALL4 = ['S', 'W', 'N', 'E'];
+  const S = [
+    // ----- Равнозначные -----
+    { id: 'eq1', g: 'eq', t: 'Помеха справа', lay: 'cross',
+      setup: 'Знаков и светофоров нет, обе дороги асфальтовые.',
+      P: [{ id: 'А', at: 'S', m: 'st' }, { id: 'Б', at: 'E', m: 'st' }],
+      order: [['Б'], ['А']], why: 'Б приближается к А справа, поэтому А ждёт.', ref: 'п. 103' },
+    { id: 'eq2', g: 'eq', t: 'Три машины прямо', lay: 'cross',
+      setup: 'Знаков и светофоров нет.',
+      P: [{ id: 'А', at: 'S', m: 'st' }, { id: 'Б', at: 'W', m: 'st' }, { id: 'В', at: 'E', m: 'st' }],
+      order: [['В'], ['А'], ['Б']], why: 'У В справа никого нет, он первый. У А справа В, поэтому А второй. У Б справа А, поэтому Б последний, хотя со встречным В он не пересекается.', ref: 'п. 103' },
+    { id: 'eq3', g: 'eq', t: 'Налево, встречный прямо', lay: 'cross',
+      setup: 'Знаков и светофоров нет.',
+      P: [{ id: 'А', at: 'S', m: 'l' }, { id: 'Б', at: 'N', m: 'st' }],
+      order: [['Б'], ['А']], why: 'А поворачивает налево и пропускает встречного Б, который едет прямо.', ref: 'п. 104' },
+    { id: 'eq4', g: 'eq', t: 'Налево, встречный направо', lay: 'cross',
+      setup: 'Знаков и светофоров нет.',
+      P: [{ id: 'А', at: 'S', m: 'l' }, { id: 'Б', at: 'N', m: 'r' }],
+      order: [['Б'], ['А']], why: 'Б поворачивает направо на ту же дорогу, куда едет А. Поворачивающий налево пропускает встречных, которые едут и прямо, и направо.', ref: 'п. 104' },
+    { id: 'eq5', g: 'eq', t: 'Оба налево навстречу', lay: 'cross',
+      setup: 'Знаков и светофоров нет.',
+      P: [{ id: 'А', at: 'S', m: 'l' }, { id: 'Б', at: 'N', m: 'l' }],
+      order: [['А', 'Б']], why: 'Пути А и Б не пересекаются: встречные, которые поворачивают налево, разъезжаются правыми бортами и едут одновременно.', ref: 'п. 95-1' },
+    { id: 'eq6', g: 'eq', t: 'Разворот', lay: 'cross',
+      setup: 'Знаков и светофоров нет.',
+      P: [{ id: 'А', at: 'S', m: 'u' }, { id: 'Б', at: 'N', m: 'st' }],
+      order: [['Б'], ['А']], why: 'Разворот подчиняется тому же правилу, что и поворот налево: А пропускает встречного Б.', ref: 'п. 104' },
+    { id: 'eq7', g: 'eq', t: 'Т-образный перекрёсток', lay: 't',
+      setup: 'Т-образный перекрёсток, знаков нет.',
+      P: [{ id: 'А', at: 'S', m: 'l' }, { id: 'Б', at: 'W', m: 'st' }, { id: 'В', at: 'E', m: 'st' }],
+      order: [['В'], ['А'], ['Б']], why: 'У А справа В, поэтому первый В. А находится справа от Б и пересекает его полосу, поэтому Б пропускает А, хотя А поворачивает налево.', ref: 'п. 103' },
+    { id: 'eq8', g: 'eq', t: 'Трамвай прямо', lay: 'cross',
+      setup: 'Знаков и светофоров нет. Т — трамвай.',
+      P: [{ id: 'Т', at: 'W', m: 'st', kind: 'tram' }, { id: 'А', at: 'S', m: 'st' }, { id: 'Б', at: 'N', m: 'st' }],
+      order: [['Т'], ['А', 'Б']], why: 'На равнозначном перекрёстке трамвай едет раньше безрельсовых при любом направлении, даже когда машина справа от него. Потом А и Б едут прямо навстречу и друг другу не мешают.', ref: 'п. 103' },
+    { id: 'eq9', g: 'eq', t: 'Трамвай поворачивает налево', lay: 'cross',
+      setup: 'Знаков и светофоров нет. Т — трамвай.',
+      P: [{ id: 'Т', at: 'S', m: 'l', kind: 'tram' }, { id: 'А', at: 'N', m: 'st' }],
+      order: [['Т'], ['А']], why: 'Правило «налево уступает встречным» касается безрельсовых машин. Трамвай на равнозначном перекрёстке главнее А и при повороте налево.', ref: 'п. 103, 104' },
+    { id: 'eq10', g: 'eq', t: 'Два трамвая', lay: 'cross',
+      setup: 'Знаков и светофоров нет. Т1 и Т2 — трамваи.',
+      P: [{ id: 'Т1', at: 'S', m: 'st', kind: 'tram' }, { id: 'Т2', at: 'E', m: 'st', kind: 'tram' }],
+      order: [['Т2'], ['Т1']], why: 'Трамваи между собой решают по помехе справа: у Т1 справа Т2, поэтому Т2 первый.', ref: 'п. 103' },
+    { id: 'eq11', g: 'eq', t: 'Цепочка помех справа', lay: 'cross',
+      setup: 'Знаков и светофоров нет.',
+      P: [{ id: 'А', at: 'S', m: 'r' }, { id: 'Б', at: 'W', m: 'st' }, { id: 'В', at: 'N', m: 'st' }],
+      order: [['А'], ['Б'], ['В']], why: 'У А справа никого нет, он первый. У Б справа А, поэтому Б второй. У В справа Б, поэтому В третий, хотя с А его путь не пересекается.', ref: 'п. 103' },
+
+    // ----- Неравнозначные -----
+    { id: 'un1', g: 'un', t: 'Главная прямо', lay: 'cross', main: ['W', 'E'],
+      signs: { W: ['2.1'], E: ['2.1'], S: ['2.4'], N: ['2.4'] },
+      setup: 'У Б знак 2.1 «Главная дорога», у А знак 2.4 «Уступите дорогу».',
+      P: [{ id: 'А', at: 'S', m: 'st' }, { id: 'Б', at: 'W', m: 'st' }],
+      order: [['Б'], ['А']], why: 'Б на главной. А на второстепенной уступает ему, хотя Б находится слева.', ref: 'п. 101' },
+    { id: 'un2', g: 'un', t: 'Налево по главной', lay: 'cross', main: ['W', 'E'],
+      signs: { W: ['2.1'], E: ['2.1'], S: ['2.4'], N: ['2.4'] },
+      setup: 'Б и В на главной (2.1), у А знак 2.4.',
+      P: [{ id: 'А', at: 'S', m: 'st' }, { id: 'Б', at: 'W', m: 'l' }, { id: 'В', at: 'E', m: 'st' }],
+      order: [['В'], ['Б'], ['А']], why: 'В едет по главной прямо и первым. Б по главной поворачивает налево и пропускает встречного В. А на второстепенной ждёт обоих.', ref: 'п. 101, 104' },
+    { id: 'un3', g: 'un', t: 'Разворот на главной', lay: 'cross', main: ['W', 'E'],
+      signs: { W: ['2.1'], E: ['2.1'], S: ['2.4'], N: ['2.4'] },
+      setup: 'Б на главной (2.1) разворачивается, у А знак 2.4.',
+      P: [{ id: 'А', at: 'S', m: 'st' }, { id: 'Б', at: 'E', m: 'u' }],
+      order: [['Б'], ['А']], why: 'Второстепенная уступает главной при любом манёвре, разворот тоже.', ref: 'п. 101' },
+    { id: 'un4', g: 'un', t: 'Главная поворачивает налево', lay: 'cross', main: ['S', 'W'],
+      signs: { S: ['2.1'], W: ['2.1'], N: ['2.4'], E: ['2.4'] }, plate: { arms: ALL4, main: ['S', 'W'] },
+      setup: 'Главная идёт от А налево, к Б: знаки 2.1 с табличкой 7.13. У В и Г знак 2.4 с той же табличкой.',
+      P: [{ id: 'А', at: 'S', m: 'l' }, { id: 'Б', at: 'W', m: 'st' }, { id: 'В', at: 'N', m: 'st' }, { id: 'Г', at: 'E', m: 'st' }],
+      order: [['А'], ['Б'], ['В'], ['Г']], why: 'А и Б на главной решают между собой по помехе справа: у Б справа А, поэтому А первый, Б второй. В и Г на второстепенных ждут обоих, а между собой тоже по помехе справа: у Г справа В.', ref: 'п. 102' },
+    { id: 'un5', g: 'un', t: 'Главная поворачивает направо', lay: 'cross', main: ['N', 'E'],
+      signs: { N: ['2.1'], E: ['2.1'], S: ['2.4'], W: ['2.4'] }, plate: { arms: ALL4, main: ['N', 'E'] },
+      setup: 'Главная идёт от А к Б (2.1 и табличка 7.13). У В знак 2.4 с табличкой 7.13.',
+      P: [{ id: 'А', at: 'N', m: 'l' }, { id: 'Б', at: 'E', m: 'st' }, { id: 'В', at: 'S', m: 'st' }],
+      order: [['А'], ['Б'], ['В']], why: 'А и Б на главной, между собой помеха справа: у Б справа А, поэтому А первый. В на второстепенной ждёт обоих.', ref: 'п. 101, 102' },
+    { id: 'un6', g: 'un', t: 'Знак STOP, направо', lay: 'cross', main: ['W', 'E'],
+      signs: { W: ['2.1'], E: ['2.1'], S: ['2.5'], N: ['2.4'] },
+      setup: 'У А знак 2.5 «Движение без остановки запрещено», у Б и В знак 2.1.',
+      P: [{ id: 'А', at: 'S', m: 'r' }, { id: 'Б', at: 'W', m: 'st' }, { id: 'В', at: 'E', m: 'l' }],
+      order: [['Б'], ['А', 'В']], why: 'А останавливается у стоп-линии и уступает, как при 2.4. Б на главной первый. В поворачивает налево по главной и ждёт встречного Б. Пути А и В не пересекаются, после Б они едут одновременно.', ref: 'п. 101, 104; знак 2.5' },
+    { id: 'un7', g: 'un', t: 'Трамвай на второстепенной', lay: 'cross', main: ['W', 'E'],
+      signs: { W: ['2.1'], E: ['2.1'], S: ['2.4'], N: ['2.4'] },
+      setup: 'Трамвай Т на второстепенной (2.4), Б и В на главной (2.1).',
+      P: [{ id: 'Т', at: 'S', m: 'st', kind: 'tram' }, { id: 'Б', at: 'W', m: 'st' }, { id: 'В', at: 'E', m: 'l' }],
+      order: [['Б'], ['В'], ['Т']], why: 'Преимущество трамвая действует на равнозначных и регулируемых перекрёстках. Со второстепенной трамвай уступает всем на главной. Б первый, В поворачивает налево и ждёт встречного Б, трамвай последний.', ref: 'п. 101, 104' },
+    { id: 'un8', g: 'un', t: 'Трамвай на главной', lay: 'cross', main: ['W', 'E'],
+      signs: { W: ['2.1'], E: ['2.1'], S: ['2.4'], N: ['2.4'] },
+      setup: 'Трамвай Т и А на главной (2.1), у Б знак 2.4.',
+      P: [{ id: 'Т', at: 'W', m: 'st', kind: 'tram' }, { id: 'А', at: 'E', m: 'l' }, { id: 'Б', at: 'S', m: 'st' }],
+      order: [['Т'], ['А'], ['Б']], why: 'Трамвай едет по главной прямо. А на главной поворачивает налево и пропускает встречный трамвай. Б на второстепенной ждёт обоих.', ref: 'п. 101, 104' },
+    { id: 'un9', g: 'un', t: 'Грунтовка и асфальт', lay: 'cross', main: ['W', 'E'], dirt: true,
+      setup: 'Знаков нет. А выезжает с грунтовой дороги на асфальт.',
+      P: [{ id: 'А', at: 'S', m: 'st' }, { id: 'Б', at: 'W', m: 'st' }],
+      order: [['Б'], ['А']], why: 'Дорога с твёрдым покрытием главная по отношению к грунтовой и без знаков. А уступает Б, хотя Б слева.', ref: 'п. 2, пп. 9' },
+    { id: 'un10', g: 'un', t: 'Двое на второстепенной навстречу', lay: 'cross', main: ['W', 'E'],
+      signs: { W: ['2.1'], E: ['2.1'], S: ['2.4'], N: ['2.4'] },
+      setup: 'В на главной (2.1). У А и Б знак 2.4, они едут навстречу друг другу.',
+      P: [{ id: 'А', at: 'S', m: 'l' }, { id: 'Б', at: 'N', m: 'st' }, { id: 'В', at: 'W', m: 'st' }],
+      order: [['В'], ['Б'], ['А']], why: 'В на главной первый. А и Б на второстепенной решают между собой по общим правилам: А поворачивает налево и пропускает встречного Б.', ref: 'п. 101, 104' },
+    { id: 'un11', g: 'un', t: 'Трамвай, главная поворачивает', lay: 'cross', main: ['S', 'W'],
+      signs: { S: ['2.1'], W: ['2.1'], N: ['2.4'], E: ['2.4'] }, plate: { arms: ALL4, main: ['S', 'W'] },
+      setup: 'Главная идёт от А налево, к трамваю Т (2.1 и табличка 7.13). У Б знак 2.4 с той же табличкой.',
+      P: [{ id: 'Т', at: 'W', m: 'st', kind: 'tram' }, { id: 'А', at: 'S', m: 'l' }, { id: 'Б', at: 'N', m: 'st' }],
+      order: [['Т'], ['А'], ['Б']], why: 'Главная поворачивает, поэтому Т и А решают между собой как на равнозначном перекрёстке. Там трамвай главнее безрельсовых: Т первый, хотя А справа от него. Б на второстепенной последний.', ref: 'п. 102, 103' },
+    { id: 'un12', g: 'un', t: 'Т-образный: главная поворачивает', lay: 't', main: ['S', 'E'],
+      signs: { S: ['2.1'], E: ['2.1'], W: ['2.4'] }, plate: { arms: ['S', 'W', 'E'], main: ['S', 'E'] },
+      setup: 'Т-образный перекрёсток. Главная идёт от А направо, к В (2.1 и табличка 7.13). У Б знак 2.4 с той же табличкой.',
+      P: [{ id: 'А', at: 'S', m: 'r' }, { id: 'Б', at: 'W', m: 'st' }, { id: 'В', at: 'E', m: 'l' }],
+      order: [['А', 'В'], ['Б']], why: 'А и В едут по главной и друг другу не мешают, поэтому едут одновременно. Б на второстепенной пересекает пути обоих и ждёт.', ref: 'п. 101, 102' },
+
+    // ----- Регулируемые -----
+    { id: 'rg1', g: 'rg', t: 'Зелёный: налево и встречный прямо', lay: 'cross',
+      lights: { S: { c: 'g' }, N: { c: 'g' }, W: { c: 'r' }, E: { c: 'r' } },
+      setup: 'У А и Б зелёный, у В красный.',
+      P: [{ id: 'А', at: 'S', m: 'l' }, { id: 'Б', at: 'N', m: 'st' }, { id: 'В', at: 'W', m: 'st' }],
+      order: [['Б'], ['А']], stay: ['В'], why: 'На зелёный А поворачивает налево и пропускает встречного Б. В стоит на красный.', ref: 'п. 95' },
+    { id: 'rg2', g: 'rg', t: 'Зелёный: оба налево', lay: 'cross',
+      lights: { S: { c: 'g' }, N: { c: 'g' }, W: { c: 'r' }, E: { c: 'r' } },
+      setup: 'У А и Б зелёный.',
+      P: [{ id: 'А', at: 'S', m: 'l' }, { id: 'Б', at: 'N', m: 'l' }],
+      order: [['А', 'Б']], why: 'Встречные, которые поворачивают налево, разъезжаются правыми бортами и едут одновременно.', ref: 'п. 95-1' },
+    { id: 'rg3', g: 'rg', t: 'Зелёный «+»', lay: 'cross',
+      lights: { S: { c: 'g', plus: true }, N: { c: 'r' }, W: { c: 'r' }, E: { c: 'r' } },
+      setup: 'У А зелёный и горит зелёный «+». У Б красный.',
+      P: [{ id: 'А', at: 'S', m: 'l' }, { id: 'Б', at: 'N', m: 'st' }],
+      order: [['А']], stay: ['Б'], why: 'Зелёный «+» сообщает: у встречных красный. Б стоит, А поворачивает налево без ожидания.', ref: 'п. 32' },
+    { id: 'rg4', g: 'rg', t: 'Стрелка направо при красном', lay: 'cross',
+      lights: { S: { c: 'r', arrow: 'on' }, N: { c: 'r' }, W: { c: 'g' }, E: { c: 'g' } },
+      setup: 'У А красный и зелёная стрелка дополнительной секции. У Б и В зелёный.',
+      P: [{ id: 'А', at: 'S', m: 'r' }, { id: 'Б', at: 'W', m: 'st' }, { id: 'В', at: 'E', m: 'st' }],
+      order: [['Б', 'В'], ['А']], why: 'По стрелке дополнительной секции при красном уступают всем с других направлений. Б и В едут прямо навстречу одновременно, А после них.', ref: 'п. 96' },
+    { id: 'rg5', g: 'rg', t: 'Трамвай налево на зелёный', lay: 'cross',
+      lights: { S: { c: 'g' }, N: { c: 'g' }, W: { c: 'r' }, E: { c: 'r' } },
+      setup: 'У трамвая Т и у А зелёный.',
+      P: [{ id: 'Т', at: 'S', m: 'l', kind: 'tram' }, { id: 'А', at: 'N', m: 'st' }],
+      order: [['Т'], ['А']], why: 'На общий зелёный трамвай едет раньше безрельсовых при любом направлении, даже налево.', ref: 'п. 97' },
+    { id: 'rg6', g: 'rg', t: 'Трамвай по стрелке', lay: 'cross',
+      lights: { S: { c: 'r', arrow: 'on' }, N: { c: 'r' }, W: { c: 'g' }, E: { c: 'g' } },
+      setup: 'У трамвая Т красный и зелёная стрелка направо, у А зелёный.',
+      P: [{ id: 'Т', at: 'S', m: 'r', kind: 'tram' }, { id: 'А', at: 'W', m: 'st' }],
+      order: [['А'], ['Т']], why: 'По стрелке дополнительной секции трамвай уступает всем с других направлений. А первый.', ref: 'п. 97' },
+    { id: 'rg7', g: 'rg', t: 'Пропустите завершающих проезд', lay: 'cross',
+      lights: { S: { c: 'g' }, N: { c: 'g' }, W: { c: 'r' }, E: { c: 'r' } },
+      setup: 'Б въехал на перекрёсток на свой зелёный и ещё не выехал. У А только что загорелся зелёный.',
+      P: [{ id: 'А', at: 'S', m: 'st' }, { id: 'Б', at: 'W', m: 'st', d0: 236 }],
+      order: [['Б'], ['А']], why: 'На зелёный сначала пропустите тех, кто заканчивает проезд перекрёстка, и пешеходов.', ref: 'п. 99' },
+    { id: 'rg8', g: 'rg', t: 'Жёлтый мигающий', lay: 'cross', main: ['W', 'E'],
+      lights: { S: { c: 'yb' }, N: { c: 'yb' }, W: { c: 'yb' }, E: { c: 'yb' } },
+      signs: { W: ['2.1'], E: ['2.1'], S: ['2.4'], N: ['2.4'] },
+      setup: 'Светофоры мигают жёлтым. У Б знак 2.1, у А знак 2.4.',
+      P: [{ id: 'А', at: 'S', m: 'st' }, { id: 'Б', at: 'W', m: 'st' }],
+      order: [['Б'], ['А']], why: 'Жёлтый мигающий: перекрёсток нерегулируемый, очередь задают знаки. Б на главной первый, хотя А справа от него.', ref: 'п. 94, 101' },
+    { id: 'rg9', g: 'rg', t: 'Светофор выключен, знаков нет', lay: 'cross',
+      lights: { S: { c: 'off' }, N: { c: 'off' }, W: { c: 'off' }, E: { c: 'off' } },
+      setup: 'Светофоры не работают, знаков приоритета нет.',
+      P: [{ id: 'А', at: 'S', m: 'st' }, { id: 'Б', at: 'W', m: 'st' }],
+      order: [['А'], ['Б']], why: 'Перекрёсток стал нерегулируемым и равнозначным. У Б справа А, поэтому А первый.', ref: 'п. 94, 103' },
+    { id: 'rg10', g: 'rg', t: 'Регулировщик: руки в стороны', lay: 'cross', reg: { face: 'S', pose: 'side' },
+      setup: 'Регулировщик стоит грудью к В, спиной к Г, руки вытянуты в стороны.',
+      P: [{ id: 'А', at: 'W', m: 'st' }, { id: 'Б', at: 'E', m: 'r' }, { id: 'В', at: 'S', m: 'st' }, { id: 'Г', at: 'N', m: 'l' }],
+      order: [['А', 'Б']], stay: ['В', 'Г'], why: 'Со стороны груди и спины ехать нельзя: В и Г стоят. Со стороны боков безрельсовым можно прямо и направо: А едет прямо, Б направо, их пути не пересекаются.', ref: 'п. 33' },
+    { id: 'rg11', g: 'rg', t: 'Регулировщик: правая рука вперёд', lay: 'cross', reg: { face: 'S', pose: 'right' },
+      setup: 'Регулировщик стоит грудью к А, правая рука вытянута вперёд.',
+      P: [{ id: 'А', at: 'S', m: 'r' }, { id: 'Б', at: 'E', m: 'l' }, { id: 'В', at: 'W', m: 'st' }, { id: 'Г', at: 'N', m: 'st' }],
+      order: [['А', 'Б']], stay: ['В', 'Г'], why: 'Со стороны груди можно только направо: А поворачивает направо. Со стороны левого бока безрельсовым можно во всех направлениях: Б едет налево. Со стороны правого бока и спины ехать нельзя: В и Г стоят. Пути А и Б не пересекаются.', ref: 'п. 33' },
+    { id: 'rg12', g: 'rg', t: 'Регулировщик: рука вверх', lay: 'cross', reg: { face: 'S', pose: 'up' },
+      setup: 'Регулировщик поднял руку вверх. Б уже выехал на перекрёсток и не может остановиться.',
+      P: [{ id: 'А', at: 'S', m: 'st' }, { id: 'Б', at: 'W', m: 'st', d0: 236 }, { id: 'В', at: 'N', m: 'l' }],
+      order: [['Б']], stay: ['А', 'В'], why: 'Рука вверх запрещает движение всем. Продолжают только те, кто уже на перекрёстке и не может остановиться без экстренного торможения: Б заканчивает проезд. А и В стоят.', ref: 'п. 33, 37' },
+    { id: 'rg13', g: 'rg', t: 'Трамвай и регулировщик: руки в стороны', lay: 'cross', reg: { face: 'S', pose: 'side' },
+      setup: 'Регулировщик стоит грудью к В, руки вытянуты в стороны. Трамвай Т хочет налево.',
+      P: [{ id: 'Т', at: 'W', m: 'l', kind: 'tram' }, { id: 'А', at: 'E', m: 'st' }, { id: 'В', at: 'S', m: 'st' }],
+      order: [['А']], stay: ['Т', 'В'], why: 'Со стороны боков трамваю можно только прямо, а Т поворачивает налево: стоит. Безрельсовым со стороны боков можно прямо и направо: А едет. В стоит, к нему грудь регулировщика.', ref: 'п. 33' },
+    { id: 'rg14', g: 'rg', t: 'Трамвай налево: правая рука вперёд', lay: 'cross', reg: { face: 'S', pose: 'right' },
+      setup: 'Регулировщик стоит грудью к А, правая рука вытянута вперёд. Трамвай Т со стороны левого бока хочет налево.',
+      P: [{ id: 'Т', at: 'E', m: 'l', kind: 'tram' }, { id: 'А', at: 'S', m: 'r' }, { id: 'В', at: 'W', m: 'st' }],
+      order: [['Т', 'А']], stay: ['В'], why: 'Со стороны левого бока трамваю разрешено налево: Т едет. Со стороны груди можно только направо: А едет. Их пути не пересекаются. Со стороны правого бока ехать нельзя: В стоит.', ref: 'п. 33' },
+    { id: 'rg15', g: 'rg', t: 'Дополнительная секция выключена', lay: 'cross',
+      lights: { S: { c: 'g', arrow: 'off', contour: 'st' }, N: { c: 'g' }, W: { c: 'r' }, E: { c: 'r' } },
+      setup: 'У А зелёный с чёрной стрелкой «прямо», дополнительная секция направо выключена. У Б зелёный, у В красный.',
+      P: [{ id: 'А', at: 'S', m: 'r' }, { id: 'Б', at: 'N', m: 'l' }, { id: 'В', at: 'W', m: 'st' }],
+      order: [['Б']], stay: ['А', 'В'], why: 'Выключенная дополнительная секция запрещает движение в её направлении. А стоит, хотя основной сигнал зелёный. Б поворачивает налево: встречных, которым можно ехать, нет. В стоит на красный.', ref: 'п. 25, 26' },
+    { id: 'rg16', g: 'rg', t: 'Трамвайный светофор', lay: 'cross',
+      lights: { S: { t: ['b', 'r'] }, N: { c: 'g' }, W: { c: 'r' }, E: { c: 'r' } },
+      setup: 'У трамвая Т светофор в форме буквы «Т»: горят нижний и правый сигналы. Т хочет налево. У А зелёный.',
+      P: [{ id: 'Т', at: 'S', m: 'l', kind: 'tram' }, { id: 'А', at: 'N', m: 'st' }],
+      order: [['А']], stay: ['Т'], why: 'Трамвайный светофор разрешает движение, когда горят нижний сигнал и один из верхних: левый — налево, средний — прямо, правый — направо. У Т разрешено только направо, а он хочет налево: стоит. А едет на зелёный.', ref: 'п. 30' },
+    { id: 'rg17', g: 'rg', t: 'Затор за перекрёстком', lay: 'cross',
+      lights: { S: { c: 'g' }, N: { c: 'g' }, W: { c: 'r' }, E: { c: 'r' } },
+      decor: [{ x: 225, y: 128 }, { x: 225, y: 86 }, { x: 225, y: 44 }, { x: 225, y: 2 }],
+      setup: 'У А и Б зелёный. На выезде прямо стоит пробка: серые машины не двигаются.',
+      P: [{ id: 'А', at: 'S', m: 'st' }, { id: 'Б', at: 'N', m: 'r' }],
+      order: [['Б']], stay: ['А'], why: 'Нельзя выезжать на перекрёсток, если за ним затор и придётся встать посередине, мешая поперечному движению. А ждёт даже на зелёный. Б поворачивает направо, его путь свободен.', ref: 'п. 92' },
+    { id: 'rg18', g: 'rg', t: 'Пешеход при повороте на зелёный', lay: 'cross', crosswalk: 'E',
+      lights: { S: { c: 'g' }, N: { c: 'g' }, W: { c: 'r' }, E: { c: 'r' } },
+      setup: 'У А зелёный. П переходит дорогу, на которую поворачивает А, на свой зелёный.',
+      P: [{ id: 'П', kind: 'ped', ml: 'пешеход', path: 'M277 130 L277 272', d0: 0 }, { id: 'А', at: 'S', m: 'r' }],
+      order: [['П'], ['А']], why: 'Поворачивая направо или налево, пропустите пешеходов, которые переходят дорогу, на которую вы поворачиваете.', ref: 'п. 91' },
+
+    // ----- Особые -----
+    { id: 'sp1', g: 'sp', t: 'Скорая со второстепенной', lay: 'cross', main: ['W', 'E'],
+      signs: { W: ['2.1'], E: ['2.1'], S: ['2.4'], N: ['2.4'] },
+      setup: 'С — скорая с синим маячком и сиреной, она на второстепенной (2.4). А на главной (2.1).',
+      P: [{ id: 'С', at: 'S', m: 'st', kind: 'amb' }, { id: 'А', at: 'W', m: 'st' }],
+      order: [['С'], ['А']], why: 'Машине с синим маячком и сиреной уступают все, в том числе водители на главной.', ref: 'п. 41' },
+    { id: 'sp2', g: 'sp', t: 'Скорая на красный', lay: 'cross',
+      lights: { S: { c: 'g' }, N: { c: 'g' }, W: { c: 'r' }, E: { c: 'r' } },
+      setup: 'У скорой С с маячком и сиреной красный, у А зелёный.',
+      P: [{ id: 'С', at: 'W', m: 'st', kind: 'amb' }, { id: 'А', at: 'S', m: 'st' }],
+      order: [['С'], ['А']], why: 'Спецмашина на задании может не выполнять сигналы светофора. А на зелёный всё равно пропускает её.', ref: 'п. 40, 41' },
+    { id: 'sp3', g: 'sp', t: 'Кольцо без знаков приоритета', lay: 'ring',
+      signs: { S: ['4.3'], W: ['4.3'], N: ['4.3'], E: ['4.3'] },
+      setup: 'На въездах знак 4.3 «Круговое движение», знаков приоритета нет. Б уже на кольце, А въезжает.',
+      P: [{ id: 'А', ml: 'прямо', path: 'M225 420 L225 300 C225 288 228.6 273.5 239 267.5 A78 78 0 0 0 239 132.5 C228.6 126.5 225 112 225 100 L225 -80', d0: 105 },
+          { id: 'Б', ml: 'по кольцу направо', path: 'M123.2 213.5 A78 78 0 0 0 255.2 255.2 C263.7 246.7 285 225 300 225 L480 225', d0: 0 }],
+      order: [['А'], ['Б']], why: 'Знаков приоритета и светофоров нет, поэтому кольцо — равнозначный перекрёсток. Действует помеха справа: для Б въезжающий А находится справа. А едет первым, Б на кольце уступает.', ref: 'п. 103' },
+    { id: 'sp4', g: 'sp', t: 'Кольцо со знаком 2.4', lay: 'ring',
+      signs: { S: ['4.3', '2.4'], W: ['4.3', '2.4'], N: ['4.3', '2.4'], E: ['4.3', '2.4'] },
+      setup: 'На въездах знаки 4.3 и 2.4 «Уступите дорогу». Б уже на кольце, А въезжает.',
+      P: [{ id: 'А', ml: 'прямо', path: 'M225 420 L225 300 C225 288 228.6 273.5 239 267.5 A78 78 0 0 0 239 132.5 C228.6 126.5 225 112 225 100 L225 -80', d0: 105 },
+          { id: 'Б', ml: 'по кольцу направо', path: 'M123.2 213.5 A78 78 0 0 0 255.2 255.2 C263.7 246.7 285 225 300 225 L480 225', d0: 0 }],
+      order: [['Б'], ['А']], why: 'Знак 2.4 на въезде делает кольцо главной дорогой. А пропускает Б, который едет по кольцу.', ref: 'Прил. 1, знак 2.4' },
+    { id: 'sp5', g: 'sp', t: 'Пешеход на переходе', lay: 'cross', crosswalk: 'E',
+      setup: 'Знаков нет. П переходит дорогу, на которую поворачивает А.',
+      P: [{ id: 'П', kind: 'ped', ml: 'пешеход', path: 'M277 130 L277 272', d0: 0 }, { id: 'А', at: 'S', m: 'r' }, { id: 'Б', at: 'W', m: 'st' }],
+      order: [['П'], ['А'], ['Б']], why: 'Поворачивая, А пропускает пешехода на дороге, куда поворачивает. У Б справа А, поэтому Б ждёт А. Пешехода на переходе Б тоже пропускает.', ref: 'п. 91, 103, 106' },
+    { id: 'sp6', g: 'sp', t: 'Светофор в разрыве разделительной полосы', lay: 'divided',
+      lightsAt: [{ x: 272, y: 308, c: 'g' }, { x: 272, y: 192, c: 'r' }, { x: 290, y: 96, c: 'g' }, { x: 110, y: 304, c: 'r' }],
+      setup: 'А пересёк первую проезжую часть на зелёный и стоит в разрыве. Перед ним своя стоп-линия и светофор, на нём красный. У Б зелёный, у В красный.',
+      P: [{ id: 'А', ml: 'прямо', path: 'M225 205 L225 -80', d0: 0 }, { id: 'Б', ml: 'прямо', path: 'M345 140 L-80 140', d0: 0 }, { id: 'В', ml: 'прямо', path: 'M60 260 L480 260', d0: 0 }],
+      order: [['Б']], stay: ['А', 'В'], why: 'Островок делит перекрёсток на два, и перед вторым своя стоп-линия и светофор. Водитель подчиняется каждому светофору. А ждёт зелёного в разрыве, В стоит на красный, едет Б.', ref: 'п. 98' },
+    { id: 'sp7', g: 'sp', t: 'Разворот через островок: два перекрёстка', lay: 'divided',
+      signsAt: [{ x: 110, y: 304, list: ['2.1'] }, { x: 290, y: 96, list: ['2.1'] }, { x: 128, y: 96, list: ['2.4'] }, { x: 128, y: 214, list: ['2.4'] }, { x: 272, y: 304, list: ['2.4'] }, { x: 272, y: 188, list: ['2.4'] }],
+      setup: 'Островок делит перекрёсток на два. Б въехал в разрыв и разворачивается на верхнюю проезжую часть. Главная — дорога В (2.1), у А и у Б знаки 2.4.',
+      P: [{ id: 'Б', ml: 'налево из разрыва', path: 'M210 222 L210 200 C210 165 200 140 165 140 L-80 140', d0: 0 },
+          { id: 'А', ml: 'прямо', path: 'M175 60 L175 480', d0: 0 }, { id: 'В', ml: 'прямо', path: 'M345 140 L-80 140', d0: 0 }],
+      order: [['В'], ['А'], ['Б']], why: 'Островок делит перекрёсток на два, и Б уже на втором. В на главной едет первым. А и Б оба на второстепенной и едут навстречу друг другу: Б поворачивает налево и пропускает А, который едет прямо (п. 104). Порядок: В, А, Б.', ref: 'п. 104 ПДД РК; островок делит перекрёсток на два' },
+    { id: 'sp8', g: 'sp', t: 'Вы в разрыве: знак 2.4', lay: 'divided',
+      signsAt: [{ x: 290, y: 96, list: ['2.1'] }, { x: 272, y: 188, list: ['2.4'] }, { x: 272, y: 304, list: ['2.4'] }],
+      setup: 'А стоит в разрыве разделительной полосы. Перед второй проезжей частью у А знак 2.4, у Б знак 2.1.',
+      P: [{ id: 'А', ml: 'прямо', path: 'M225 205 L225 -80', d0: 0 }, { id: 'Б', ml: 'прямо', path: 'M345 140 L-80 140', d0: 0 }],
+      order: [['Б'], ['А']], why: 'Островок делит перекрёсток на два. Перед вторым у А знак 2.4, поэтому Б на главной первый.', ref: 'Прил. 1, знаки приоритета' },
+    { id: 'sp9', g: 'sp', t: 'Покрытие не видно', lay: 'cross', snow: true,
+      setup: 'Темно и снег, знаков нет. А не может понять, какое покрытие у его дороги.',
+      P: [{ id: 'А', at: 'S', m: 'st' }, { id: 'Б', at: 'W', m: 'st' }],
+      order: [['Б'], ['А']], why: 'Не можете определить покрытие и знаков приоритета нет: считайте, что вы на второстепенной. А пропускает Б, хотя Б слева.', ref: 'п. 105' },
+    { id: 'sp10', g: 'sp', t: 'Велосипедист на велодорожке', lay: 'cross', bikepath: 'W',
+      setup: 'Знаков нет. Велодорожка пересекает дорогу, на которую поворачивает А. В — велосипедист.',
+      P: [{ id: 'В', kind: 'bike', ml: 'велосипедист', path: 'M112 128 L112 272', d0: 0 }, { id: 'А', at: 'S', m: 'l' }, { id: 'Б', at: 'N', m: 'st' }],
+      order: [['Б', 'В'], ['А']], why: 'А поворачивает налево: пропускает встречного Б и велосипедиста, который пересекает дорогу по велодорожке. Б и В друг другу не мешают и едут одновременно.', ref: 'п. 91, 104' },
+    { id: 'sp11', g: 'sp', t: 'Маячок без сирены', lay: 'cross', main: ['W', 'E'],
+      signs: { W: ['2.1'], E: ['2.1'], S: ['2.4'], N: ['2.4'] },
+      setup: 'У скорой С мигает синий маячок, сирена выключена. С на второстепенной (2.4), А на главной (2.1).',
+      P: [{ id: 'С', at: 'S', m: 'st', kind: 'amb' }, { id: 'А', at: 'W', m: 'st' }],
+      order: [['А'], ['С']], why: 'Преимущество спецмашина получает, когда включены и синий маячок, и звуковой сигнал. Сирена выключена, поэтому С на второстепенной уступает А.', ref: 'п. 40, 41' }
+  ];
+
+  // ---------- Helpers ----------
+  const NSVG = 'http://www.w3.org/2000/svg';
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const $ = id => document.getElementById(id);
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const KEY = 'pdd-rk-perekrestki.v1';
+  let progress = {};
+  try { progress = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { progress = {}; }
+  const saveProgress = () => { try { localStorage.setItem(KEY, JSON.stringify(progress)); } catch (e) { /* ignore */ } };
+
+  const chipLabel = p => {
+    const what = p.kind === 'tram' ? 'трамвай, ' : p.kind === 'amb' ? 'скорая, ' : '';
+    return what + (p.ml || MOVE[p.m]);
+  };
+  const plural = (n, [a, b, c]) => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c; };
+  const join = ids => ids.length === 1 ? ids[0] : ids.slice(0, -1).join(', ') + ' и ' + ids[ids.length - 1];
+  function answerHTML(s) {
+    let h = s.order.map((grp, i) => `<span class="n">${i + 1}</span>${esc(join(grp))}${grp.length > 1 ? ' одновременно' : ''}`).join(' → ');
+    if (s.stay && s.stay.length) h += `<br>Стоят: ${esc(join(s.stay))}`;
+    return h;
+  }
+
+  // ---------- Card ----------
+  function cardHTML(s) {
+    const grp = GROUPS.find(g => g.k === s.g);
+    const who = s.P.map(p => `<button type="button" data-p="${esc(p.id)}" aria-pressed="false"><i style="border-color:${COL[p.id]}">${esc(p.id)}</i>${esc(chipLabel(p))}<b></b></button>`).join('');
+    return `<article class="card" id="card-${s.id}" data-id="${s.id}">
+      <div class="card-h"><h3>${esc(s.t)}</h3><span class="tag">${esc(grp.t)}<span class="tick" hidden>✓</span></span></div>
+      <div class="stage"><svg class="sc" viewBox="0 0 400 400" role="img" aria-label="${esc(s.t + '. ' + s.setup)}">
+        ${roadsSVG(s)}${extrasSVG(s)}<g class="l-rails"></g><g class="l-arrows"></g>${controlsSVG(s)}<g class="l-veh"></g><g class="l-bdg"></g><g class="l-paths"></g>
+      </svg></div>
+      <p class="setup">${esc(s.setup)}</p>
+      <div class="who" role="group" aria-label="Участники">${who}</div>
+      <p class="hint">Ваш порядок: <span class="seq">нажмите участников по очереди</span></p>
+      <div class="act"><button type="button" class="btn primary" data-a="check" disabled>Проверить</button><button type="button" class="btn" data-a="reset">Сначала</button><button type="button" class="btn" data-a="show">Показать ответ</button></div>
+      <div class="result" hidden><p class="verdict"></p><p class="answer">${answerHTML(s)}</p><p class="why">${esc(s.why)}</p><p class="ref">${esc(/^(п\.|Прил\.)/.test(s.ref) && !s.ref.includes('ПДД') ? s.ref + ' ПДД РК' : s.ref)}</p><div><button type="button" class="link-btn replay" data-a="replay">Показать проезд ещё раз</button></div></div>
+    </article>`;
+  }
+
+  const ST = {};
+  function el(name, attrs) { const e = document.createElementNS(NSVG, name); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+  function setupCard(s) {
+    const card = $('card-' + s.id);
+    const svg = card.querySelector('svg');
+    const L = { rails: svg.querySelector('.l-rails'), arrows: svg.querySelector('.l-arrows'), veh: svg.querySelector('.l-veh'), bdg: svg.querySelector('.l-bdg'), paths: svg.querySelector('.l-paths') };
+    const st = { s, card, items: {}, seq: [], token: 0 };
+    const box = BOX[s.lay];
+    const stay = new Set(s.stay || []);
+    s.P.forEach(p => {
+      const kind = p.kind || 'car';
+      const d = p.path || rotPath(SP[p.m], ANG[p.at]);
+      const pe = el('path', { d, fill: 'none', stroke: 'none' });
+      L.paths.appendChild(pe);
+      const len = pe.getTotalLength();
+      const d0 = p.d0 !== undefined ? p.d0 : 120;
+      if (kind === 'tram') { L.rails.appendChild(el('path', { d, class: 'rail-o' })); L.rails.appendChild(el('path', { d, class: 'rail-i' })); }
+      // Arrow from the vehicle front until it leaves the junction area.
+      const pts = [];
+      let entered = false;
+      const inB = (q, m) => q.x >= box[0] - m && q.x <= box[1] + m && q.y >= box[2] - m && q.y <= box[3] + m;
+      for (let x = d0 + HALF[kind] + 4; x <= len; x += 4) {
+        const q = pe.getPointAtLength(x);
+        pts.push(q);
+        if (inB(q, 0)) entered = true;
+        else if (entered && !inB(q, box[4])) break;
+      }
+      if (pts.length > 1) {
+        const c = COL[p.id];
+        const a = pts[pts.length - 1], b = pts[pts.length - 2];
+        const ang = Math.atan2(a.y - b.y, a.x - b.x);
+        const head = [[a.x + Math.cos(ang) * 6, a.y + Math.sin(ang) * 6], [a.x + Math.cos(ang + 2.4) * 9, a.y + Math.sin(ang + 2.4) * 9], [a.x + Math.cos(ang - 2.4) * 9, a.y + Math.sin(ang - 2.4) * 9]];
+        L.arrows.appendChild(el('polyline', { points: pts.map(q => `${q.x.toFixed(1)},${q.y.toFixed(1)}`).join(' '), class: 'arrow' + (kind === 'ped' ? ' dash' : ''), stroke: c }));
+        L.arrows.appendChild(el('polygon', { points: head.map(h => h.map(v => v.toFixed(1)).join(',')).join(' '), fill: c, opacity: .9 }));
+      }
+      const veh = el('g', { class: 'veh', 'data-p': p.id });
+      veh.innerHTML = vehicleSVG(p);
+      L.veh.appendChild(veh);
+      const bdg = el('g', { class: 'bdg', 'data-p': p.id });
+      const tc = kind === 'amb' ? '#B8C2C9' : COL[p.id];
+      bdg.innerHTML = `<circle r="9.5" fill="#FFFFFF" stroke="${tc}" stroke-width="3"/><text y="4" text-anchor="middle" font-family="Golos Text, Arial, sans-serif" font-weight="700" font-size="${p.id.length > 1 ? 9 : 11}" fill="#14202A">${esc(p.id)}</text>`
+        + `<g class="ans" transform="translate(15 -15)"><circle r="10.5" fill="#FFC72C" stroke="#14202A" stroke-width="1.5"/><text class="ans-t" y="4.5" text-anchor="middle" font-family="Fira Sans Extra Condensed, Arial Narrow, sans-serif" font-weight="700" font-size="14" fill="#14202A"></text></g>`
+        + `<g class="pk" transform="translate(-15 -15)"><circle r="10" fill="#0A87A8" stroke="#FFFFFF" stroke-width="1.5"/><text class="pk-t" y="4.5" text-anchor="middle" font-family="Fira Sans Extra Condensed, Arial Narrow, sans-serif" font-weight="700" font-size="13" fill="#FFFFFF"></text></g>`
+        + (stay.has(p.id) ? `<g class="xs" transform="translate(15 -15)"><circle r="10.5" fill="#C62A2F" stroke="#FFFFFF" stroke-width="1.5"/><path d="M-4 -4L4 4M4 -4L-4 4" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/></g>` : '');
+      L.bdg.appendChild(bdg);
+      const gi = s.order.findIndex(gr => gr.includes(p.id));
+      if (gi >= 0) bdg.querySelector('.ans-t').textContent = gi + 1;
+      else bdg.querySelector('.ans').remove();
+      st.items[p.id] = { p, pe, len, d0, veh, bdg, kind };
+      place(st.items[p.id], d0);
+    });
+    card.querySelector('svg').addEventListener('click', e => {
+      const t = e.target.closest('[data-p]');
+      if (t) pick(st, t.getAttribute('data-p'));
+    });
+    card.addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      if (b.dataset.p) pick(st, b.dataset.p);
+      const a = b.dataset.a;
+      if (a === 'check') check(st);
+      if (a === 'reset') resetCard(st);
+      if (a === 'show') reveal(st, null);
+      if (a === 'replay') play(st);
+    });
+    ST[s.id] = st;
+  }
+
+  function place(it, d) {
+    const len = it.len;
+    const dd = Math.max(0, Math.min(len, d));
+    const q = it.pe.getPointAtLength(dd);
+    const q2 = dd + 2 <= len ? it.pe.getPointAtLength(dd + 2) : null;
+    const q1 = q2 ? q : it.pe.getPointAtLength(Math.max(0, dd - 2));
+    const qq = q2 || q;
+    let deg = Math.atan2(qq.y - q1.y, qq.x - q1.x) * 180 / Math.PI + 90;
+    if (it.kind === 'ped') deg = 0;
+    it.veh.setAttribute('transform', `translate(${q.x.toFixed(1)} ${q.y.toFixed(1)}) rotate(${deg.toFixed(1)})`);
+    it.bdg.setAttribute('transform', `translate(${q.x.toFixed(1)} ${q.y.toFixed(1)})`);
+  }
+
+  function updatePicks(st) {
+    const { card, seq } = st;
+    Object.values(st.items).forEach(it => {
+      const i = seq.indexOf(it.p.id);
+      const pk = it.bdg.querySelector('.pk');
+      pk.classList.toggle('on', i >= 0);
+      if (i >= 0) pk.querySelector('.pk-t').textContent = i + 1;
+    });
+    card.querySelectorAll('.who button').forEach(b => {
+      const i = seq.indexOf(b.dataset.p);
+      b.setAttribute('aria-pressed', String(i >= 0));
+      b.querySelector('b').textContent = i >= 0 ? i + 1 : '';
+    });
+    card.querySelector('.seq').textContent = seq.length ? seq.map((id, i) => `${i + 1}. ${id}`).join('  →  ') : 'нажмите участников по очереди';
+    card.querySelector('[data-a="check"]').disabled = seq.length === 0 || card.classList.contains('answer');
+  }
+
+  function pick(st, id) {
+    if (st.card.classList.contains('answer') || st.running) return;
+    if (st.seq.includes(id)) { st.seq = st.seq.filter(x => x !== id); updatePicks(st); return; }
+    st.seq.push(id);
+    updatePicks(st);
+    const movers = st.s.order.flat();
+    if (st.seq.length === movers.length && st.seq.every(x => movers.includes(x))) check(st);
+  }
+
+  function evaluate(s, seq) {
+    const stay = s.stay || [];
+    const bad = seq.find(x => stay.includes(x));
+    if (bad) return { ok: false, msg: `Не так: ${bad} сейчас ехать нельзя.` };
+    const movers = s.order.flat();
+    if (seq.length !== movers.length || !movers.every(x => seq.includes(x))) return { ok: false, msg: 'Не так: в вашем ответе не все, кто едет.' };
+    const gi = id => s.order.findIndex(g => g.includes(id));
+    for (let i = 1; i < seq.length; i++) if (gi(seq[i]) < gi(seq[i - 1])) return { ok: false, msg: 'Не так: очередь другая.' };
+    return { ok: true, msg: 'Верно!' };
+  }
+
+  function check(st) {
+    if (!st.seq.length) return;
+    const r = evaluate(st.s, st.seq);
+    progress[st.s.id] = r.ok ? 'ok' : 'bad';
+    saveProgress();
+    reveal(st, r);
+    updateProgress();
+  }
+
+  function reveal(st, r) {
+    const { card } = st;
+    card.classList.remove('r-ok', 'r-bad');
+    if (r) card.classList.add(r.ok ? 'r-ok' : 'r-bad');
+    card.querySelector('.verdict').textContent = r ? r.msg : 'Ответ';
+    card.querySelector('.result').hidden = false;
+    card.classList.add('answer');
+    card.querySelector('[data-a="check"]').disabled = true;
+    markCard(st.s.id);
+    play(st);
+  }
+
+  function resetCard(st) {
+    st.token++;
+    st.running = false;
+    st.seq = [];
+    const { card } = st;
+    card.classList.remove('answer', 'r-ok', 'r-bad');
+    card.querySelector('.result').hidden = true;
+    Object.values(st.items).forEach(it => { place(it, it.d0); it.bdg.querySelector('.ans')?.classList.remove('on'); it.veh.style.opacity = ''; it.bdg.style.opacity = ''; });
+    updatePicks(st);
+  }
+
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  function play(st) {
+    const tok = ++st.token;
+    const items = Object.values(st.items);
+    items.forEach(it => { place(it, it.d0); it.veh.style.opacity = ''; it.bdg.style.opacity = ''; });
+    if (reduce) { st.running = false; return; }
+    st.card.classList.remove('answer');
+    items.forEach(it => it.bdg.querySelector('.ans')?.classList.remove('on'));
+    st.running = true;
+    let gi = 0;
+    const DUR = 1600;
+    const next = () => {
+      if (tok !== st.token) return;
+      if (gi >= st.s.order.length) {
+        // End state: everyone back at the start with order numbers.
+        setTimeout(() => {
+          if (tok !== st.token) return;
+          items.forEach(it => { place(it, it.d0); it.veh.style.opacity = ''; it.bdg.style.opacity = ''; });
+          st.card.classList.add('answer');
+          st.running = false;
+        }, 350);
+        return;
+      }
+      const grp = st.s.order[gi].map(id => st.items[id]);
+      grp.forEach(it => it.bdg.querySelector('.ans')?.classList.add('on'));
+      const t0 = performance.now();
+      const frame = now => {
+        if (tok !== st.token) return;
+        const t = Math.min(1, (now - t0) / DUR), e = ease(t);
+        grp.forEach(it => {
+          const dEnd = it.len;
+          place(it, it.d0 + e * (dEnd - it.d0));
+          if (t > .85) { const o = String(Math.max(0, 1 - (t - .85) / .15)); it.veh.style.opacity = o; it.bdg.style.opacity = o; }
+        });
+        if (t < 1) requestAnimationFrame(frame);
+        else { gi++; setTimeout(next, 220); }
+      };
+      requestAnimationFrame(frame);
+    };
+    setTimeout(next, 250);
+  }
+
+  // ---------- Page ----------
+  let filter = 'all', todoOnly = false;
+  function markCard(id) {
+    const card = $('card-' + id);
+    const ok = progress[id] === 'ok';
+    card.classList.toggle('ok', ok);
+    card.querySelector('.tick').hidden = !ok;
+  }
+  function updateProgress() {
+    const n = S.filter(s => progress[s.id] === 'ok').length;
+    $('okc').textContent = n;
+    $('okt').textContent = S.length;
+    $('okbar').style.width = (100 * n / S.length).toFixed(1) + '%';
+  }
+  function renderChips() {
+    const cnt = k => S.filter(s => s.g === k).length;
+    $('chips').innerHTML = `<button type="button" class="chip" data-f="all" aria-pressed="${filter === 'all'}">Все <span class="n">${S.length}</span></button>`
+      + GROUPS.map(g => `<button type="button" class="chip" data-f="${g.k}" aria-pressed="${filter === g.k}">${g.t} <span class="n">${cnt(g.k)}</span></button>`).join('')
+      + `<button type="button" class="chip todo" data-f="todo" aria-pressed="${todoOnly}">Ещё не решены</button>`;
+  }
+  function applyFilter() {
+    S.forEach(s => {
+      const show = (filter === 'all' || s.g === filter) && (!todoOnly || progress[s.id] !== 'ok');
+      $('card-' + s.id).hidden = !show;
+    });
+    GROUPS.forEach(g => {
+      const any = S.some(s => s.g === g.k && !$('card-' + s.id).hidden);
+      $('sec-' + g.k).hidden = !any;
+    });
+    $('chips').querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.f === 'todo' ? todoOnly : b.dataset.f === filter)));
+  }
+
+  function legend() {
+    const mini = (inner, vb = '0 0 60 60') => `<svg viewBox="${vb}" aria-hidden="true">${inner}</svg>`;
+    const carIcon = id => `<rect width="60" height="60" rx="8" fill="#3A434A"/><g transform="translate(30 34)">${vehicleSVG({ id })}</g><g transform="translate(30 34)"><circle r="9.5" fill="#fff" stroke="${COL[id]}" stroke-width="3"/><text y="4" text-anchor="middle" font-family="Golos Text, Arial" font-weight="700" font-size="11" fill="#14202A">${id}</text></g>`;
+    const items = [
+      [mini(carIcon('А')), 'Участник с буквой. Стрелка его цвета показывает, куда он едет.'],
+      [mini(`<rect width="60" height="60" rx="8" fill="#3A434A"/><g transform="translate(30 30) rotate(90) scale(.8)">${vehicleSVG({ id: 'Т', kind: 'tram' })}</g>`), 'Т — трамвай, под ним рельсы.'],
+      [mini(`<rect width="60" height="60" rx="8" fill="#3A434A"/><g transform="translate(30 30)">${vehicleSVG({ id: 'С', kind: 'amb' })}</g>`), 'С — скорая с синим маячком и сиреной.'],
+      [mini(`<g transform="translate(5 5) scale(.5)">${SIGN['2.1']()}</g>`), '2.1 «Главная дорога».'],
+      [mini(`<g transform="translate(5 5) scale(.5)">${SIGN['2.4']()}</g>`), '2.4 «Уступите дорогу».'],
+      [mini(`<g transform="translate(5 5) scale(.5)">${SIGN['2.5']()}</g>`), '2.5 «Движение без остановки запрещено».'],
+      [mini(plateG('S', ALL4, ['S', 'W'], 30, 30, .5)), 'Табличка 7.13: толстые линии — главная дорога. Сторона таблички, ближайшая к знаку, — верх.'],
+      [mini(`<g transform="translate(5 5) scale(.5)">${SIGN['4.3']()}</g>`), '4.3 «Круговое движение».'],
+      [mini(lightG(22, 30, { c: 'r', arrow: 'on', plus: true })), 'Светофор. Справа внизу стрелка дополнительной секции, справа вверху зелёный «+».'],
+      [mini(lightG(30, 30, { t: ['b', 'r'] })), 'Трамвайный светофор: нижний сигнал и верхний левый, средний или правый разрешают налево, прямо или направо.'],
+      [mini(`<rect width="60" height="60" rx="8" fill="#3A434A"/><rect x="18" y="0" width="24" height="60" fill="#B5523B" fill-opacity=".85"/><g transform="translate(30 32)">${vehicleSVG({ id: 'В', kind: 'bike' })}</g>`), 'Велодорожка и велосипедист.'],
+      [mini(`<rect width="60" height="60" rx="8" fill="#3A434A"/><g transform="translate(-170 -170)">${regulatorG('S', 'right')}</g>`), 'Регулировщик сверху. Треугольник у головы показывает, куда смотрит грудь.'],
+      [mini(`<g transform="translate(30 30)"><circle r="12" fill="#FFC72C" stroke="#14202A" stroke-width="2"/><text y="5.5" text-anchor="middle" font-family="Fira Sans Extra Condensed, Arial" font-weight="700" font-size="17" fill="#14202A">1</text></g>`), 'Жёлтый номер — место в очереди в правильном ответе. Синий номер — ваш выбор.'],
+      [mini(`<g transform="translate(30 30)"><circle r="12" fill="#C62A2F" stroke="#fff" stroke-width="2"/><path d="M-5 -5L5 5M5 -5L-5 5" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>`), 'Красный крест — этому участнику сейчас ехать нельзя.']
+    ];
+    $('legend-grid').innerHTML = items.map(([icon, text]) => `<div class="lg">${icon}<span>${esc(text)}</span></div>`).join('');
+  }
+
+  function build() {
+    $('total').textContent = `${S.length} ${plural(S.length, ['ситуация', 'ситуации', 'ситуаций'])}`;
+    $('list').innerHTML = GROUPS.map(g => {
+      const items = S.filter(s => s.g === g.k);
+      return `<section class="sec" id="sec-${g.k}"><h2>${esc(g.t)} <small>${items.length}</small></h2><ol class="rules">${g.rules.map(r => `<li>${esc(r)}</li>`).join('')}</ol></section>` + items.map(cardHTML).join('');
+    }).join('');
+    S.forEach(setupCard);
+    S.forEach(s => markCard(s.id));
+    renderChips();
+    legend();
+    updateProgress();
+    applyFilter();
+  }
+
+  $('chips').addEventListener('click', e => {
+    const b = e.target.closest('.chip');
+    if (!b) return;
+    if (b.dataset.f === 'todo') todoOnly = !todoOnly; else filter = b.dataset.f;
+    applyFilter();
+  });
+  $('resetp').addEventListener('click', () => {
+    progress = {};
+    saveProgress();
+    S.forEach(s => { markCard(s.id); resetCard(ST[s.id]); });
+    updateProgress();
+    applyFilter();
+  });
+  // In print every card shows the answer: numbers on vehicles and the explanation.
+  window.addEventListener('beforeprint', () => { S.forEach(s => { const st = ST[s.id]; st.token++; st.running = false; Object.values(st.items).forEach(it => { place(it, it.d0); it.veh.style.opacity = ''; it.bdg.style.opacity = ''; }); }); });
+
+  build();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1076 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<meta charset="utf-8">
+<title>Кольца ПДД РК</title>
+<meta name="description" content="Тренажёр по круговому движению по ПДД Республики Казахстан: въезд, перестроение, выезд, светофоры, знаки 2.4 и 4.3, остановка на кольце.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:wght@500;600;700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* Layout: asphalt hero, sticky filter strip, grid of scenario cards.
+   Each card: top-view scene (SVG) + question + animated correct manoeuvre + rule reference. */
+:root {
+  --bg: #F2F5F7;
+  --surface: #FFFFFF;
+  --surface-2: #EAF0F3;
+  --ink: #14202A;
+  --ink-2: #33414D;
+  --muted: #5B6975;
+  --line: #D5DEE4;
+  --accent: #0A87A8;
+  --accent-text: #006C8A;
+  --accent-soft: #DCF1F6;
+  --ok: #1E8C4E;
+  --ok-soft: #E1F4E8;
+  --bad: #C62A2F;
+  --bad-soft: #FBE6E6;
+  --road: #3A434A;
+  --road-line: #EEF2F4;
+  --ground: #D7E2D2;
+  --walk: #C3CCD2;
+  --shoulder: #C9BFA6;
+  --lawn: #9CC98A;
+  --water: #86BFDD;
+  --curb: #8E9BA4;
+  --on-road: #F3F6F8;
+  --on-road-2: #AEBAC3;
+  --f-num: "Fira Sans Extra Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --f-body: "Golos Text", system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1317; --surface: #151D23; --surface-2: #1B252C; --ink: #E3EAEE; --ink-2: #C3CDD4; --muted: #93A2AD;
+    --line: #283540; --accent: #3BBFDB; --accent-text: #5CCBE3; --accent-soft: #0E3540;
+    --ok: #4CC97F; --ok-soft: #12321F; --bad: #F0666B; --bad-soft: #3A1719;
+    --road: #3C464E; --road-line: #D9E1E6; --ground: #22302A; --walk: #56626A; --shoulder: #5E5747; --lawn: #2F5A32; --water: #24506A;
+    --curb: #75838D; --on-road: #F3F6F8; --on-road-2: #B5C2CB;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1317; --surface: #151D23; --surface-2: #1B252C; --ink: #E3EAEE; --ink-2: #C3CDD4; --muted: #93A2AD;
+  --line: #283540; --accent: #3BBFDB; --accent-text: #5CCBE3; --accent-soft: #0E3540;
+  --ok: #4CC97F; --ok-soft: #12321F; --bad: #F0666B; --bad-soft: #3A1719;
+  --road: #3C464E; --road-line: #D9E1E6; --ground: #22302A; --walk: #56626A; --shoulder: #5E5747; --lawn: #2F5A32; --water: #24506A;
+  --curb: #75838D; --on-road: #F3F6F8; --on-road-2: #B5C2CB;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--f-body); -webkit-text-size-adjust: 100%; }
+.wrap {
+  max-width: 1240px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+a { color: var(--accent-text); }
+
+/* Hero */
+.hero { background: #2B3339; color: var(--on-road); }
+.hero .wrap { padding-block: 28px 30px; display: grid; gap: 10px; }
+.kicker { margin: 0; font: 600 12px/1.3 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--on-road-2); display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.kicker .kz { background: #00AFCA; color: #062A33; padding: 3px 8px; border-radius: 4px; }
+.hero h1 { margin: 0; font: 700 clamp(40px, 8.5vw, 88px)/.92 var(--f-num); text-transform: uppercase; text-wrap: balance; }
+.hero h1 span { color: #FFC72C; }
+.lead { margin: 0; max-width: 66ch; color: var(--on-road-2); font-size: 16px; }
+.lead b { color: var(--on-road); font-weight: 600; }
+.hero-links { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; margin: 0; }
+.hero-links a { color: #7FDBEC; font-weight: 600; }
+.lane-line { height: 6px; margin-top: 4px; background: repeating-linear-gradient(90deg, var(--on-road) 0 56px, transparent 56px 96px); opacity: .9; }
+
+/* Controls */
+.controls { background: var(--bg); border-bottom: 1px solid var(--line); z-index: 5; }
+.controls .wrap { padding-block: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+@media (min-width: 760px) {
+  .controls { position: sticky; top: env(safe-area-inset-top, 0px); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+}
+.chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 auto; min-width: 0; }
+@media (max-width: 759px) { .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; } }
+.chip { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; height: 34px; padding: 0 12px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+.chip .n { font: 600 12px var(--f-num); color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.chip[aria-pressed="true"] .n { color: var(--surface); opacity: .7; }
+.chip.todo[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
+.progress { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); white-space: nowrap; }
+.progress b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.bar { width: 90px; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--ok); width: 0; transition: width .3s; }
+.link-btn { border: 0; background: transparent; color: var(--accent-text); font-weight: 600; padding: 4px 2px; font-size: 14px; }
+.link-btn:hover { text-decoration: underline; }
+
+/* Legend */
+.legend { margin: 18px 0 6px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 16px; }
+.legend summary { cursor: pointer; font-weight: 600; padding: 10px 0; }
+.legend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 10px 18px; padding: 4px 0 14px; }
+.lg { display: grid; grid-template-columns: 52px 1fr; gap: 10px; align-items: center; font-size: 13.5px; color: var(--ink-2); }
+.lg svg { width: 52px; height: 36px; border-radius: 6px; }
+.how { margin: 0 0 12px; font-size: 14px; color: var(--ink-2); max-width: 80ch; }
+
+/* Sections */
+.list { display: grid; gap: 14px; padding-block: 10px 30px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 450px), 1fr)); align-items: start; }
+.sec { grid-column: 1 / -1; margin-top: 18px; display: grid; gap: 10px; }
+.sec:first-child { margin-top: 4px; }
+.sec h2 { margin: 0; font: 700 clamp(26px, 4vw, 34px)/1.05 var(--f-num); text-transform: uppercase; letter-spacing: .01em; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.sec h2 small { font: 600 15px var(--f-num); color: var(--muted); letter-spacing: 0; }
+.rules { margin: 0; padding: 12px 16px 12px 34px; background: var(--accent-soft); border-radius: var(--r); display: grid; gap: 4px; max-width: 980px; font-size: 14.5px; }
+.rules li::marker { color: var(--accent-text); font-weight: 700; }
+
+/* Card */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card.ok { border-color: var(--ok); }
+.card-h { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; justify-content: space-between; }
+.card-h h3 { min-width: 0; }
+.card-h h3 { margin: 0; font: 600 17px/1.3 var(--f-body); text-wrap: balance; }
+.tag { font: 600 11px/1.25 var(--f-body); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.tag .tick { color: var(--ok); margin-left: 6px; }
+.signtop { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: center; align-items: flex-end; }
+.stk { margin: 0; display: grid; justify-items: center; gap: 2px; }
+.stk img { display: block; background: #fff; }
+.stk .sg { width: 58px; height: 58px; object-fit: contain; }
+.stk .pl { width: auto; height: auto; max-width: 74px; max-height: 64px; min-height: 30px; border-radius: 3px; }
+.stk figcaption { font: 600 12.5px/1.2 var(--f-num); color: var(--muted); }
+.stage { position: relative; width: 100%; max-width: 460px; margin: 0 auto; }
+.stage svg { display: block; width: 100%; height: auto; border-radius: 10px; touch-action: manipulation; }
+.setup { margin: 0; font-size: 14px; color: var(--ink-2); }
+.qtext { margin: 0; font-weight: 600; font-size: 15px; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.opts.col { display: grid; gap: 6px; }
+.opt { min-height: 38px; height: auto; padding: 7px 14px; text-align: left; line-height: 1.35; }
+.opt.right { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); opacity: 1; }
+.opt.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); opacity: 1; }
+.who { display: flex; flex-wrap: wrap; gap: 6px; }
+.who button { border: 1px solid var(--line); background: var(--surface-2); border-radius: 9px; padding: 5px 10px 5px 6px; font-size: 13.5px; display: inline-flex; align-items: center; gap: 7px; }
+.who button i { width: 20px; height: 20px; border-radius: 50%; display: inline-grid; place-items: center; font: 700 11px var(--f-body); font-style: normal; color: #14202A; border: 2.5px solid; background: #fff; }
+.who button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.who button b { font: 700 12px var(--f-num); color: var(--accent-text); min-width: 10px; }
+.hint { margin: 0; font-size: 13.5px; color: var(--muted); }
+.seq { font-weight: 600; color: var(--ink); }
+.act { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { height: 38px; padding: 0 14px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; font-size: 14px; }
+.btn.primary { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.opt:disabled { cursor: default; }
+.result { border-radius: 10px; padding: 12px 14px; background: var(--surface-2); display: grid; gap: 6px; font-size: 14.5px; }
+.result p { margin: 0; }
+.verdict { font-weight: 700; }
+.card.r-ok .result { background: var(--ok-soft); }
+.card.r-ok .verdict { color: var(--ok); }
+.card.r-bad .result { background: var(--bad-soft); }
+.card.r-bad .verdict { color: var(--bad); }
+.answer { font: 600 15px/1.4 var(--f-body); }
+.answer .n { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #FFC72C; color: #14202A; font: 700 12px var(--f-num); margin-right: 4px; vertical-align: 1px; }
+.why { color: var(--ink-2); }
+.ref { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+/* Scene */
+.sc .gr { fill: var(--ground); }
+.sc .walk, .sc .lot { fill: var(--walk); }
+.sc .sh { fill: var(--shoulder); }
+.sc .rd { fill: var(--road); }
+.sc .rd2 { fill: var(--road); opacity: .7; }
+.sc .curb { stroke: var(--curb); stroke-width: 3; }
+.sc .dl { stroke: var(--road-line); stroke-width: 2; stroke-dasharray: 12 10; fill: none; }
+.sc .ln { stroke: var(--road-line); stroke-width: 2; fill: none; }
+.sc .island { fill: var(--ground); stroke: var(--curb); stroke-width: 3; }
+.sc .zebra { fill: var(--road-line); }
+.sc .zok { fill: #30C26B; fill-opacity: .3; stroke: #1E8C4E; stroke-width: 1.5; stroke-dasharray: 4 3; }
+.sc .zno { fill: #E5484D; fill-opacity: .26; stroke: #C62A2F; stroke-width: 1.5; stroke-dasharray: 4 3; }
+.sc .lbl, .sc .lbl-r { font: 600 11px var(--f-body); paint-order: stroke; stroke-width: 3.5px; stroke-linejoin: round; }
+.sc .lbl { fill: var(--ink); stroke: var(--ground); }
+.sc .lbl-r { fill: #fff; stroke: var(--road); }
+.sc .lbl-ok { font: 700 11px var(--f-body); fill: #14612F; paint-order: stroke; stroke: #fff; stroke-width: 3px; }
+.sc .lbl-no { font: 700 11px var(--f-body); fill: #A01E23; paint-order: stroke; stroke: #fff; stroke-width: 3px; }
+.sc .water { fill: var(--water); }
+.sc .rail2 { stroke: #A3ADB4; stroke-width: 4; }
+.sc .deck { fill: #59636B; fill-opacity: .93; }
+.sc .shadow { fill: #000; opacity: .16; }
+.sc .pier { fill: #8C969E; }
+.sc .tun { fill: #1E2326; opacity: .5; }
+.sc .portal { fill: #7B858C; }
+.sc .sleeper { stroke: #8B7355; stroke-width: 3; }
+.sc .railb { stroke: #AEB7BD; stroke-width: 2.5; }
+.sc .hill { fill: #000; opacity: .1; }
+.sc .plat { fill: var(--walk); stroke: var(--curb); stroke-width: 1.5; }
+.sc .m14 { stroke: #F2C230; stroke-width: 3.5; }
+.sc .m110 { stroke: #F2C230; stroke-width: 3.5; stroke-dasharray: 9 7; }
+.sc .m117 { stroke: #F2C230; stroke-width: 2.5; fill: none; }
+.sc .gr2 { fill: var(--lawn); }
+.sc .zarc-ok { fill: none; stroke: #30C26B; stroke-opacity: .55; }
+.sc .zarc-no { fill: none; stroke: #E5484D; stroke-opacity: .5; }
+.sc .bikeln { fill: #2E9E5B; fill-opacity: .55; }
+.sc .w18 { stroke: var(--road-line); stroke-width: 4; stroke-dasharray: 8 8; }
+.sc .l-top { pointer-events: none; }
+.sc .mk { fill: none; stroke: var(--road-line); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.sc .clock rect { fill: #14202A; stroke: #FFC72C; stroke-width: 1.5; }
+.sc .clock text { fill: #FFC72C; font: 700 14px var(--f-num); }
+.sc .pole { stroke: #6B7680; stroke-width: 2; }
+.sc .resp { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.sc .okp { stroke: #30C26B; }
+.sc .nop { stroke: #E5484D; stroke-dasharray: 7 6; }
+.sc .resx { stroke: #E5484D; stroke-width: 4; stroke-linecap: round; }
+.sc .resh { fill: #30C26B; }
+.sc .dim line { stroke: var(--ink-2); stroke-width: 1.3; }
+.sc .dim text { font: 600 11px var(--f-body); fill: var(--ink); paint-order: stroke; stroke: var(--ground); stroke-width: 3px; }
+.sc .l-res, .sc .after { display: none; }
+.card.answered .sc .l-res, .card.shown .sc .l-res, .card.answered .sc .after, .card.shown .sc .after { display: inline; }
+.sc .veh, .sc .bdg { cursor: pointer; }
+.sc .ghost { opacity: .45; }
+.sc .ans, .sc .pk, .sc .xs { display: none; }
+.sc .ans.on, .card.answered .sc .ans { display: inline; }
+.card.answered .sc .xs { display: inline; }
+.sc .pk.on { display: inline; }
+.card.answered .sc .pk.on { display: none; }
+.sc .arrow { fill: none; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; opacity: .9; }
+.sc .arrow.dash { stroke-dasharray: 2 6; }
+.sc .blink { animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: .15; } }
+@media (prefers-reduced-motion: reduce) { .sc .blink { animation: none; } .bar i { transition: none; } }
+
+.foot { padding-block: 24px 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; display: grid; gap: 8px; }
+.foot p { margin: 0; max-width: 90ch; }
+.foot b { color: var(--ink-2); }
+
+@media print {
+  :root:not(#x), :root[data-theme]:not(#x) {
+    --bg: #fff; --surface: #fff; --surface-2: #F1F4F6; --ink: #000; --ink-2: #1E2A33; --muted: #4B5863; --line: #C9D2D8;
+    --accent-soft: #EEF7FA; --road: #4A545B; --road-line: #F2F5F7; --ground: #E3EBDF; --walk: #CDD5DA; --shoulder: #D6CDB6;
+    --lawn: #B5D9A6; --water: #A9D2E8; --curb: #8E9BA4; color-scheme: light;
+  }
+  @page { size: A4; margin: 10mm; }
+  body { font-size: 10.5px; }
+  .controls, .legend, .who, .hint, .act, .opts, .verdict, .lane-line, .hero-links, .link-btn { display: none !important; }
+  .hero { background: none; color: #000; }
+  .hero .wrap { padding: 0 0 4px; gap: 3px; }
+  .hero h1 { font-size: 26px; }
+  .hero h1 span { color: #000; }
+  .kicker, .lead { color: #333; font-size: 10px; }
+  .lead b { color: #000; }
+  .kicker .kz { background: none; padding: 0; color: #333; }
+  .wrap { max-width: none; padding: 0; }
+  .list { grid-template-columns: 1fr 1fr; gap: 6px; padding: 0; }
+  .sec { margin-top: 4px; break-after: avoid; }
+  .sec h2 { font-size: 16px; }
+  .rules { font-size: 9.5px; padding: 6px 8px 6px 22px; }
+  .card { break-inside: avoid; padding: 6px 8px; gap: 4px; border-radius: 6px; }
+  .card-h h3 { font-size: 11.5px; }
+  .stk .sg { width: 34px; height: 34px; }
+  .stk .pl { max-width: 42px; max-height: 36px; min-height: 0; }
+  .stage { max-width: 62mm; }
+  .setup, .qtext { font-size: 9.5px; }
+  .result { display: grid !important; padding: 5px 7px; font-size: 9.5px; gap: 2px; background: #F1F4F6 !important; }
+  .answer { font-size: 10.5px; }
+  .ref { font-size: 9px; }
+  .sc .ans, .sc .xs, .sc .l-res, .sc .after { display: inline !important; }
+  .sc .pk { display: none !important; }
+  .foot { font-size: 9px; padding: 6px 0 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker"><span class="kz">Казахстан</span><span>Тренажёр кругового движения</span><span>сверено с adilet.zan.kz 22.10.2026</span></p>
+    <h1>Кольца <span>ПДД РК</span></h1>
+    <p class="lead"><b id="total">0 ситуаций</b>: въезд, перестроение и выезд, светофоры, обгон, разворот, где можно остановиться. Ответьте на вопрос и посмотрите, как машины проезжают по правилам. К каждому ответу приложен пункт ПДД.</p>
+    <p class="hero-links"><a href="./">Все тренажёры</a><a href="cifry.html">Цифры ПДД РК →</a><a href="perekrestki.html">Перекрёстки →</a><a href="znaki.html">Знаки и разметка →</a><a href="razvoroty.html">Развороты и перестроения →</a><a href="stoyanka.html">Стоянка и остановка →</a></p>
+    <div class="lane-line" aria-hidden="true"></div>
+  </div>
+</header>
+
+<section class="controls" aria-label="Фильтры">
+  <div class="wrap">
+    <div class="chips" id="chips" role="group" aria-label="Раздел"></div>
+    <div class="progress"><span>Верно: <b id="okc">0</b> из <b id="okt">0</b></span><span class="bar" aria-hidden="true"><i id="okbar"></i></span><button type="button" class="link-btn" id="resetp">Сбросить</button></div>
+  </div>
+</section>
+
+<div class="wrap">
+  <details class="legend" id="legend">
+    <summary>Как читать схему</summary>
+    <p class="how">Вид сверху, движение правостороннее, по кольцу едут против часовой стрелки. Стрелка показывает, куда собирается ехать участник. В вопросах об очереди нажимайте участников в том порядке, в каком они проедут; кому ехать нельзя, не нажимайте. После ответа машины проедут по правилам, а на схеме появятся зелёные и красные линии и зоны.</p>
+    <div class="legend-grid">
+      <div class="lg"><svg viewBox="0 0 52 36" aria-hidden="true"><rect width="52" height="36" fill="var(--road)"/><path d="M6 18H40" stroke="#2F80ED" stroke-width="3.2" stroke-linecap="round" fill="none"/><path d="M46 18L37 13V23Z" fill="#2F80ED"/></svg><span>Стрелка: куда собирается ехать участник</span></div>
+      <div class="lg"><svg viewBox="0 0 52 36" aria-hidden="true"><rect width="52" height="36" fill="var(--road)"/><path d="M6 18H40" stroke="#30C26B" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M46 18L37 13V23Z" fill="#30C26B"/></svg><span>Зелёная линия: так правильно</span></div>
+      <div class="lg"><svg viewBox="0 0 52 36" aria-hidden="true"><rect width="52" height="36" fill="var(--road)"/><path d="M6 18H46" stroke="#E5484D" stroke-width="4" stroke-dasharray="7 6" stroke-linecap="round" fill="none"/><path d="M19 11L33 25M33 11L19 25" stroke="#E5484D" stroke-width="4" stroke-linecap="round"/></svg><span>Красный пунктир с крестом: так нельзя</span></div>
+      <div class="lg"><svg viewBox="0 0 52 36" aria-hidden="true"><rect width="52" height="36" fill="var(--road)"/><rect x="4" y="6" width="20" height="24" fill="#30C26B" fill-opacity=".35" stroke="#1E8C4E" stroke-dasharray="4 3"/><rect x="28" y="6" width="20" height="24" fill="#E5484D" fill-opacity=".3" stroke="#C62A2F" stroke-dasharray="4 3"/></svg><span>Зелёная зона: стоять можно. Красная: нельзя</span></div>
+      <div class="lg"><svg viewBox="0 0 52 36" aria-hidden="true"><rect width="52" height="36" fill="var(--ground)"/><rect y="0" width="52" height="14" fill="var(--walk)"/><line x1="0" y1="14" x2="52" y2="14" stroke="var(--curb)" stroke-width="3"/><rect y="14" width="52" height="22" fill="var(--road)"/></svg><span>Серая полоса за бордюром: тротуар</span></div>
+      <div class="lg"><svg viewBox="0 0 52 36" aria-hidden="true"><rect width="52" height="36" fill="var(--ground)"/><rect y="0" width="52" height="14" fill="var(--shoulder)"/><rect y="14" width="52" height="22" fill="var(--road)"/></svg><span>Песочная полоса: обочина</span></div>
+    </div>
+  </details>
+  <main class="list" id="list"></main>
+</div>
+
+<footer class="wrap foot">
+<p><b>Источник.</b> Правила дорожного движения РК, приказ Министра внутренних дел от 30 июня 2023 года № 534, с изменениями по приказу № 305 от 27.04.2026: главы 8 (маневрирование), 11 (обгон), 12 (остановка и стоянка), 13 (проезд перекрёстков), приложение 1 (знаки 1.7, 2.4, 3.27, 4.3). Текст: <a href="https://adilet.zan.kz/rus/docs/V2300033003" target="_blank" rel="noopener">adilet.zan.kz</a>.</p>
+<p><b>Про кольцо.</b> Отдельной главы о круговом движении в ПДД РК нет. Кольцо без знаков приоритета и светофоров считается равнозначным перекрёстком (п. 103), со знаком 2.4 на въезде главное кольцо. Правило об остановке на большом кольце выведено из п. 84, 85 и 87: прямого запрета остановки на кольце в правилах нет, запрещено стоять ближе 30 м от края пересекаемой проезжей части.</p>
+</footer>
+
+<script>window.IMG = {"1.7": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iODM0LjExNiIgaGVpZ2h0PSI3MzQuNDIzIiB2ZXJzaW9uPSIxLjEiPg0KPHRpdGxlPjEuNyDQn9C10YDQtdGB0LXRh9C10L3QuNC1INGBINC60YDRg9Cz0L7QstGL0Lwg0LTQstC40LbQtdC90LjQtdC8PC90aXRsZT4NCjxwYXRoIHN0eWxlPSJmaWxsOiNmZmZmZmY7IiBkPSJtIDAsNjg5LjQyMyBjIDAsMjQuODUzIDIwLjE0Nyw0NSA0NSw0NSBsIDc0NC4xMTYsMCBjIDI0Ljg1MywwIDQ1LC0yMC4xNDcgNDUsLTQ1IGMgMCwtNy44OTkgLTIuMDc5LC0xNS42NTkgLTYuMDI5LC0yMi41IGwgLTM3Mi4wNTgsLTY0NC40MjMgYyAtOC4wMzgsLTEzLjkyMyAtMjIuODk0LC0yMi41IC0zOC45NzEsLTIyLjUgYyAtMTYuMDc3LDAgLTMwLjkzMyw4LjU3NyAtMzguOTcxLDIyLjUgbCAtMzcyLjA1OCw2NDQuNDIzIGMgLTMuOTUwLDYuODQxIC02LjAyOSwxNC42MDEgLTYuMDI5LDIyLjUgeiIvPg0KPHBhdGggc3R5bGU9ImZpbGw6bm9uZTtzdHJva2U6IzAwMDAwMDtzdHJva2Utd2lkdGg6MnB4OyIgZD0ibSAxLDY4OS40MjMgYyAwLDI0LjMwMSAxOS42OTksNDQgNDQsNDQgbCA3NDQuMTE2LDAgYyAyNC4zMDEsMCA0NCwtMTkuNjk5IDQ0LC00NCBjIDAsLTcuNzI0IC0yLjAzMywtMTUuMzExIC01Ljg5NSwtMjIuMCBsIC0zNzIuMDU4LC02NDQuNDIzIGMgLTcuODYwLC0xMy42MTQgLTIyLjM4NSwtMjIuMCAtMzguMTA1LC0yMi4wIGMgLTE1LjcyMCwwIC0zMC4yNDUsOC4zODYgLTM4LjEwNSwyMi4wIGwgLTM3Mi4wNTgsNjQ0LjQyMyBjIC0zLjg2Miw2LjY4OSAtNS44OTUsMTQuMjc2IC01Ljg5NSwyMi4wIHoiLz4NCjxwYXRoIHN0eWxlPSJmaWxsOiNmZjAwMDA7IiBkPSJtIDEwLDY4OS40MjMgYyAwLDE5LjMzMCAxNS42NzAsMzUgMzUsMzUgbCA3NDQuMTE2LDAgYyAxOS4zMzAsMCAzNSwtMTUuNjcwIDM1LC0zNSBjIDAsLTYuMTQ0IC0xLjYxNywtMTIuMTc5IC00LjY4OSwtMTcuNSBsIC0zNzIuMDU4LC02NDQuNDIzIGMgLTYuMjUyLC0xMC44MjkgLTE3LjgwNywtMTcuNSAtMzAuMzExLC0xNy41IGMgLTEyLjUwNCwwIC0yNC4wNTksNi42NzEgLTMwLjMxMSwxNy41IGwgLTM3Mi4wNTgsNjQ0LjQyMyBjIC0zLjA3Miw1LjMyMSAtNC42ODksMTEuMzU3IC00LjY4OSwxNy41IHogbSA4My42MzQsLTMzLjg1MiBjIDAsLTEuNzU1IDAuNDYyLC0zLjQ4MCAxLjM0MCwtNS4wMDAgbCAzMTMuNDI0LC01NDIuODY2IGMgMS43ODYsLTMuMDk0IDUuMDg3LC01IDguNjYwLC01LjAwMCBjIDMuNTczLDAgNi44NzMsMS45MDYgOC42NjAsNS4wMDAgbCAzMTMuNDI0LDU0Mi44NjYgYyAwLjg3OCwxLjUyMCAxLjM0MCwzLjI0NSAxLjM0MCw1LjAwMCBjIDAsNS41MjMgLTQuNDc3LDEwIC0xMCwxMCBsIC02MjYuODQ4LDAgYyAtNS41MjMsMCAtMTAsLTQuNDc3IC0xMCwtMTAgeiIvPg0KPHBhdGggc3R5bGU9ImZpbGw6IzAwMDAwMDsiIGQ9Im0gNDM3LjE4NSw1ODkuMjIzIGMgMzUuNzcwLC02LjMwNyA2Ni41MTQsLTI5LjAxOCA4My4wNTcsLTYxLjM1NCBsIC00NS44MDYsMC4wMDAgNjguODUyLC0xMTkuMzQ0IDY4Ljg1MiwxMTkuMzQ0IC00Ni4zODcsMC4wMDAgYyAtMTkuMDA5LDUzLjU0NiAtNjUuMzM5LDkyLjczNiAtMTIxLjI5NSwxMDIuNjAyIHoiLz4NCjxwYXRoIHN0eWxlPSJmaWxsOiMwMDAwMDA7IiBkPSJtIDUwNS44NDQsNDAwLjU4MiBjIC0yMy4zNDcsLTI3LjgyNCAtNTguMzg3LC00My4wOTQgLTk0LjY2MiwtNDEuMjUyIGwgMjIuOTAzLDM5LjY2OSAtMTM3Ljc4MSwwLjA0NCA2OC45MjksLTExOS4zMDAgMjMuMTkzLDQwLjE3MiBjIDU1Ljg3NiwtMTAuMzExIDExMi45ODEsMTAuMjE3IDE0OS41MDQsNTMuNzQ0IHoiLz4NCjxwYXRoIHN0eWxlPSJmaWxsOiMwMDAwMDA7IiBkPSJtIDMwOC4xNDYsNDM1LjQ0MiBjIC0xMi40MjMsMzQuMTMxIC04LjEyNyw3Mi4xMTIgMTEuNjA2LDEwMi42MDYgbCAyMi45MDMsLTM5LjY2OSA2OC45MjksMTE5LjMwMCAtMTM3Ljc4MSwtMC4wNDQgMjMuMTkzLC00MC4xNzIgYyAtMzYuODY3LC00My4yMzUgLTQ3LjY0MiwtMTAyLjk1MyAtMjguMjA5LC0xNTYuMzQ2IHoiLz4NCjwvc3ZnPg==", "2.4": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjgzNC4xMiIgaGVpZ2h0PSI3MzQuNDIiIHZlcnNpb249IjEuMSI+DQo8dGl0bGU+Mi40INCj0YHRgtGD0L/QuNGC0LUg0LTQvtGA0L7Qs9GDPC90aXRsZT4NCjxwYXRoIHN0eWxlPSJmaWxsOiNmZmZmZmY7IiBkPSJtIDQ1IDAgYSA0NSA0NSAwIDAgMCAtNDUgNDUgYSA0NSA0NSAwIDAgMCA2LjAzIDIyLjUgbCAzNzIuMDYgNjQ0LjQyIGEgNDUgNDUgMCAwIDAgMzguOTcgMjIuNSBhIDQ1IDQ1IDAgMCAwIDM4Ljk3IC0yMi41IGwgMzcyLjA2IC02NDQuNDIgYSA0NSA0NSAwIDAgMCA2LjAzIC0yMi41IGEgNDUgNDUgMCAwIDAgLTQ1IC00NSB6Ii8+DQo8cGF0aCBzdHlsZT0iZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyOyIgZD0ibSA0NSAxIGEgNDQgNDQgMCAwIDAgLTQ0IDQ0IGEgNDQgNDQgMCAwIDAgNS44OSAyMiBsIDM3Mi4wNiA2NDQuNDIgYSA0NCA0NCAwIDAgMCAzOC4xMSAyMiBhIDQ0IDQ0IDAgMCAwIDM4LjExIC0yMiBsIDM3Mi4wNiAtNjQ0LjQyIGEgNDQgNDQgMCAwIDAgNS44OSAtMjIgYSA0NCA0NCAwIDAgMCAtNDQgLTQ0IHoiLz4NCjxwYXRoIHN0eWxlPSJmaWxsOiNmZjAwMDA7IiBkPSJtIDQ1IDEwIGEgMzUgMzUgMCAwIDAgLTM1IDM1IGEgMzUgMzUgMCAwIDAgNC42OSAxNy41IGwgMzcyLjA2IDY0NC40MiBhIDM1IDM1IDAgMCAwIDMwLjMxIDE3LjUgYSAzNSAzNSAwIDAgMCAzMC4zMSAtMTcuNSBsIDM3Mi4wNiAtNjQ0LjQyIGEgMzUgMzUgMCAwIDAgNC42OSAtMTcuNSBhIDM1IDM1IDAgMCAwIC0zNSAtMzUgeiBtIDY4NS40OCA1OC44NSBhIDEwIDEwIDAgMCAxIDEwIDEwIGEgMTAgMTAgMCAwIDEgLTEuMzQgNSBsIC0zMTMuNDIgNTQyLjg3IGEgMTAgMTAgMCAwIDEgLTguNjYgNSBhIDEwIDEwIDAgMCAxIC04LjY2IC01IGwgLTMxMy40MiAtNTQyLjg3IGEgMTAgMTAgMCAwIDEgLTEuMzQgLTUgYSAxMCAxMCAwIDAgMSAxMCAtMTAgeiIvPg0KPC9zdmc+DQo=", "3.27": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3MDAiIGhlaWdodD0iNzAwIiB2ZXJzaW9uPSIxLjEiPgo8dGl0bGU+My4yNyDQntGB0YLQsNC90L7QstC60LAg0LfQsNC/0YDQtdGJ0LXQvdCwPC90aXRsZT4KPGNpcmNsZSBzdHlsZT0iZmlsbDojZmZmZmZmOyIgY3g9IjM1MCIgY3k9IjM1MCIgcj0iMzUwIi8+CjxjaXJjbGUgc3R5bGU9ImZpbGw6bm9uZTtzdHJva2U6IzAwMDAwMDtzdHJva2Utd2lkdGg6MnB4OyIgY3g9IjM1MCIgY3k9IjM1MCIgcj0iMzQ5Ii8+CjxwYXRoIHN0eWxlPSJmaWxsOiNmZjAwMDA7IiBkPSJtIDM1MCw2OTAgYyAxODcuNzc3LDAgMzQwLC0xNTIuMjIzIDM0MCwtMzQwIGMgMCwtMTg3Ljc3NyAtMTUyLjIyMywtMzQwIC0zNDAsLTM0MCBjIC0xODcuNzc3LDAgLTM0MCwxNTIuMjIzIC0zNDAsMzQwIGMgMCwxODcuNzc3IDE1Mi4yMjMsMzQwIDM0MCwzNDAgeiBtIDE4MS40NDAsLTEyNi43NDAgYyAtNTAuNjM4LDQzLjA4MyAtMTE0Ljk1NCw2Ni43NDAgLTE4MS40NDAsNjYuNzQwIGMgLTY2LjQ4NiwwIC0xMzAuODAyLC0yMy42NTggLTE4MS40NDAsLTY2Ljc0MCBsIDE4MS40NDAsLTE4MS40NDAgeiBtIC0zOTQuNzAwLC0zMS44MjAgYyAtNDMuMDgzLC01MC42MzggLTY2Ljc0MCwtMTE0Ljk1NCAtNjYuNzQwLC0xODEuNDQwIGMgMCwtNjYuNDg2IDIzLjY1OCwtMTMwLjgwMiA2Ni43NDAsLTE4MS40NDAgbCAxODEuNDQwLDE4MS40NDAgeiBtIDMxLjgyMCwtMzk0LjcwMCBjIDUwLjYzOCwtNDMuMDgzIDExNC45NTQsLTY2Ljc0MCAxODEuNDQwLC02Ni43NDAgYyA2Ni40ODYsMCAxMzAuODAyLDIzLjY1OCAxODEuNDQwLDY2Ljc0MCBsIC0xODEuNDQwLDE4MS40NDAgeiBtIDM5NC43MDAsMzEuODIwIGMgNDMuMDgzLDUwLjYzOCA2Ni43NDAsMTE0Ljk1NCA2Ni43NDAsMTgxLjQ0MCBjIDAsNjYuNDg2IC0yMy42NTgsMTMwLjgwMiAtNjYuNzQwLDE4MS40NDAgbCAtMTgxLjQ0MCwtMTgxLjQ0MCB6Ii8+CjxwYXRoIHN0eWxlPSJmaWxsOiMwZDY5ZTE7IiBkPSJtIDEzNy40ODgsMTgzLjQ1MCBjIC0zNy4yNDcsNDcuNTI2IC01Ny40ODgsMTA2LjE2NyAtNTcuNDg4LDE2Ni41NTAgYyAwLDYwLjM4MyAyMC4yNDEsMTE5LjAyMyA1Ny40ODgsMTY2LjU1MCBsIDE2Ni41NTAsLTE2Ni41NTAgeiIvPgo8cGF0aCBzdHlsZT0iZmlsbDojMGQ2OWUxOyIgZD0ibSAxODMuNDUwLDU2Mi41MTIgYyA0Ny41MjYsMzcuMjQ3IDEwNi4xNjcsNTcuNDg4IDE2Ni41NTAsNTcuNDg4IGMgNjAuMzgzLDAgMTE5LjAyMywtMjAuMjQxIDE2Ni41NTAsLTU3LjQ4OCBsIC0xNjYuNTUwLC0xNjYuNTUwIHoiLz4KPHBhdGggc3R5bGU9ImZpbGw6IzBkNjllMTsiIGQ9Im0gNTYyLjUxMiw1MTYuNTUwIGMgMzcuMjQ3LC00Ny41MjYgNTcuNDg4LC0xMDYuMTY3IDU3LjQ4OCwtMTY2LjU1MCBjIDAsLTYwLjM4MyAtMjAuMjQxLC0xMTkuMDIzIC01Ny40ODgsLTE2Ni41NTAgbCAtMTY2LjU1MCwxNjYuNTUwIHoiLz4KPHBhdGggc3R5bGU9ImZpbGw6IzBkNjllMTsiIGQ9Im0gNTE2LjU1MCwxMzcuNDg4IGMgLTQ3LjUyNiwtMzcuMjQ3IC0xMDYuMTY3LC01Ny40ODggLTE2Ni41NTAsLTU3LjQ4OCBjIC02MC4zODMsMCAtMTE5LjAyMywyMC4yNDEgLTE2Ni41NTAsNTcuNDg4IGwgMTY2LjU1MCwxNjYuNTUwIHoiLz4KPC9zdmc+", "4.3": "data:image/jpeg;base64,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"};</script>
+<script>
+// Shared scene library for the PDD RK trainers (rings, U-turns and lane changes, parking).
+// Exposes window.ENG: route builder, ring point helper and layout builders used by page data.
+(() => {
+  const CX = 200, CY = 200;
+
+  // Route commands -> SVG polyline path. Commands:
+  //   ['M', x, y]            start
+  //   ['L', x, y]            straight line
+  //   ['Q', cx, cy, x, y]    quadratic curve
+  //   ['A', r, deg, k]       counter-clockwise (on screen) arc around the ring centre to angle deg,
+  //                          radius moves to r within the first 1/k of the arc (k defaults to 1)
+  function route(cmds, cx = CX, cy = CY) {
+    const pts = [];
+    let x = 0, y = 0;
+    const push = (px, py) => { pts.push([px, py]); x = px; y = py; };
+    for (const c of cmds) {
+      const op = c[0];
+      if (op === 'M') push(c[1], c[2]);
+      else if (op === 'L') {
+        const x0 = x, y0 = y, n = Math.max(1, Math.ceil(Math.hypot(c[1] - x0, c[2] - y0) / 4));
+        for (let i = 1; i <= n; i++) push(x0 + (c[1] - x0) * i / n, y0 + (c[2] - y0) * i / n);
+      } else if (op === 'Q') {
+        const x0 = x, y0 = y, n = 28;
+        for (let i = 1; i <= n; i++) { const t = i / n, u = 1 - t; push(u * u * x0 + 2 * u * t * c[1] + t * t * c[3], u * u * y0 + 2 * u * t * c[2] + t * t * c[4]); }
+      } else if (op === 'A') {
+        const r0 = Math.hypot(x - cx, y - cy), phi0 = Math.atan2(y - cy, x - cx) * 180 / Math.PI;
+        let pe = c[2];
+        while (pe > phi0) pe -= 360;
+        while (phi0 - pe > 360) pe += 360;
+        const k = c[3] || 1, n = Math.max(2, Math.ceil((phi0 - pe) / 2));
+        for (let i = 1; i <= n; i++) {
+          const t = i / n, ph = (phi0 + (pe - phi0) * t) * Math.PI / 180, rr = r0 + (c[1] - r0) * Math.min(1, t * k);
+          push(cx + rr * Math.cos(ph), cy + rr * Math.sin(ph));
+        }
+      }
+    }
+    return 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L');
+  }
+  const rp = (r, deg, cx = CX, cy = CY) => [cx + r * Math.cos(deg * Math.PI / 180), cy + r * Math.sin(deg * Math.PI / 180)];
+
+  // ---------- Layouts ----------
+  // Straight street: road from y=Y0, lanes of LW px. Two-way 2 lanes: top lane goes left (west), bottom lane goes right (east).
+  const Y0 = 100, LW = 36;
+  const laneY = i => Y0 + LW * (i + 0.5);
+  function street(o = {}) {
+    const W = o.w || 400, n = o.lanes || 2, H = o.h || 260, y1 = Y0 + n * LW, th = o.th || 26, bh = o.bh || 26;
+    let g = `<rect class="gr" x="0" y="0" width="${W}" height="${H}"/>`;
+    const side = (kind, y, h) => kind === 'walk' ? `<rect class="walk" x="0" y="${y}" width="${W}" height="${h}"/>` : kind === 'shoulder' ? `<rect class="sh" x="0" y="${y}" width="${W}" height="${h}"/>` : '';
+    g += side(o.top || 'walk', Y0 - th, th) + side(o.bottom || 'walk', y1, bh);
+    g += `<rect class="rd" x="0" y="${Y0}" width="${W}" height="${n * LW}"/>`;
+    if ((o.top || 'walk') === 'walk') g += `<line class="curb" x1="0" y1="${Y0}" x2="${W}" y2="${Y0}"/>`;
+    if ((o.bottom || 'walk') === 'walk') g += `<line class="curb" x1="0" y1="${y1}" x2="${W}" y2="${y1}"/>`;
+    const lineAt = (y, kind, x1 = 0, x2 = W) => {
+      if (kind === 'dash') return `<line class="dl" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/>`;
+      if (kind === 'solid') return `<line class="ln" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/>`;
+      if (kind === 'double') return `<line class="ln" x1="${x1}" y1="${y - 3}" x2="${x2}" y2="${y - 3}"/><line class="ln" x1="${x1}" y1="${y + 3}" x2="${x2}" y2="${y + 3}"/>`;
+      if (kind === '1.11') return `<line class="ln" x1="${x1}" y1="${y - 3}" x2="${x2}" y2="${y - 3}"/><line class="dl" x1="${x1}" y1="${y + 3}" x2="${x2}" y2="${y + 3}"/>`;
+      if (kind === '1.8') return `<line class="w18" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/>`;
+      if (kind === '1.11r') return `<line class="dl" x1="${x1}" y1="${y - 3}" x2="${x2}" y2="${y - 3}"/><line class="ln" x1="${x1}" y1="${y + 3}" x2="${x2}" y2="${y + 3}"/>`;
+      return '';
+    };
+    if (o.oneway) { for (let i = 1; i < n; i++) g += lineAt(Y0 + i * LW, (o.lines && o.lines[i - 1]) || 'dash'); }
+    else {
+      const mid = Y0 + (n / 2) * LW;
+      g += lineAt(mid, o.center || 'dash');
+      for (let i = 1; i < n / 2; i++) { g += lineAt(Y0 + i * LW, 'dash'); g += lineAt(mid + i * LW, 'dash'); }
+    }
+    if (o.edge === 'shoulderLine') g += lineAt(Y0 + 1, 'solid') + lineAt(y1 - 1, 'solid');
+    if (o.median) { const m = Y0 + (n / 2) * LW; g += `<rect class="island" x="0" y="${m - 7}" width="${W}" height="14"/>` + (o.gap ? `<rect class="rd" x="${o.gap[0]}" y="${m - 9}" width="${o.gap[1] - o.gap[0]}" height="18"/>` : ''); }
+    return g;
+  }
+
+  // Ring: centre (200,200), island radius RI, outer radius RO, four arms of width AW, arm length to H.
+  function ring(o = {}) {
+    const RO = o.ro || 132, RI = o.ri || 64, AW = o.aw || 72, lanes = o.lanes || 2, H = o.h || 400;
+    let g = `<rect class="gr" x="0" y="0" width="400" height="${H}"/>`;
+    g += `<rect class="rd" x="${200 - AW / 2}" y="0" width="${AW}" height="${H}"/><rect class="rd" x="0" y="${200 - AW / 2}" width="400" height="${AW}"/>`;
+    g += `<circle class="rd" cx="200" cy="200" r="${RO}"/>`;
+    const e = RO + 2;
+    g += `<path class="dl" d="M200 0V${200 - e}M200 ${200 + e}V${H}M0 200H${200 - e}M${200 + e} 200H400"/>`;
+    if (o.inboundTwo) g += `<path class="dl" d="M${200 + AW / 4} ${200 + e}V${H}M${200 - AW / 4} ${200 + e}V${H}M${200 - AW / 4} ${200 - e}V0M${200 + AW / 4} ${200 - e}V0M0 ${200 + AW / 4}H${200 - e}M0 ${200 - AW / 4}H${200 - e}M${200 + e} ${200 - AW / 4}H400M${200 + e} ${200 + AW / 4}H400"/>`;
+    for (let i = 1; i < lanes; i++) g += `<circle cx="200" cy="200" r="${RI + i * (RO - RI) / lanes}" fill="none" class="dl"/>`;
+    g += `<circle class="island" cx="200" cy="200" r="${RI}"/>`;
+    return g;
+  }
+
+  // Ring route between arms. Arm angles: E 0, S 90, W 180, N -90. Traffic goes counter-clockwise on screen.
+  // o: off (entry lane offset from the arm axis), r (ring lane radius), out (exit lane offset), r2 (radius before the exit),
+  //    stop (stop on the ring at this angle instead of leaving), ro (outer ring radius), from0 (start distance from the centre)
+  const ARM = { E: 0, S: 90, W: 180, N: -90 };
+  function ringRoute(from, to, o = {}) {
+    const ro = o.ro || 132, off = o.off ?? 18, r = o.r ?? 115, out = o.out ?? 18, r2 = o.r2 ?? r, L0 = o.from0 ?? 200;
+    const t = ARM[from] * Math.PI / 180, ux = Math.cos(t), uy = Math.sin(t), rx = Math.sin(t), ry = -Math.cos(t);
+    const P = d => [CX + ux * d + rx * off, CY + uy * d + ry * off];
+    const ja = ARM[from] - Math.asin(Math.min(.95, off / r)) * 180 / Math.PI - 14;
+    const J = rp(r, ja), C = P(ro - 2);
+    const cmds = o.startA != null ? [['M', ...rp(o.r0 ?? r, o.startA)]] : [['M', ...P(L0)], ['L', ...P(ro + 8)], ['Q', C[0], C[1], J[0], J[1]]];
+    if (o.mid != null) cmds.push(['A', r, o.mid]);
+    if (o.stop != null) { cmds.push(['A', r2, o.stop, o.k || 2]); return cmds; }
+    const v = ARM[to] * Math.PI / 180, vx = Math.cos(v), vy = Math.sin(v), sx = -Math.sin(v), sy = Math.cos(v);
+    const Q = d => [CX + vx * d + sx * out, CY + vy * d + sy * out];
+    const xa = ARM[to] + Math.asin(Math.min(.95, out / r2)) * 180 / Math.PI + 14;
+    cmds.push(['A', r2, xa, o.k || (r2 === r ? 1 : 2)]);
+    const D = Q(ro - 2);
+    cmds.push(['Q', D[0], D[1], ...Q(ro + 8)], ['L', ...Q(o.to0 ?? 210)]);
+    return cmds;
+  }
+  // Distance along a route from its start to the point where it reaches radius rr from the centre (yield line).
+  function distTo(cmds, rr) {
+    const d = route(cmds), pts = d.slice(1).split(' L').map(p => p.split(' ').map(Number));
+    let L = 0;
+    for (let i = 1; i < pts.length; i++) { L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); if (Math.hypot(pts[i][0] - CX, pts[i][1] - CY) <= rr) return L; }
+    return L;
+  }
+
+  // Cumulative length of a route after each command (for multi-step demos and reversing ranges).
+  const plen = cmds => { const pts = route(cmds).slice(1).split(' L').map(p => p.split(' ').map(Number)); let L = 0; for (let i = 1; i < pts.length; i++) L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); return L; };
+  const cum = cmds => cmds.map((_, i) => plen(cmds.slice(0, i + 1)));
+
+  window.ENG = { route, rp, street, ring, laneY, Y0, LW, ringRoute, distTo, ARM, cum };
+})();
+
+</script>
+<script>
+// «Кольца ПДД РК»: entry, lanes, exit and stopping on a roundabout.
+(() => {
+  const E = window.ENG;
+  const R = (from, to, o) => E.ringRoute(from, to, o);
+  // Entering car: path from the arm edge, waiting just before the ring.
+  const IN = (from, to, o = {}) => { const p = R(from, to, o); return { path: p, d0: o.d0 ?? Math.max(0, E.distTo(p, (o.ro || 132) + 12) - 20) }; };
+  // Sign stacks at the right of each entry (top sign first).
+  const BASE = { S: [254, 374], E: [372, 142], N: [146, 52], W: [28, 276] };
+  const SA = (keys, arms = 'SENW', base = BASE) => [...arms].flatMap(a => keys.map((k, i) => ({ k, x: base[a][0], y: base[a][1] - 26 * (keys.length - 1 - i), s: 24 })));
+  const ring = o => () => E.ring(o);
+  const BIG = { ro: 170, ri: 104, lanes: 2 };          // big ring: lanes at r 120 and 154
+  const BIGR = { ro: 170, r: 154 };
+
+  window.PAGE = {
+    key: 'kolca',
+    groups: [
+      { k: 'in', t: 'Въезд на кольцо', rules: [
+        'Нет знаков приоритета и светофора: кольцо считается равнозначным перекрёстком. Работает помеха справа (п. 103): кто въезжает, тот подъезжает справа к машинам на кольце и едет первым.',
+        'На въезде знак 2.4 или 2.5: кольцо главное, въезжающий уступает всем, кто уже едет по кольцу (п. 101).',
+        'Знак 4.3 «Круговое движение» задаёт только направление: против часовой стрелки. Очередь он не меняет. Знак 1.7 только предупреждает о кольце.',
+        'Въезжать можно из любой полосы: требование занять крайнее положение перед поворотом не действует при въезде на кольцо (п. 52).',
+        'Светофор работает: очередь задаёт он (п. 94). Жёлтый мигает или светофор выключен: смотрите на знаки.'
+      ] },
+      { k: 'move', t: 'По кольцу и перестроение', rules: [
+        'Перестраиваетесь: уступите тем, кто едет попутно и полосу не меняет (п. 51).',
+        'Перестраиваются двое одновременно: едет тот, кто справа (ближе к внешнему краю), второй уступает (п. 51).',
+        'Обгон на кольце разрешён, даже если вы едете не по главной (исключение в п. 81, пп. 2).',
+        'Двигаться можно только против часовой стрелки (знак 4.3). Развернуться можно, объехав кольцо целиком.',
+        'Пропустили съезд: езжайте на второй круг. Задний ход на перекрёстке запрещён (п. 59).'
+      ] },
+      { k: 'out', t: 'Выезд с кольца', rules: [
+        'Съезд с кольца — поворот направо. Заранее займите правую полосу кольца (п. 52) и включите правый указатель (п. 47).',
+        'Съезжать из левой полосы можно, только если это разрешают стрелы разметки 1.18 или знак 5.8.1 (п. 52).',
+        'На съезде пропустите пешеходов, которые переходят дорогу, на которую вы поворачиваете (п. 91).',
+        'Кто съезжает, не мешает тому, кто въезжает с того же рукава: их пути не пересекаются, и они едут одновременно.'
+      ] },
+      { k: 'stop', t: 'Остановка на кольце', rules: [
+        'Кольцо — перекрёсток. На пересечении проезжих частей и ближе 30 м от края пересекаемой проезжей части остановка запрещена (п. 87, пп. 7), стоянка тоже (п. 88, пп. 1).',
+        'Небольшое городское кольцо: между соседними въездами меньше 60 м, встать негде.',
+        'Большое кольцо: остановиться можно у внешнего (правого) края, если до каждого въезда и съезда не меньше 30 м и нет знаков 3.27 или 3.28. В один ряд, параллельно краю (п. 85).',
+        'У центрального островка не вставайте: это левая сторона, а слева п. 84 разрешает стоять только на дорогах с одной полосой в каждую сторону и на дорогах с односторонним движением.'
+      ] }
+    ],
+    scenes: [
+      // ---------- Въезд ----------
+      { id: 'k-eq', g: 'in', t: 'Кольцо без знаков приоритета', vb: '0 0 400 400', bg: ring(),
+        signs: SA(['4.3']),
+        cars: [
+          { label: 'А', what: 'въезжает', ...IN('S', 'N') },
+          { label: 'Б', what: 'едет по кольцу', path: R(null, 'E', { startA: 150 }) }
+        ],
+        setup: 'На въездах только знак 4.3. Светофора нет.',
+        q: { type: 'order', text: 'Кто проедет первым?', order: [['А'], ['Б']] },
+        why: 'Знаков 2.4 нет, значит, кольцо равнозначное. А подъезжает к Б справа, поэтому Б уступает. А въезжает первым, Б едет следом.',
+        ref: 'ПДД РК, п. 103; знак 4.3' },
+
+      { id: 'k-main', g: 'in', t: 'На въезде знак 2.4', vb: '0 0 400 400', bg: ring(),
+        signs: SA(['2.4', '4.3']),
+        cars: [
+          { label: 'А', what: 'въезжает', ...IN('S', 'N') },
+          { label: 'Б', what: 'едет по кольцу', path: R(null, 'E', { startA: 150 }) }
+        ],
+        setup: 'Та же ситуация, но под знаком 4.3 висит 2.4 «Уступите дорогу».',
+        q: { type: 'order', text: 'Кто проедет первым?', order: [['Б'], ['А']] },
+        why: 'Знак 2.4 делает кольцо главной дорогой. А уступает всем, кто уже на кольце, и въезжает после Б.',
+        ref: 'ПДД РК, п. 101; знаки 2.4 и 4.3' },
+
+      { id: 'k-17', g: 'in', t: 'Знак 1.7 перед кольцом', vb: '0 0 400 400', bg: ring(),
+        signTop: ['1.7', '4.3'],
+        signs: [{ k: '1.7', x: 254, y: 376, s: 26 }],
+        cars: [{ label: 'А', what: 'подъезжает', path: R('S', 'N'), d0: 6, arrowLen: 120 }],
+        q: { type: 'pick', text: 'Перед кольцом стоит знак 1.7. Кольцо из-за него главное?', opts: ['Нет, знак только предупреждает о кольце', 'Да, теперь кольцо главное', 'Да, но только для грузовиков'], ans: 0 },
+        why: 'Знак 1.7 предупреждающий: впереди пересечение с круговым движением. Очередь задают знаки 2.4, 2.5 или светофор. Без них действует помеха справа, и въезжающий едет первым.',
+        ref: 'ПДД РК, приложение 1, знак 1.7; п. 103' },
+
+      { id: 'k-lane', g: 'in', t: 'Въезд из правой полосы налево', vb: '0 0 400 400', bg: ring({ aw: 100, inboundTwo: true }),
+        signs: [{ k: '4.3', x: 268, y: 376, s: 24 }],
+        cars: [
+          { label: 'А', what: 'правая полоса', ...IN('S', 'W', { off: 37.5, out: 37.5 }) },
+          { label: 'Б', what: 'левая полоса', ...IN('S', 'W', { off: 12.5, r: 81, r2: 115, out: 12.5 }) }
+        ],
+        q: { type: 'pick', text: 'Оба едут налево, на третий съезд. Из какой полосы можно въехать на кольцо?', opts: ['Только из левой', 'Только из правой', 'Из любой'], ans: 2 },
+        demo: [['А'], ['Б']],
+        why: 'Перед поворотом нужно занять крайнее положение, но на въезде на кольцо это правило не действует. Въезжайте из любой полосы. Перед своим съездом перестройтесь в правую полосу кольца.',
+        ref: 'ПДД РК, п. 52' },
+
+      { id: 'k-light', g: 'in', t: 'Светофоры на въезде и на кольце', vb: '0 0 400 400', bg: ring(),
+        signs: SA(['2.4', '4.3'], 'S'),
+        feat: [{ t: 'light', x: 280, y: 366, c: 'g' }, { t: 'light', x: 126, y: 334, c: 'r' }],
+        cars: [
+          { label: 'А', what: 'зелёный', ...IN('S', 'N') },
+          { label: 'Б', what: 'красный', path: R(null, 'E', { startA: 136 }) }
+        ],
+        setup: 'Перед въездом А горит зелёный. На кольце перед этим въездом для Б горит красный.',
+        q: { type: 'order', text: 'Кто едет сейчас?', order: [['А']], stay: ['Б'] },
+        why: 'Кольцо регулируемое: очередь задаёт светофор, знак 2.4 не действует. А едет на зелёный, Б стоит на красный.',
+        ref: 'ПДД РК, п. 94' },
+
+      { id: 'k-flash', g: 'in', t: 'Жёлтый мигает', vb: '0 0 400 400', bg: ring(),
+        signs: SA(['2.4', '4.3']),
+        feat: [{ t: 'light', x: 280, y: 366, c: 'y', blink: true }, { t: 'light', x: 126, y: 334, c: 'y', blink: true }],
+        cars: [
+          { label: 'А', what: 'въезжает', ...IN('S', 'N') },
+          { label: 'Б', what: 'едет по кольцу', path: R(null, 'E', { startA: 136 }) }
+        ],
+        setup: 'Светофоры мигают жёлтым. На въездах 2.4 и 4.3.',
+        q: { type: 'order', text: 'Кто проедет первым?', order: [['Б'], ['А']] },
+        why: 'Мигающий жёлтый делает перекрёсток нерегулируемым, работают знаки приоритета. С 2.4 кольцо главное: Б едет первым, А за ним.',
+        ref: 'ПДД РК, п. 94' },
+
+      { id: 'k-ped', g: 'in', t: 'Пешеходный переход перед въездом', vb: '0 0 400 450', bg: ring({ h: 450 }),
+        signs: [{ k: '2.4', x: 254, y: 404, s: 22 }, { k: '4.3', x: 254, y: 428, s: 22 }],
+        feat: [{ t: 'zebra', h: true, y: 356, x1: 166, x2: 234 }],
+        cars: [
+          { label: 'А', what: 'въезжает', path: R('S', 'N', { from0: 250 }), d0: 52 },
+          { label: 'П', kind: 'ped', what: 'пешеход', path: [['M', 148, 356], ['L', 252, 356]] }
+        ],
+        q: { type: 'order', text: 'Кто первым?', order: [['П'], ['А']] },
+        why: 'Переход нерегулируемый. Пешеход на переходе идёт первым, потом А въезжает на кольцо.',
+        ref: 'ПДД РК, п. 106' },
+
+      // ---------- По кольцу ----------
+      { id: 'k-lc', g: 'move', t: 'Перестроение на кольце', vb: '0 0 400 400', bg: ring(),
+        signs: SA(['2.4', '4.3']),
+        cars: [
+          { label: 'А', what: 'перестраивается вправо', path: R(null, 'E', { startA: 158, r0: 81, r: 115, k: 1.4 }) },
+          { label: 'Б', what: 'едет прямо по полосе', path: R(null, 'N', { startA: 176 }) }
+        ],
+        setup: 'А из левой полосы кольца перестраивается в правую, чтобы съехать направо. Б едет по правой полосе дальше.',
+        q: { type: 'order', text: 'Кто проедет первым?', order: [['Б'], ['А']] },
+        why: 'При перестроении уступают тем, кто едет попутно и полосу не меняет. Б едет первым, А перестраивается за ним.',
+        ref: 'ПДД РК, п. 51' },
+
+      { id: 'k-lc2', g: 'move', t: 'Одновременное перестроение', vb: '0 0 400 400', bg: ring({ ro: 140, ri: 56, lanes: 3 }),
+        cars: [
+          { label: 'А', what: 'из левой в среднюю', path: R(null, null, { startA: 172, r0: 70, r: 98, stop: -8, k: 2.2 }) },
+          { label: 'Б', what: 'из правой в среднюю', path: R(null, null, { startA: 168, r0: 126, r: 98, stop: -62, k: 2.6 }) }
+        ],
+        setup: 'Кольцо в три полосы. А и Б одновременно перестраиваются в среднюю полосу.',
+        q: { type: 'order', text: 'Кто перестроится первым?', order: [['Б'], ['А']] },
+        why: 'При одновременном перестроении уступает тот, у кого другой справа. Б справа от А (ближе к внешнему краю), поэтому Б перестраивается первым.',
+        ref: 'ПДД РК, п. 51' },
+
+      { id: 'k-overtake', g: 'move', t: 'Обгон на кольце', vb: '0 0 400 400', bg: ring(),
+        signs: SA(['4.3']),
+        cars: [
+          { label: 'А', what: 'обгоняет', path: [['M', ...E.rp(115, 168)], ['A', 81, 112], ['A', 81, 62], ['A', 115, 20, 1.6], ['Q', 330, 218, 345, 218], ['L', 410, 218]] },
+          { label: 'Б', kind: 'truck', what: 'грузовик', path: R(null, null, { startA: 128, stop: 70 }) }
+        ],
+        setup: 'Кольцо равнозначное. Впереди А медленно едет грузовик Б.',
+        q: { type: 'yn', text: 'А может обогнать Б по левой полосе кольца?', ans: 0 },
+        demo: [{ ids: ['А', 'Б'], dur: 2600 }],
+        why: 'Обгон на нерегулируемом перекрёстке по неглавной дороге запрещён, но для кольца сделано исключение. А обгоняет по левой полосе и возвращается вправо до своего съезда.',
+        ref: 'ПДД РК, п. 81, пп. 2' },
+
+      { id: 'k-uturn', g: 'move', t: 'Разворот через кольцо', vb: '0 0 400 400', bg: ring(),
+        signs: SA(['2.4', '4.3']),
+        cars: [{ label: 'А', what: 'разворачивается', ...IN('S', 'S') }],
+        q: { type: 'yn', text: 'А хочет вернуться туда, откуда приехал. Можно развернуться, объехав кольцо?', ans: 0 },
+        demo: [{ ids: ['А'], dur: 3200 }],
+        why: 'Можно. Объедьте кольцо целиком и съезжайте на свой же рукав. Перед съездом займите правую полосу и включите правый указатель.',
+        ref: 'ПДД РК, п. 52; знак 4.3' },
+
+      { id: 'k-reverse', g: 'move', t: 'Проехал свой съезд', vb: '0 0 400 400', bg: ring(),
+        signs: SA(['2.4', '4.3']),
+        cars: [{ label: 'А', what: 'пропустил съезд', path: R(null, 'E', { startA: -24 }) }],
+        res: [{ ok: false, p: [['M', ...E.rp(115, -24)], ['Q', 322, 192, 330, 218], ['L', 360, 218]], at: .45 }],
+        setup: 'А хотел съехать направо (на восток), но проскочил съезд.',
+        q: { type: 'yn', text: 'Можно сдать назад и съехать?', opts: ['Можно', 'Нельзя'], ans: 1 },
+        demo: [{ ids: ['А'], dur: 3400 }],
+        why: 'Задним ходом на перекрёстке ездить нельзя, а кольцо — перекрёсток. Езжайте на второй круг и съезжайте.',
+        ref: 'ПДД РК, п. 59' },
+
+      { id: 'k-wrong', g: 'move', t: 'Налево коротким путём', vb: '0 0 400 400', bg: ring(),
+        signs: SA(['4.3']),
+        cars: [{ label: 'А', what: 'едет налево', ...IN('S', 'W') }],
+        res: [{ ok: false, p: [['M', 218, 330], ['Q', 200, 262, 120, 260], ['Q', 72, 236, 0, 218]], at: .5 }],
+        setup: 'А нужно налево, на запад. Через левую часть кольца путь короче.',
+        q: { type: 'yn', text: 'Можно свернуть налево по часовой стрелке?', ans: 1 },
+        why: 'Нельзя. Знак 4.3 требует ехать против часовой стрелки. Налево с кольца выезжают через третий съезд.',
+        ref: 'ПДД РК, знак 4.3' },
+
+      // ---------- Выезд ----------
+      { id: 'k-exit-left', g: 'out', t: 'Съезд из левой полосы', vb: '0 0 400 400', bg: ring(),
+        signs: SA(['2.4', '4.3']),
+        cars: [
+          { label: 'А', what: 'левая полоса', path: R(null, 'E', { startA: 118, r0: 81, r: 81, r2: 115, k: 1.6 }) },
+          { label: 'Б', what: 'правая полоса', path: R(null, 'N', { startA: 124 }) }
+        ],
+        res: [{ ok: false, p: R(null, 'E', { startA: 118, r0: 81, r: 81, to0: 205 }), at: .62 }],
+        setup: 'А едет по левой полосе кольца и хочет на ближайший съезд. Справа рядом едет Б.',
+        q: { type: 'yn', text: 'Можно съехать прямо из левой полосы?', ans: 1 },
+        demo: [['Б'], ['А']],
+        why: 'Нельзя. Съезд — поворот направо, перед ним займите правую полосу (п. 52). А пропускает Б (п. 51), перестраивается и только потом съезжает.',
+        ref: 'ПДД РК, п. 51, 52' },
+
+      { id: 'k-exit-118', g: 'out', t: 'Стрелы разрешают съезд слева', vb: '0 0 400 400', bg: ring({ aw: 100, inboundTwo: true }),
+        feat: [{ t: 'mark', x: E.rp(81, 70)[0], y: E.rp(81, 70)[1], deg: 70, k: 'sr', s: 1.7 }, { t: 'mark', x: E.rp(115, 72)[0], y: E.rp(115, 72)[1], deg: 72, k: 'r', s: 1.7 }],
+        cars: [
+          { label: 'А', what: 'левая полоса', path: R(null, 'E', { startA: 130, r0: 81, r: 81, out: 12.5 }) },
+          { label: 'Б', what: 'правая полоса', path: R(null, 'E', { startA: 130, r0: 115, r: 115, out: 37.5 }) }
+        ],
+        setup: 'На полосах кольца нанесены стрелы 1.18: в левой «прямо или направо», в правой «направо». На съезде две полосы.',
+        q: { type: 'yn', text: 'А может съехать из левой полосы?', ans: 0 },
+        demo: [['А', 'Б']],
+        why: 'Можно. Разметка 1.18 или знак 5.8.1 задают направления по полосам, и тогда поворот выполняют по этим полосам (п. 52). А съезжает в левую полосу съезда, Б в правую.',
+        ref: 'ПДД РК, п. 52; разметка 1.18' },
+
+      { id: 'k-exit-ped', g: 'out', t: 'Пешеход на съезде', vb: '0 0 400 400', bg: ring(),
+        signs: SA(['2.4', '4.3'], 'SNW'),
+        feat: [{ t: 'zebra', x: 356, y1: 166, y2: 234 }],
+        cars: [
+          { label: 'А', what: 'съезжает', path: R(null, 'E', { startA: 150 }) },
+          { label: 'П', kind: 'ped', what: 'пешеход', path: [['M', 356, 150], ['L', 356, 250]] }
+        ],
+        q: { type: 'order', text: 'Кто первым?', order: [['П'], ['А']] },
+        why: 'Съезжая, А поворачивает направо и уступает пешеходу, который переходит дорогу, куда А поворачивает.',
+        ref: 'ПДД РК, п. 91, 106' },
+
+      { id: 'k-out-in', g: 'out', t: 'Один съезжает, другой въезжает', vb: '0 0 400 400', bg: ring(),
+        signs: SA(['4.3']),
+        cars: [
+          { label: 'А', what: 'съезжает', path: R(null, 'E', { startA: 118 }) },
+          { label: 'Б', what: 'въезжает', ...IN('E', 'N') }
+        ],
+        setup: 'Кольцо равнозначное. А съезжает на рукав, с которого въезжает Б.',
+        q: { type: 'order', text: 'Кто проедет первым?', order: [['А', 'Б']] },
+        why: 'Пути не пересекаются: А уходит по правой половине рукава, Б въезжает по своей половине. Оба едут одновременно.',
+        ref: 'ПДД РК, п. 103' },
+
+      // ---------- Остановка ----------
+      { id: 'k-stop-small', g: 'stop', t: 'Высадить пассажира на маленьком кольце', vb: '0 0 400 400', bg: ring(),
+        signs: SA(['2.4', '4.3']),
+        feat: [{ t: 'arc', r: 124, a1: -180, a2: 180, ok: false, after: true }],
+        cars: [{ label: 'А', what: 'хочет встать', path: R(null, 'E', { startA: 150 }) }],
+        res: [{ ok: false, p: R(null, null, { startA: 150, stop: 44, r2: 124 }), at: .8 }],
+        setup: 'Обычное городское кольцо: между соседними въездами метров 40. Пассажир просит высадить у края.',
+        q: { type: 'yn', text: 'Можно остановиться у правого края кольца?', ans: 1 },
+        why: 'Нельзя. Кольцо — перекрёсток: остановка запрещена ближе 30 м от края пересекаемой проезжей части. На маленьком кольце такого места нет. Съезжайте и остановитесь дальше 30 м от кольца.',
+        ref: 'ПДД РК, п. 87, пп. 7' },
+
+      { id: 'k-stop-big', g: 'stop', t: 'Большое кольцо', vb: '0 0 400 400', bg: ring(BIG),
+        feat: [
+          { t: 'arc', r: 160, a1: 26, a2: 64, ok: true, after: true }, { t: 'arc', r: 160, a1: 116, a2: 154, ok: true, after: true },
+          { t: 'arc', r: 160, a1: 206, a2: 244, ok: true, after: true }, { t: 'arc', r: 160, a1: -64, a2: -26, ok: true, after: true },
+          { t: 'arc', r: 160, a1: -26, a2: 26, ok: false, after: true }, { t: 'arc', r: 160, a1: 64, a2: 116, ok: false, after: true },
+          { t: 'arc', r: 160, a1: 154, a2: 206, ok: false, after: true }, { t: 'arc', r: 160, a1: 244, a2: 296, ok: false, after: true },
+          { t: 'label', x: 292, y: 360, text: '≥ 30 м', cls: 'lbl' }, { t: 'label', x: 360, y: 300, text: '≥ 30 м', cls: 'lbl' }
+        ],
+        cars: [{ label: 'А', what: 'встаёт у края', path: R(null, null, { ...BIGR, startA: 140, stop: 45, r2: 160 }) }],
+        setup: 'Площадь-кольцо: от въезда до соседнего съезда больше 60 м. Знаков 3.27 и 3.28 нет.',
+        q: { type: 'yn', text: 'Можно остановиться у правого края, посередине между съездами?', ans: 0 },
+        why: 'Можно. Остановка запрещена только ближе 30 м от края пересекаемой проезжей части. Посередине большого кольца до каждого въезда и съезда больше 30 м. Встаньте в один ряд у правого края (зелёные участки).',
+        ref: 'ПДД РК, п. 84, 85, 87 пп. 7' },
+
+      { id: 'k-stop-327', g: 'stop', t: 'Большое кольцо и знак 3.27', vb: '0 0 400 400', bg: ring(BIG),
+        signs: [{ k: '3.27', x: 342, y: 338, s: 24 }],
+        feat: [{ t: 'arc', r: 160, a1: -180, a2: 180, ok: false, after: true }],
+        cars: [{ label: 'А', what: 'хочет встать', path: R(null, 'E', { ...BIGR, startA: 140, out: 18 }) }],
+        res: [{ ok: false, p: R(null, null, { ...BIGR, startA: 140, stop: 45, r2: 160 }), at: .85 }],
+        q: { type: 'yn', text: 'Можно остановиться у края за знаком 3.27?', ans: 1 },
+        why: 'Нельзя. Знак 3.27 запрещает и остановку, и стоянку на своей стороне. А проезжает дальше.',
+        ref: 'ПДД РК, знак 3.27' },
+
+      { id: 'k-stop-island', g: 'stop', t: 'У центрального островка', vb: '0 0 400 400', bg: ring(BIG),
+        feat: [{ t: 'arc', r: 112, a1: -180, a2: 180, ok: false, after: true, w: 14 }],
+        cars: [{ label: 'А', what: 'хочет встать', path: R(null, 'E', { ...BIGR, startA: 140, out: 18 }) }],
+        res: [{ ok: false, p: R(null, null, { ...BIGR, startA: 140, stop: 50, r2: 113, r: 120 }), at: .85 }],
+        setup: 'Большое кольцо. Водитель хочет встать у островка, где никому не мешает.',
+        q: { type: 'yn', text: 'Можно остановиться у центрального островка?', ans: 1 },
+        why: 'Нельзя. Островок слева по ходу движения. Левая сторона разрешена для остановки только на дорогах с одной полосой в каждом направлении и на дорогах с односторонним движением (знак 5.5). Кольцо не обозначают знаком 5.5.',
+        ref: 'ПДД РК, п. 84' }
+    ]
+  };
+})();
+
+</script>
+<script>
+// Shared runtime for the PDD RK scene trainers: renders window.PAGE scenarios, checks answers, animates.
+(() => {
+  const P = window.PAGE, IMG = window.IMG || {}, E = window.ENG;
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COL = { 'А': '#2F80ED', 'Б': '#F2994A', 'В': '#27AE60', 'Г': '#A35BE0', 'Д': '#E5484D', 'П': '#E86FB0', 'С': '#E8EEF2', 'Т': '#D64545', '_': '#8C96A0' };
+  const pathOf = p => Array.isArray(p) ? E.route(p) : p;
+
+  // ---------- Vehicles (drawn heading up, centred) ----------
+  function vehSVG(kind, col) {
+    if (kind === 'bus') return `<rect x="-11" y="-32" width="22" height="64" rx="4" fill="${col}"/><rect x="-8" y="-28" width="16" height="56" rx="2" fill="#FFFFFF" fill-opacity=".3"/>`;
+    if (kind === 'moto') return `<rect x="-2.5" y="-13" width="5" height="26" rx="2.5" fill="#1F2328"/><ellipse cy="1" rx="6.5" ry="5" fill="${col}"/><circle cy="-1" r="3.4" fill="#E8B98A"/>`;
+    if (kind === 'bike') return `<rect x="-1.6" y="-13" width="3.2" height="26" rx="1.6" fill="#1F2328"/><ellipse cy="1" rx="5.5" ry="4.2" fill="${col}"/><circle cy="-1" r="3" fill="#E8B98A"/>`;
+    if (kind === 'ped') return `<ellipse rx="8" ry="5" fill="${col}"/><circle r="4" fill="#E8B98A"/>`;
+    if (kind === 'amb') return `<rect x="-10" y="-18" width="20" height="36" rx="5" fill="#FFFFFF" stroke="#B8C2C9"/><rect x="-7" y="-3" width="6" height="3.5" rx="1" fill="#2D6BFF" class="blink"/><rect x="1" y="-3" width="6" height="3.5" rx="1" fill="#2D6BFF"/>`;
+    return `<rect x="-10" y="-18" width="20" height="36" rx="5.5" fill="${col}"/><rect x="-8" y="-10" width="16" height="7" rx="2" fill="#0B1820" opacity=".55"/><rect x="-8" y="8" width="16" height="5" rx="2" fill="#0B1820" opacity=".45"/><circle cx="-6" cy="-17" r="1.8" fill="#FFF6C9"/><circle cx="6" cy="-17" r="1.8" fill="#FFF6C9"/>`;
+  }
+  // Truck: cab at the front (top), box behind.
+  function truckSVG(col) { return `<rect x="-11" y="-16" width="22" height="46" rx="2" fill="#8C96A0"/><rect x="-10" y="-31" width="20" height="16" rx="3" fill="${col}"/><rect x="-8" y="-28" width="16" height="5" rx="1.5" fill="#0B1820" opacity=".5"/>`; }
+  const HALF = { car: 18, truck: 31, bus: 32, moto: 13, bike: 13, ped: 6, amb: 18 };
+  const drawVeh = (kind, col) => kind === 'truck' ? truckSVG(col) : vehSVG(kind, col);
+
+  // ---------- Signs and features ----------
+  function sign(sg) {
+    const s = sg.s || 26, u = IMG[sg.k];
+    let g = `<line class="pole" x1="${sg.x}" y1="${sg.y + s / 2}" x2="${sg.x}" y2="${sg.y + s / 2 + (sg.pole ?? 10)}"/>`;
+    if (u) g += `<image href="${u}" x="${sg.x - s / 2}" y="${sg.y - s / 2}" width="${s}" height="${s}" preserveAspectRatio="xMidYMid meet"/>`;
+    let py = sg.y + s / 2 + 1;
+    (sg.plates || []).forEach(pk => {
+      const pu = IMG[pk], pw = s * 1.15, ph = s * 0.55;
+      if (pu) g += `<rect x="${sg.x - pw / 2}" y="${py}" width="${pw}" height="${ph}" fill="#fff"/><image href="${pu}" x="${sg.x - pw / 2}" y="${py}" width="${pw}" height="${ph}" preserveAspectRatio="xMidYMid meet"/>`;
+      py += ph + 1;
+    });
+    return g;
+  }
+  function feat(f, H) {
+    const Y0 = E.Y0;
+    switch (f.t) {
+      case 'zebra': {
+        let g = '';
+        if (f.h) { for (let x = f.x1; x < f.x2; x += 9) g += `<rect class="zebra" x="${x}" y="${f.y - 10}" width="5" height="20"/>`; return g; }
+        for (let y = f.y1 ?? Y0 + 3; y < (f.y2 ?? Y0 + 69); y += 9) g += `<rect class="zebra" x="${f.x - 10}" y="${y}" width="20" height="5"/>`;
+        return g;
+      }
+      case 'arc': { // thick zone along a ring between screen angles a1 < a2
+        if (f.a2 - f.a1 >= 360) return `<circle class="${f.ok ? 'zarc-ok' : 'zarc-no'}" style="stroke-width:${f.w || 16}px" cx="200" cy="200" r="${f.r}"/>`;
+        const [x1, y1] = E.rp(f.r, f.a1), [x2, y2] = E.rp(f.r, f.a2);
+        return `<path class="${f.ok ? 'zarc-ok' : 'zarc-no'}" style="stroke-width:${f.w || 16}px" d="M${x1.toFixed(1)} ${y1.toFixed(1)}A${f.r} ${f.r} 0 ${f.a2 - f.a1 > 180 ? 1 : 0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}"/>`;
+      }
+      case 'mark': { // lane arrow (marking 1.18) heading `deg` (0 = up on screen); kinds: s, r, l, sr, sl
+        const P = { s: 'M0 11V-9M-4 -4L0 -10L4 -4', r: 'M0 11V0Q0 -5 6 -5M3 -9L8 -5L3 -1', l: 'M0 11V0Q0 -5 -6 -5M-3 -9L-8 -5L-3 -1', sr: 'M0 11V-9M-4 -4L0 -10L4 -4M0 4Q0 -1 6 -1M3 -5L8 -1L3 3', sl: 'M0 11V-9M-4 -4L0 -10L4 -4M0 4Q0 -1 -6 -1M-3 -5L-8 -1L-3 3' };
+        return `<path class="mk" transform="translate(${f.x} ${f.y}) rotate(${f.deg || 0}) scale(${f.s || 1})" d="${P[f.k || 's']}"/>`;
+      }
+      case 'zone': return `<rect class="${f.ok ? 'zok' : 'zno'}" x="${f.x1}" y="${f.y1}" width="${f.x2 - f.x1}" height="${f.y2 - f.y1}"/>`;
+      case 'label': return `<text class="${f.cls || 'lbl'}" x="${f.x}" y="${f.y}" text-anchor="${f.a || 'middle'}">${esc(f.text)}</text>`;
+      case 'dim': return `<g class="dim"><line x1="${f.x1}" y1="${f.y}" x2="${f.x2}" y2="${f.y}"/><line x1="${f.x1}" y1="${f.y - 5}" x2="${f.x1}" y2="${f.y + 5}"/><line x1="${f.x2}" y1="${f.y - 5}" x2="${f.x2}" y2="${f.y + 5}"/><text x="${(f.x1 + f.x2) / 2}" y="${f.y - 5}" text-anchor="middle">${esc(f.text)}</text></g>`;
+      case 'bridge': { // water under our road; lane markings stay visible
+        const n = f.n || 2, y1 = Y0 + n * E.LW, w = f.x2 - f.x1;
+        return `<rect class="water" x="${f.x1}" y="0" width="${w}" height="${Y0 - 8}"/><rect class="water" x="${f.x1}" y="${y1 + 8}" width="${w}" height="${H - y1 - 8}"/>`
+          + `<rect class="walk" x="${f.x1}" y="${Y0 - 8}" width="${w}" height="8"/><rect class="walk" x="${f.x1}" y="${y1}" width="${w}" height="8"/>`
+          + `<line class="rail2" x1="${f.x1}" y1="${Y0 - 8}" x2="${f.x2}" y2="${Y0 - 8}"/><line class="rail2" x1="${f.x1}" y1="${y1 + 8}" x2="${f.x2}" y2="${y1 + 8}"/>`
+          + (f.lbl === false ? '' : `<text class="lbl" x="${(f.x1 + f.x2) / 2}" y="${f.ly ?? Y0 - 14}" text-anchor="middle">${esc(f.text || 'мост')}</text>`);
+      }
+      case 'overpass': { // our road passes over a lower road (путепровод)
+        const n = f.n || 2, y1 = Y0 + n * E.LW;
+        return `<rect class="gr" x="${f.x - 40}" y="0" width="80" height="${Y0 - 8}"/><rect class="gr" x="${f.x - 40}" y="${y1 + 8}" width="80" height="${H - y1 - 8}"/>`
+          + `<rect class="rd2" x="${f.x - 24}" y="0" width="48" height="${Y0 - 8}"/><rect class="rd2" x="${f.x - 24}" y="${y1 + 8}" width="48" height="${H - y1 - 8}"/>`
+          + `<rect class="walk" x="${f.x - 40}" y="${Y0 - 8}" width="80" height="8"/><rect class="walk" x="${f.x - 40}" y="${y1}" width="80" height="8"/>`
+          + `<line class="rail2" x1="${f.x - 40}" y1="${Y0 - 8}" x2="${f.x + 40}" y2="${Y0 - 8}"/><line class="rail2" x1="${f.x - 40}" y1="${y1 + 8}" x2="${f.x + 40}" y2="${y1 + 8}"/>`
+          + `<text class="lbl" x="${f.x}" y="${f.ly ?? H - 10}" text-anchor="middle">${esc(f.text || 'путепровод')}</text>`;
+      }
+      case 'deck': // another road crosses above ours (we are under the overpass)
+        return `<rect class="deck" x="${f.x - 26}" y="0" width="52" height="${H}"/><line class="rail2" x1="${f.x - 26}" y1="0" x2="${f.x - 26}" y2="${H}"/><line class="rail2" x1="${f.x + 26}" y1="0" x2="${f.x + 26}" y2="${H}"/><text class="lbl" x="${f.x}" y="14" text-anchor="middle">${esc(f.text || 'путепровод над дорогой')}</text>`;
+      case 'estakada':
+        return `<rect class="shadow" x="${f.x1}" y="${Y0 + (f.n || 2) * E.LW + 4}" width="${f.x2 - f.x1}" height="18"/>` + [...Array(Math.floor((f.x2 - f.x1) / 60) + 1)].map((_, i) => `<rect class="pier" x="${f.x1 + 10 + i * 60}" y="${Y0 + (f.n || 2) * E.LW + 6}" width="8" height="16"/>`).join('') + `<text class="lbl" x="${(f.x1 + f.x2) / 2}" y="${Y0 - 12}" text-anchor="middle">${esc(f.text || 'эстакада')}</text>`;
+      case 'tunnel': return `<rect class="tun" x="${f.x1}" y="${Y0 - 26}" width="${f.x2 - f.x1}" height="${(f.n || 2) * E.LW + 52}"/><rect class="portal" x="${f.x1 - 4}" y="${Y0 - 26}" width="8" height="${(f.n || 2) * E.LW + 52}"/><rect class="portal" x="${f.x2 - 4}" y="${Y0 - 26}" width="8" height="${(f.n || 2) * E.LW + 52}"/><text class="lbl" x="${(f.x1 + f.x2) / 2}" y="${Y0 - 32}" text-anchor="middle">тоннель</text>`;
+      case 'rail': { let g = ''; for (let y = 0; y < H; y += 8) g += `<line class="sleeper" x1="${f.x - 6}" y1="${y}" x2="${f.x + 20}" y2="${y}"/>`; return g + `<line class="railb" x1="${f.x}" y1="0" x2="${f.x}" y2="${H}"/><line class="railb" x1="${f.x + 14}" y1="0" x2="${f.x + 14}" y2="${H}"/>`; }
+      case 'tside': { const w = f.w || 72; return `<rect class="${f.cls || 'rd'}" x="${f.x - w / 2}" y="0" width="${w}" height="${Y0 + 1}"/>` + (f.cls ? '' : `<line class="dl" x1="${f.x}" y1="0" x2="${f.x}" y2="${Y0 - 6}"/>`) + (f.text ? `<text class="lbl" x="${f.x}" y="14" text-anchor="middle">${esc(f.text)}</text>` : ''); }
+      case 'bside': { const w = f.w || 72, y = Y0 + (f.n || 2) * E.LW; return `<rect class="${f.cls || 'rd'}" x="${f.x - w / 2}" y="${y - 1}" width="${w}" height="${H}"/>` + (f.cls ? '' : `<line class="dl" x1="${f.x}" y1="${y + 6}" x2="${f.x}" y2="${H}"/>`) + (f.text ? `<text class="lbl" x="${f.x}" y="${H - 8}" text-anchor="middle">${esc(f.text)}</text>` : ''); }
+      case 'yard': return `<rect class="lot" x="${f.x - (f.w || 60) / 2}" y="${Y0 + (f.n || 2) * E.LW}" width="${f.w || 60}" height="${H}"/><text class="lbl" x="${f.x}" y="${H - 8}" text-anchor="middle">${esc(f.text || 'двор')}</text>`;
+      case 'hill': return `<rect class="hill" x="${f.x1}" y="0" width="${f.x2 - f.x1}" height="${H}"/><text class="lbl" x="${(f.x1 + f.x2) / 2}" y="${H - 8}" text-anchor="middle">${esc(f.text || 'гребень подъёма, обзор < 100 м')}</text>`;
+      case 'plat': return `<rect class="plat" x="${f.x1}" y="${f.y}" width="${f.x2 - f.x1}" height="${f.h || 10}" rx="2"/>`;
+      case 'line': return `<line class="${f.cls || 'ln'}" x1="${f.x1}" y1="${f.y1}" x2="${f.x2}" y2="${f.y2}"/>`;
+      case 'm14': return `<line class="m14" x1="${f.x1}" y1="${f.y}" x2="${f.x2}" y2="${f.y}"/>`;
+      case 'm110': return `<line class="m110" x1="${f.x1}" y1="${f.y}" x2="${f.x2}" y2="${f.y}"/>`;
+      case 'm117': { let d = `M${f.x1} ${f.y}`; for (let x = f.x1 + 8, up = true; x <= f.x2; x += 8, up = !up) d += ` L${x} ${f.y + (up ? -8 : 0)}`; return `<path class="m117" d="${d}"/>`; }
+      case 'bays': { let g = ''; for (let x = f.x1; x <= f.x2; x += (f.step || 28)) g += `<line class="ln" x1="${x}" y1="${f.y1}" x2="${x}" y2="${f.y2}"/>`; return g; }
+      case 'grass': return `<rect class="gr2" x="${f.x1}" y="${f.y1}" width="${f.x2 - f.x1}" height="${f.y2 - f.y1}" rx="4"/>`;
+      case 'light': { const c = f.c, dim = '#3A3F44', b = f.blink ? ' class="blink"' : ''; return `<rect x="${f.x - 6}" y="${f.y - 15}" width="12" height="30" rx="3" fill="#1A1D20" stroke="#fff" stroke-width="1"/><circle cx="${f.x}" cy="${f.y - 8}" r="3.6" fill="${c === 'r' ? '#E5484D' : dim}"/><circle cx="${f.x}" cy="${f.y}" r="3.6" fill="${c === 'y' ? '#F5B83D' : dim}"${c === 'y' ? b : ''}/><circle cx="${f.x}" cy="${f.y + 8}" r="3.6" fill="${c === 'g' ? '#30C26B' : dim}"/>`; }
+      case 'clock': return `<g class="clock"><rect x="${f.x - 34}" y="${f.y - 14}" width="68" height="26" rx="6"/><text x="${f.x}" y="${f.y + 5}" text-anchor="middle" data-clock="1">${esc(f.text || '')}</text></g>`;
+      case 'raw': return f.svg;
+      default: return '';
+    }
+  }
+
+  // ---------- Card ----------
+  const ST = {};
+  const KEY = 'pdd-rk-' + P.key + '.v1';
+  let progress = {};
+  try { progress = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { progress = {}; }
+  const saveProgress = () => { try { localStorage.setItem(KEY, JSON.stringify(progress)); } catch (e) { /* ignore */ } };
+
+  function sceneSVG(s) {
+    const vb = s.vb || '0 0 400 260', H = +vb.split(' ')[3];
+    let bg = typeof s.bg === 'function' ? s.bg() : (s.bg || E.street());
+    const one = f => f.after ? `<g class="after">${feat(f, H)}</g>` : feat(f, H);
+    const feats = (s.feat || []).filter(f => !f.top).map(one).join('');
+    const tops = (s.feat || []).filter(f => f.top).map(one).join('');
+    const signs = (s.signs || []).map(sign).join('');
+    return `<svg class="sc" viewBox="${vb}" role="img" aria-label="${esc(s.t)}">${bg}${feats}<g class="l-res"></g><g class="l-arrows"></g>${signs}<g class="l-veh"></g><g class="l-top">${tops}</g><g class="l-bdg"></g><g class="l-paths"></g></svg>`;
+  }
+  function cardHTML(s) {
+    const g = P.groups.find(x => x.k === s.g);
+    const q = s.q || { type: 'show' };
+    let ask = '';
+    if (q.type === 'yn' || q.type === 'pick') ask = `<div class="opts${q.type === 'pick' ? ' col' : ''}">${(q.opts || ['Можно', 'Нельзя']).map((o, i) => `<button type="button" class="btn opt" data-o="${i}">${esc(o)}</button>`).join('')}</div>`;
+    if (q.type === 'order') ask = `<div class="who">${s.cars.filter(c => c.label && !c.dim).map(c => `<button type="button" data-p="${esc(c.label)}" aria-pressed="false"><i style="border-color:${c.col || COL[c.label] || '#2F80ED'}">${esc(c.label)}</i>${esc(c.what || '')}<b></b></button>`).join('')}</div><p class="hint">Ваш порядок: <span class="seq">нажмите участников по очереди</span></p><div class="act"><button type="button" class="btn primary" data-a="check" disabled>Проверить</button><button type="button" class="btn" data-a="reset">Сначала</button></div>`;
+    if (q.type === 'show') ask = `<div class="act"><button type="button" class="btn primary" data-a="show">Показать</button></div>`;
+    const answerLine = q.type === 'order' ? orderText(q) : q.type === 'show' ? '' : `Правильно: ${esc((q.opts || ['Можно', 'Нельзя'])[q.ans])}`;
+    return `<article class="card${q.type === 'show' ? ' shown' : ''}" id="card-${s.id}" data-id="${s.id}">
+      <div class="card-h"><h3>${esc(s.t)}</h3><span class="tag">${esc(g ? g.t : '')}<span class="tick" hidden>✓</span></span></div>
+      ${s.signTop ? `<div class="signtop">${s.signTop.map(e => { const ks = Array.isArray(e) ? e : [e]; return `<figure class="stk">${ks.map((k, i) => IMG[k] ? `<img class="${i ? 'pl' : 'sg'}" src="${IMG[k]}" alt="${i ? 'Табличка' : 'Знак'} ${esc(k)}">` : '').join('')}<figcaption>${esc(ks.join(' + '))}</figcaption></figure>`; }).join('')}</div>` : ''}
+      <div class="stage">${sceneSVG(s)}</div>
+      ${s.setup ? `<p class="setup">${esc(s.setup)}</p>` : ''}
+      ${q.text ? `<p class="qtext">${esc(q.text)}</p>` : ''}
+      ${ask}
+      <div class="result"${q.type === 'show' ? '' : ' hidden'}>${q.type === 'show' ? '' : '<p class="verdict"></p>'}${answerLine ? `<p class="answer">${answerLine}</p>` : ''}<p class="why">${esc(s.why || '')}</p>${s.ref ? `<p class="ref">${esc(s.ref)}</p>` : ''}${q.type === 'show' ? '' : '<div><button type="button" class="link-btn" data-a="replay">Показать ещё раз</button></div>'}</div>
+    </article>`;
+  }
+  function orderText(q) {
+    const join = a => a.length === 1 ? a[0] : a.slice(0, -1).join(', ') + ' и ' + a[a.length - 1];
+    let h = q.order.map((grp, i) => `<span class="n">${i + 1}</span>${esc(join(grp))}${grp.length > 1 ? ' одновременно' : ''}`).join(' → ');
+    if (q.stay && q.stay.length) h += `<br>Стоят: ${esc(join(q.stay))}`;
+    return h;
+  }
+
+  function el(n, a) { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); return e; }
+  function setupCard(s) {
+    const card = $('card-' + s.id), svg = card.querySelector('svg');
+    const L = { res: svg.querySelector('.l-res'), arrows: svg.querySelector('.l-arrows'), veh: svg.querySelector('.l-veh'), bdg: svg.querySelector('.l-bdg'), paths: svg.querySelector('.l-paths') };
+    const vb = (s.vb || '0 0 400 260').split(' ').map(Number);
+    const st = { s, card, svg, L, items: {}, seq: [], token: 0, W: vb[2], H: vb[3] };
+    const q = s.q || { type: 'show' };
+    const stay = new Set(q.stay || []);
+    (s.cars || []).forEach((c, idx) => {
+      const id = c.label || ('x' + idx), kind = c.kind || 'car', col = c.col || COL[c.label] || (c.dim ? COL._ : '#2F80ED');
+      const it = { c, id, kind, col };
+      if (c.path) {
+        const d = pathOf(c.path);
+        it.pe = el('path', { d, fill: 'none', stroke: 'none' }); L.paths.appendChild(it.pe);
+        it.len = it.pe.getTotalLength(); it.d1 = c.d1 != null ? c.d1 : it.len;
+        { // start no earlier than the point where the vehicle first fits inside the scene
+          const m = (HALF[kind] || 18) + 2;
+          let d = 0;
+          for (; d < it.len; d += 4) { const p = it.pe.getPointAtLength(d); if (p.x >= m && p.x <= st.W - m && p.y >= m && p.y <= st.H - m) break; }
+          it.d0 = Math.min(Math.max(c.d0 ?? 0, d < it.len ? d : 0), it.d1);
+        }
+        if (c.arrow !== false && !c.ghost && !c.dim) {
+          const pts = []; const a0 = it.d0 + (HALF[kind] || 18) + 4, a1 = Math.min(it.d1, it.d0 + (c.arrowLen || 9999));
+          for (let x = a0; x <= a1; x += 4) pts.push(it.pe.getPointAtLength(x));
+          if (pts.length > 1) {
+            const a = pts[pts.length - 1], b = pts[pts.length - 2], ang = Math.atan2(a.y - b.y, a.x - b.x);
+            L.arrows.appendChild(el('polyline', { points: pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '), class: 'arrow' + (kind === 'ped' ? ' dash' : ''), stroke: col }));
+            L.arrows.appendChild(el('polygon', { points: [[a.x + Math.cos(ang) * 6, a.y + Math.sin(ang) * 6], [a.x + Math.cos(ang + 2.4) * 9, a.y + Math.sin(ang + 2.4) * 9], [a.x + Math.cos(ang - 2.4) * 9, a.y + Math.sin(ang - 2.4) * 9]].map(p => p.map(v => v.toFixed(1)).join(',')).join(' '), fill: col, opacity: .9 }));
+          }
+        }
+      }
+      it.veh = el('g', { class: 'veh' + (c.ghost ? ' ghost' : ''), 'data-p': id }); it.veh.innerHTML = drawVeh(kind, col); L.veh.appendChild(it.veh);
+      it.bdg = el('g', { class: 'bdg' + (c.ghost ? ' ghost' : ''), 'data-p': id });
+      if (c.label && !c.dim) {
+        const tc = kind === 'amb' ? '#B8C2C9' : col;
+        it.bdg.innerHTML = `<circle r="9" fill="#fff" stroke="${tc}" stroke-width="3"/><text y="4" text-anchor="middle" font-family="Golos Text, Arial" font-weight="700" font-size="${c.label.length > 1 ? 8 : 11}" fill="#14202A">${esc(c.label)}</text>`
+          + `<g class="ans" transform="translate(14 -14)"><circle r="10" fill="#FFC72C" stroke="#14202A" stroke-width="1.5"/><text class="ans-t" y="4.5" text-anchor="middle" font-family="Fira Sans Extra Condensed, Arial" font-weight="700" font-size="13" fill="#14202A"></text></g>`
+          + `<g class="pk" transform="translate(-14 -14)"><circle r="9.5" fill="#0A87A8" stroke="#fff" stroke-width="1.5"/><text class="pk-t" y="4.5" text-anchor="middle" font-family="Fira Sans Extra Condensed, Arial" font-weight="700" font-size="12" fill="#fff"></text></g>`
+          + (stay.has(c.label) ? `<g class="xs" transform="translate(14 -14)"><circle r="10" fill="#C62A2F" stroke="#fff" stroke-width="1.5"/><path d="M-4 -4L4 4M4 -4L-4 4" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></g>` : '');
+        if (q.type === 'order') {
+          const gi = q.order.findIndex(g => g.includes(c.label));
+          if (gi >= 0) it.bdg.querySelector('.ans-t').textContent = gi + 1; else it.bdg.querySelector('.ans').remove();
+        } else { const a = it.bdg.querySelector('.ans'); if (a) a.remove(); }
+      }
+      L.bdg.appendChild(it.bdg);
+      st.items[id] = it;
+      home(it);
+    });
+    // Result overlays: green = correct manoeuvre, red dashed with a cross = forbidden one.
+    (s.res || []).forEach(r => {
+      const d = pathOf(r.p);
+      const pe = el('path', { d, class: 'resp ' + (r.ok ? 'okp' : 'nop') });
+      L.res.appendChild(pe);
+      if (!r.ok) {
+        const len = pe.getTotalLength(), m = pe.getPointAtLength(len * (r.at ?? 0.55));
+        L.res.appendChild(el('path', { d: `M${m.x - 7} ${m.y - 7}L${m.x + 7} ${m.y + 7}M${m.x + 7} ${m.y - 7}L${m.x - 7} ${m.y + 7}`, class: 'resx' }));
+      } else {
+        const len = pe.getTotalLength(), a = pe.getPointAtLength(len), b = pe.getPointAtLength(Math.max(0, len - 3)), ang = Math.atan2(a.y - b.y, a.x - b.x);
+        L.res.appendChild(el('polygon', { class: 'resh', points: [[a.x + Math.cos(ang) * 6, a.y + Math.sin(ang) * 6], [a.x + Math.cos(ang + 2.4) * 9, a.y + Math.sin(ang + 2.4) * 9], [a.x + Math.cos(ang - 2.4) * 9, a.y + Math.sin(ang - 2.4) * 9]].map(p => p.map(v => v.toFixed(1)).join(',')).join(' ') }));
+      }
+    });
+    card.querySelector('svg').addEventListener('click', e => { const t = e.target.closest('[data-p]'); if (t && q.type === 'order') pick(st, t.getAttribute('data-p')); });
+    card.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.p) pick(st, b.dataset.p);
+      if (b.dataset.o != null) answerOpt(st, +b.dataset.o);
+      const a = b.dataset.a;
+      if (a === 'check') checkOrder(st);
+      if (a === 'reset') resetCard(st);
+      if (a === 'replay' || a === 'show') play(st);
+    });
+    ST[s.id] = st;
+  }
+
+  function place(it, d) {
+    if (!it.pe) { const [x, y, deg] = it.c.at || [0, 0, 0]; it.veh.setAttribute('transform', `translate(${x} ${y}) rotate(${deg})`); it.bdg.setAttribute('transform', `translate(${x} ${y})`); return; }
+    const len = it.len, dd = Math.max(0, Math.min(len, d));
+    // Heading from a forward difference, or a backward one at the path end and just before a reversing point.
+    const q = it.pe.getPointAtLength(dd);
+    const back = dd + 2 > len || [it.c.rev, it.c.fwd].some(c => typeof c === 'number' && dd < c && dd + 2 > c);
+    const q1 = back ? it.pe.getPointAtLength(Math.max(0, dd - 2)) : q, qq = back ? q : it.pe.getPointAtLength(dd + 2);
+    let deg = Math.atan2(qq.y - q1.y, qq.x - q1.x) * 180 / Math.PI + 90;
+    let rv = it.c.rev;                   // reversing: true for the whole path, or a distance from which the car backs up
+    if (typeof rv === 'number') rv = dd >= rv && (it.c.fwd == null || dd < it.c.fwd);
+    if (rv) deg += 180;
+    if (it.kind === 'ped') deg = 0;
+    it.veh.setAttribute('transform', `translate(${q.x.toFixed(1)} ${q.y.toFixed(1)}) rotate(${deg.toFixed(1)})`);
+    it.bdg.setAttribute('transform', `translate(${q.x.toFixed(1)} ${q.y.toFixed(1)})`);
+  }
+  const home = it => { it.cur = it.d0 ?? 0; place(it, it.cur); it.veh.style.opacity = ''; it.bdg.style.opacity = ''; };
+
+  function markCard(id) { const c = $('card-' + id); const ok = progress[id] === 'ok'; c.classList.toggle('ok', ok); c.querySelector('.tick').hidden = !ok; }
+  function answerOpt(st, i) {
+    if (st.card.classList.contains('answered')) return;
+    const q = st.s.q, ok = i === q.ans;
+    st.card.querySelectorAll('.opt').forEach((b, k) => { b.disabled = true; if (k === q.ans) b.classList.add('right'); else if (k === i) b.classList.add('wrong'); });
+    progress[st.s.id] = ok ? 'ok' : 'bad'; saveProgress(); updateProgress();
+    reveal(st, ok ? 'Верно!' : 'Не так.', ok);
+  }
+  function reveal(st, msg, ok) {
+    const { card } = st;
+    card.classList.add('answered', ok ? 'r-ok' : 'r-bad');
+    const v = card.querySelector('.verdict'); if (v) v.textContent = msg;
+    card.querySelector('.result').hidden = false;
+    markCard(st.s.id);
+    play(st);
+  }
+  function updatePicks(st) {
+    const { card, seq } = st;
+    Object.values(st.items).forEach(it => { const pk = it.bdg.querySelector('.pk'); if (!pk) return; const i = seq.indexOf(it.id); pk.classList.toggle('on', i >= 0); if (i >= 0) pk.querySelector('.pk-t').textContent = i + 1; });
+    card.querySelectorAll('.who button').forEach(b => { const i = seq.indexOf(b.dataset.p); b.setAttribute('aria-pressed', String(i >= 0)); b.querySelector('b').textContent = i >= 0 ? i + 1 : ''; });
+    const s = card.querySelector('.seq'); if (s) s.textContent = seq.length ? seq.map((id, i) => `${i + 1}. ${id}`).join('  →  ') : 'нажмите участников по очереди';
+    const c = card.querySelector('[data-a="check"]'); if (c) c.disabled = seq.length === 0 || card.classList.contains('answered');
+  }
+  function pick(st, id) {
+    if (st.card.classList.contains('answered') || st.running) return;
+    if (st.seq.includes(id)) st.seq = st.seq.filter(x => x !== id); else st.seq.push(id);
+    updatePicks(st);
+    const movers = st.s.q.order.flat();
+    if (st.seq.length === movers.length && st.seq.every(x => movers.includes(x))) checkOrder(st);
+  }
+  function checkOrder(st) {
+    const q = st.s.q, seq = st.seq; if (!seq.length) return;
+    let ok = true, msg = 'Верно!';
+    const bad = seq.find(x => (q.stay || []).includes(x));
+    const movers = q.order.flat(), gi = id => q.order.findIndex(g => g.includes(id));
+    if (bad) { ok = false; msg = `Не так: ${bad} сейчас ехать нельзя.`; }
+    else if (seq.length !== movers.length || !movers.every(x => seq.includes(x))) { ok = false; msg = 'Не так: в ответе не все, кто едет.'; }
+    else for (let i = 1; i < seq.length; i++) if (gi(seq[i]) < gi(seq[i - 1])) { ok = false; msg = 'Не так: очередь другая.'; break; }
+    progress[st.s.id] = ok ? 'ok' : 'bad'; saveProgress(); updateProgress();
+    reveal(st, msg, ok);
+  }
+  function resetCard(st) {
+    st.token++; st.running = false; st.seq = [];
+    st.card.classList.remove('answered', 'r-ok', 'r-bad', 'done');
+    st.card.querySelector('.result').hidden = true;
+    st.card.querySelectorAll('.opt').forEach(b => { b.disabled = false; b.classList.remove('right', 'wrong'); });
+    Object.values(st.items).forEach(it => { home(it); const a = it.bdg.querySelector('.ans'); if (a) a.classList.remove('on'); });
+    updatePicks(st);
+  }
+
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  function play(st) {
+    const tok = ++st.token, s = st.s, q = s.q || { type: 'show' };
+    const items = Object.values(st.items);
+    items.forEach(home);
+    const clock = st.svg.querySelector('[data-clock]');
+    const clock0 = (s.feat || []).find(f => f.t === 'clock');
+    if (clock && clock0) clock.textContent = clock0.text || '';
+    let steps = s.demo || (q.order ? q.order.map(ids => ({ ids })) : [{ ids: Object.keys(st.items).filter(k => st.items[k].pe && !st.items[k].c.ghost && !st.items[k].c.dim) }]);
+    steps = steps.map(x => Array.isArray(x) ? { ids: x } : x);
+    st.card.classList.remove('done');
+    if (reduce) { steps.forEach(stp => (stp.ids || []).forEach(id => { const it = st.items[id]; if (it && it.pe) { it.cur = stp.to ?? it.d1; place(it, it.cur); } })); st.card.classList.add('done'); if (clock && steps.length) { const last = [...steps].reverse().find(x => x.clock); if (last) clock.textContent = last.clock; } return; }
+    st.running = true;
+    let gi = 0;
+    const DUR = s.dur || 1700;
+    const next = () => {
+      if (tok !== st.token) return;
+      if (gi >= steps.length) { st.running = false; st.card.classList.add('done'); return; }
+      const stp = steps[gi];
+      if (clock && stp.clock) clock.textContent = stp.clock;
+      const grp = (stp.ids || []).map(id => st.items[id]).filter(it => it && it.pe);
+      grp.forEach(it => { it.from = it.cur; it.goal = stp.to ?? it.d1; });
+      grp.forEach(it => { const a = it.bdg.querySelector('.ans'); if (a) a.classList.add('on'); });
+      const t0 = performance.now(), dur = grp.length ? (stp.dur || DUR) : (stp.dur || 600);
+      const frame = now => {
+        if (tok !== st.token) return;
+        const t = Math.min(1, (now - t0) / dur), e = ease(t);
+        grp.forEach(it => {
+          it.cur = it.from + e * (it.goal - it.from); place(it, it.cur);
+          const end = it.pe.getPointAtLength(it.goal), out = it.goal >= it.len - 1 && (end.x < -10 || end.x > st.W + 10 || end.y < -10 || end.y > st.H + 10);
+          if (out && t > .85) { const o = String(Math.max(0, 1 - (t - .85) / .15)); it.veh.style.opacity = o; it.bdg.style.opacity = o; }
+        });
+        if (t < 1) requestAnimationFrame(frame); else { gi++; setTimeout(next, stp.pause || 250); }
+      };
+      requestAnimationFrame(frame);
+    };
+    setTimeout(next, 250);
+  }
+
+  // ---------- Page ----------
+  let filter = 'all', todoOnly = false;
+  function updateProgress() {
+    const qs = P.scenes.filter(s => s.q && s.q.type !== 'show');
+    const n = qs.filter(s => progress[s.id] === 'ok').length;
+    $('okc').textContent = n; $('okt').textContent = qs.length; $('okbar').style.width = (qs.length ? 100 * n / qs.length : 0).toFixed(1) + '%';
+  }
+  function renderChips() {
+    const cnt = k => P.scenes.filter(s => s.g === k).length;
+    $('chips').innerHTML = `<button type="button" class="chip" data-f="all" aria-pressed="true">Все <span class="n">${P.scenes.length}</span></button>` + P.groups.map(g => `<button type="button" class="chip" data-f="${g.k}" aria-pressed="false">${esc(g.t)} <span class="n">${cnt(g.k)}</span></button>`).join('') + `<button type="button" class="chip todo" data-f="todo" aria-pressed="false">Ещё не решены</button>`;
+  }
+  function applyFilter() {
+    P.scenes.forEach(s => { $('card-' + s.id).hidden = !((filter === 'all' || s.g === filter) && (!todoOnly || progress[s.id] !== 'ok' || !s.q || s.q.type === 'show')); });
+    P.groups.forEach(g => { $('sec-' + g.k).hidden = !P.scenes.some(s => s.g === g.k && !$('card-' + s.id).hidden); });
+    $('chips').querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.f === 'todo' ? todoOnly : b.dataset.f === filter)));
+  }
+  function build() {
+    const n = P.scenes.length, m10 = n % 10, m100 = n % 100;
+    $('total').textContent = n + ' ' + (m10 === 1 && m100 !== 11 ? 'ситуация' : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? 'ситуации' : 'ситуаций');
+    $('list').innerHTML = P.groups.map(g => {
+      const items = P.scenes.filter(s => s.g === g.k);
+      return `<section class="sec" id="sec-${g.k}"><h2>${esc(g.t)} <small>${items.length}</small></h2>${g.rules && g.rules.length ? `<ol class="rules">${g.rules.map(r => `<li>${esc(r)}</li>`).join('')}</ol>` : ''}</section>` + items.map(cardHTML).join('');
+    }).join('');
+    P.scenes.forEach(setupCard);
+    P.scenes.forEach(s => markCard(s.id));
+    renderChips(); updateProgress(); applyFilter();
+  }
+  $('chips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; if (b.dataset.f === 'todo') todoOnly = !todoOnly; else filter = b.dataset.f; applyFilter(); });
+  $('resetp').addEventListener('click', () => { progress = {}; saveProgress(); P.scenes.forEach(s => { markCard(s.id); resetCard(ST[s.id]); }); updateProgress(); applyFilter(); });
+  window.addEventListener('beforeprint', () => P.scenes.forEach(s => { const st = ST[s.id]; st.token++; st.running = false; Object.values(st.items).forEach(home); }));
+  build();
+})();
+
+</script>
+
+</body>
+</html>

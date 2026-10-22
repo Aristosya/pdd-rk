@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Тренажёры ПДД РК</title>
+<meta name="description" content="Шесть бесплатных тренажёров по правилам дорожного движения Республики Казахстан: цифры, перекрёстки, знаки, кольца, развороты, стоянка.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:wght@600;700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* Layout: asphalt hero, then a grid of six trainer tiles. */
+:root {
+  --bg: #F2F5F7; --surface: #FFFFFF; --ink: #14202A; --ink-2: #33414D; --muted: #5B6975; --line: #D5DEE4;
+  --accent: #0A87A8; --accent-text: #006C8A; --on-road: #F3F6F8; --on-road-2: #AEBAC3;
+  --f-num: "Fira Sans Extra Condensed", "Arial Narrow", sans-serif;
+  --f-body: "Golos Text", system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0D1317; --surface: #151D23; --ink: #E3EAEE; --ink-2: #C3CDD4; --muted: #93A2AD; --line: #283540; --accent: #3BBFDB; --accent-text: #5CCBE3; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #0D1317; --surface: #151D23; --ink: #E3EAEE; --ink-2: #C3CDD4; --muted: #93A2AD; --line: #283540; --accent: #3BBFDB; --accent-text: #5CCBE3; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--f-body); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.hero { background: #2B3339; color: var(--on-road); }
+.hero .wrap { padding-block: 32px 30px; display: grid; gap: 12px; }
+.kicker { margin: 0; font: 600 12px/1.3 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--on-road-2); display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.kicker .kz { background: #00AFCA; color: #062A33; padding: 3px 8px; border-radius: 4px; }
+h1 { margin: 0; font: 700 clamp(44px, 9vw, 96px)/.92 var(--f-num); text-transform: uppercase; text-wrap: balance; }
+h1 span { color: #FFC72C; }
+.lead { margin: 0; max-width: 62ch; color: var(--on-road-2); font-size: 16px; }
+.lane-line { height: 6px; margin-top: 6px; background: repeating-linear-gradient(90deg, var(--on-road) 0 56px, transparent 56px 96px); opacity: .9; }
+.grid { display: grid; gap: 14px; padding-block: 24px 30px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+.tile { display: grid; gap: 8px; align-content: start; padding: 18px 18px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; color: inherit; text-decoration: none; min-width: 0; }
+.tile:hover { border-color: var(--accent); }
+.tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.t-name { font: 700 28px/1 var(--f-num); text-transform: uppercase; }
+.t-what { color: var(--ink-2); }
+.t-size { font: 600 13px var(--f-body); color: var(--accent-text); }
+.foot { border-top: 1px solid var(--line); padding-block: 18px 36px; color: var(--muted); font-size: 13.5px; display: grid; gap: 6px; }
+.foot p { margin: 0; max-width: 90ch; }
+.foot a { color: var(--accent-text); }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker"><span class="kz">Казахстан</span><span>Подготовка к экзамену</span><span>сверено с adilet.zan.kz 22.10.2026</span></p>
+    <h1>Тренажёры <span>ПДД РК</span></h1>
+    <p class="lead">Шесть страниц по правилам дорожного движения Республики Казахстан. В каждой схемы, вопросы, анимация правильного манёвра и ссылка на пункт правил. Прогресс сохраняется в вашем браузере.</p>
+    <div class="lane-line" aria-hidden="true"></div>
+  </div>
+</header>
+<main class="wrap grid"><a class="tile" href="cifry.html"><span class="t-name">Цифры ПДД РК</span><span class="t-what">Скорости, расстояния, люфты, сроки и штрафы по КоАП: фильтры, сортировка, поиск и проверка себя.</span><span class="t-size">108 фактов</span></a><a class="tile" href="perekrestki.html"><span class="t-name">Перекрёстки</span><span class="t-what">Очередь проезда: равнозначные, главная дорога, светофор, регулировщик, трамвай, кольцо.</span><span class="t-size">52 ситуации</span></a><a class="tile" href="znaki.html"><span class="t-name">Знаки и разметка</span><span class="t-what">Все группы знаков и таблички с примерами, схема разметки и режим «Угадай знак».</span><span class="t-size">227 карточек и 34 линии разметки</span></a><a class="tile" href="kolca.html"><span class="t-name">Кольца</span><span class="t-what">Въезд, перестроение и выезд, светофоры, обгон и разворот, где можно остановиться.</span><span class="t-size">21 ситуация</span></a><a class="tile" href="razvoroty.html"><span class="t-name">Развороты и перестроения</span><span class="t-what">Мосты, путепроводы, эстакады, тоннели, запреты разворота, разворот с обочины и через двор, полосы разгона.</span><span class="t-size">33 ситуации</span></a><a class="tile" href="stoyanka.html"><span class="t-name">Стоянка и остановка</span><span class="t-what">Где можно и нельзя, тротуар и бордюр, знаки 3.27–3.30, перестановка с 19 до 21, знак 5.15 и все таблички 7.6.</span><span class="t-size">71 ситуация</span></a></main>
+<footer class="wrap foot">
+  <p>Неофициальные учебные материалы. Источник правил: Правила дорожного движения РК, приказ Министра внутренних дел от 30 июня 2023 года № 534, и КоАП РК, тексты на <a href="https://adilet.zan.kz/rus/docs/V2300033003">adilet.zan.kz</a>. При расхождении верен официальный текст.</p>
+  <p>Исходные файлы: <a href="https://github.com/Aristosya/pdd-rk">github.com/Aristosya/pdd-rk</a>.</p>
+</footer>
+</body>
+</html>
