@@ -171,9 +171,7 @@ blockquote { margin: 6px 0 0; padding: 8px 10px; border-left: 3px solid var(--ac
 
 <header class="hero">
   <div class="wrap">
-    <p class="kicker"><span class="kz">Казахстан</span><span>Приложения 1 и 2 к ПДД РК</span><span>сверено с adilet.zan.kz 22.10.2026</span></p>
     <h1>Знаки и разметка <span>ПДД РК</span></h1>
-    <p class="lead"><b id="lead-n">Все знаки</b> и разметка с официальными изображениями, текстом Правил и примером словами. У главных знаков есть схема. В режиме «Угадай знак» проверьте себя.</p>
     <p class="hero-links"><a href="./">Все тренажёры</a><a href="cifry.html">Цифры ПДД РК →</a><a href="perekrestki.html">Перекрёстки →</a><a href="kolca.html">Кольца →</a><a href="razvoroty.html">Развороты и перестроения →</a><a href="stoyanka.html">Стоянка и остановка →</a></p>
     <div class="lane-line" aria-hidden="true"></div>
   </div>
@@ -218,8 +216,6 @@ blockquote { margin: 6px 0 0; padding: 8px 10px; border-left: 3px solid var(--ac
 </div>
 
 <footer class="wrap foot">
-  <p><b>Источник.</b> Приложения 1 и 2 к Правилам дорожного движения РК (приказ Министра внутренних дел от 30 июня 2023 года № 534, с изменениями по 27.04.2026), <a href="https://adilet.zan.kz/rus/docs/V2300033003" target="_blank" rel="noopener">adilet.zan.kz</a>. Названия и цитаты взяты из официального текста, примеры написаны простыми словами.</p>
-  <p><b>Изображения.</b> Знаки 4.1.2–7.27 и рисунки разметки — официальные изображения из приказа. Картинки знаков 1.1–4.1.1 на сайте adilet повреждены, поэтому здесь стоят изображения из Wikimedia Commons (российские и казахстанские знаки той же системы, общественное достояние или CC BY-SA). Знаки 1.31.1–1.31.3, 1.34 и 3.9.1 нарисованы для этой страницы.</p>
   <details><summary>Авторство изображений Wikimedia Commons</summary><ul id="credits"></ul></details>
 </footer>
 
@@ -437,7 +433,6 @@ const PAYLOAD = {"data": {"groups": [{"k": "1", "t": "Предупреждающ
   const plural = (n, [a, b, c]) => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c; };
   const numsLabel = nums => nums.length === 1 ? nums[0] : (nums.length === 2 ? nums.join(', ') : `${nums[0]}–${nums[nums.length - 1]}`);
   D.cards.forEach(c => { c._s = norm([c.nums.join(' '), c.name, c.ex, c.desc].join(' ')); });
-  $('lead-n').textContent = `${D.cards.length} ${plural(D.cards.length, ['знак', 'знака', 'знаков'])}`;
 
   // ---------- Scenes for the main signs ----------
   const W = '#FFFFFF';
