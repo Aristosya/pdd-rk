@@ -652,6 +652,9 @@ window.REFS_IMG = n => (window.IMG && window.IMG[n]) || window.REFIMG[n] || null
   const sg = (k, x, y = 186, s = 22, plates) => ({ k, x, y, s, plates });   // sign on the right (bottom) sidewalk
   const zone = (x1, x2, ok, y1 = 146, y2 = 172) => ({ t: 'zone', x1, x2, y1, y2, ok, after: true });
   const stayP = STAY(240, 160), stayC = E.cum(stayP);
+  // One-way road with four lanes: lane arrows, and a car moving to the left curb.
+  const ONEWAY4 = [118, 154, 190, 226].map(y => ({ t: 'mark', x: 40, y, deg: 90, k: 's' }));
+  const LEFT4 = [['M', -30, 154], ['L', 120, 154], ['Q', 160, 154, 180, 133], ['Q', 200, 112, 240, 112], ['L', 256, 112]];
   const tow = [['M', -40, 154], ['L', 200, 154], ['Q', 250, 154, 270, 158], ['L', 300, 160], ['L', 480, 160]], towC = E.cum(tow);
 
   // ---------- Plates 7.6: how to park (sidewalk = the step on the plate) ----------
@@ -781,6 +784,15 @@ window.REFS_IMG = n => (window.IMG && window.IMG[n]) || window.REFIMG[n] || null
         q: { type: 'yn', text: 'Можно остановиться у левого края?', ans: 1 },
         why: 'Слева водитель встаёт только на дороге с одной полосой в каждую сторону или на дороге с односторонним движением. Здесь по две полосы в каждую сторону.',
         ref: 'ПДД РК, п. 84' },
+
+      { id: 'b-left-oneway4', g: 'basic', t: 'Слева на односторонней в 4 полосы', vb: '0 0 400 300', bg: ST({ oneway: true, lanes: 4, h: 300 }),
+        feat: ONEWAY4,
+        cars: [{ label: 'А', path: LEFT4 }],
+        res: [{ ok: true, p: LEFT4 }],
+        setup: 'Населённый пункт. Дорога с односторонним движением, четыре полосы.',
+        q: { type: 'yn', text: 'Можно остановиться у левого края?', ans: 0 },
+        why: 'На дороге с односторонним движением п. 84 разрешает вставать слева при любом числе полос. Одна полоса в каждую сторону нужна только на дороге с двусторонним движением.',
+        ref: 'ПДД РК, п. 63, 84' },
 
       { id: 'b-truck-left', g: 'basic', t: 'Грузовик слева на односторонней', bg: ST({ oneway: true }),
         feat: [{ t: 'mark', x: 40, y: 118, deg: 90, k: 's' }, { t: 'mark', x: 40, y: 154, deg: 90, k: 's' }],
@@ -951,6 +963,15 @@ window.REFS_IMG = n => (window.IMG && window.IMG[n]) || window.REFIMG[n] || null
         q: { type: 'yn', text: 'Знак 3.27 стоит на противоположной стороне. Можно остановиться на своей?', ans: 0 },
         why: 'Знаки 3.27–3.30 действуют только на той стороне дороги, где их установили.',
         ref: 'ПДД РК, приложение 1, глава 3' },
+
+      { id: 's-side-oneway', g: 'sign', t: 'Знак 3.27 только справа', vb: '0 0 400 300', bg: ST({ oneway: true, lanes: 4, h: 300 }),
+        signs: [sg('3.27', 120, 257)],
+        feat: [...ONEWAY4, { t: 'zone', x1: 120, x2: 400, y1: 218, y2: 244, ok: false, after: true }, { t: 'zone', x1: 120, x2: 400, y1: 100, y2: 126, ok: true, after: true }],
+        cars: [{ label: 'А', path: LEFT4 }],
+        setup: 'Населённый пункт. Одностороннее движение, четыре полосы. Знак 3.27 стоит только у правого края.',
+        q: { type: 'yn', text: 'Можно встать на стоянку у левого края?', ans: 0 },
+        why: 'Знак 3.27 действует только на своей стороне дороги. У левого края знака нет, и на односторонней дороге п. 84 разрешает стоять слева.',
+        ref: 'ПДД РК, п. 84; знак 3.27' },
 
       { id: 's-zone', g: 'sign', t: 'Где кончается зона', bg: ST(),
         signs: [sg('3.28', 60)],
