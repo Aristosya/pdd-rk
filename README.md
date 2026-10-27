@@ -8,3 +8,4 @@ https://aristosya.github.io/pdd-rk/
 - [Кольца](https://aristosya.github.io/pdd-rk/kolca.html)
 - [Развороты и перестроения](https://aristosya.github.io/pdd-rk/razvoroty.html)
 - [Стоянка и остановка](https://aristosya.github.io/pdd-rk/stoyanka.html)
+- [Первая помощь](https://aristosya.github.io/pdd-rk/pomosh.html)
