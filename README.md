@@ -9,3 +9,4 @@ https://aristosya.github.io/pdd-rk/
 - [Развороты и перестроения](https://aristosya.github.io/pdd-rk/razvoroty.html)
 - [Стоянка и остановка](https://aristosya.github.io/pdd-rk/stoyanka.html)
 - [Первая помощь](https://aristosya.github.io/pdd-rk/pomosh.html)
+- [Дополнительные вопросы](https://aristosya.github.io/pdd-rk/dop.html)
