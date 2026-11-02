@@ -1320,6 +1320,9 @@ window.REFS_IMG = n => (window.IMG && window.IMG[n]) || window.REFIMG[n] || null
       state.quiz = !!saved.quiz;
     }
   } catch (e) { /* storage unavailable */ }
+  // The home page opens this page to learn (#learn) or to check yourself with closed cards (#check).
+  if (location.hash === '#check') state.quiz = true;
+  else if (location.hash === '#learn') state.quiz = false;
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify({ cats: [...state.cats], sort: state.sort === 'shuffle' ? 'pdd' : state.sort, quiz: state.quiz })); } catch (e) { /* ignore */ }
   }

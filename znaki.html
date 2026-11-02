@@ -714,6 +714,8 @@ const PAYLOAD = {"data": {"groups": [{"k": "1", "t": "Предупреждающ
   $('credits').innerHTML = Object.entries(D.credits).map(([n, v]) => `<li>${esc(n)}: <a href="https://commons.wikimedia.org/wiki/File:${encodeURIComponent(v.file.replace(/ /g, '_'))}" target="_blank" rel="noopener">${esc(v.file)}</a>, ${esc(v.lic)}</li>`).join('');
   renderChips();
   renderSigns();
+  // The home page opens this page to learn (#learn) or to check yourself on the «Угадай знак» tab (#check).
+  if (location.hash === '#check') setTab('quiz');
   // Print shows every panel's content: render markings ahead of time.
   window.addEventListener('beforeprint', () => { if (!$('mlist').innerHTML) { renderMarks(); placeHotspots(); } });
 })();
