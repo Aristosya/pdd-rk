@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <meta charset="utf-8">
 <title>Дополнительные вопросы ПДД РК</title>
 <meta name="description" content="Вопросы экзамена ПДД Республики Казахстан: занос, свет, аварийка, ДТП, сигналы рукой, регулировщик, буксировка, переезды, штрафы.">
@@ -277,13 +277,83 @@ a { color: var(--accent-text); }
   .foot { font-size: 9px; padding: 6px 0 0; }
 }
 </style>
+<style id="site-theme">
+/* Site chrome for the published pages: white top bar with the trainer menu, grey page, white rounded blocks,
+   sentence-case headings, black buttons. Added by build_site.py after each page's own styles; scene colours
+   (road, ground, cars) stay as the pages define them. */
+:root {
+  --bg: #F2F3F5; --surface: #FFFFFF; --surface-2: #F2F3F5;
+  --ink: #1F2125; --ink-2: #3D424A; --muted: #666B73; --line: #E3E5E8;
+  --chip: #E9EAEC; --chip-hover: #DEE0E3; --btn: #111214; --btn-ink: #FFFFFF;
+  --r: 20px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1013; --surface: #181B1F; --surface-2: #20242A;
+    --ink: #F1F2F4; --ink-2: #C9CDD3; --muted: #959BA3; --line: #2A2F35;
+    --chip: #262A30; --chip-hover: #30353C; --btn: #F1F2F4; --btn-ink: #111214;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1013; --surface: #181B1F; --surface-2: #20242A;
+  --ink: #F1F2F4; --ink-2: #C9CDD3; --muted: #959BA3; --line: #2A2F35;
+  --chip: #262A30; --chip-hover: #30353C; --btn: #F1F2F4; --btn-ink: #111214;
+}
+body { background: var(--bg); }
+
+/* Top bar */
+.topbar { position: sticky; top: 0; z-index: 30; background: var(--surface); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
+.topbar-in { display: flex; align-items: center; gap: 28px; height: 64px; }
+.brand { flex: none; display: inline-flex; align-items: center; gap: 10px; font: 600 20px/1 var(--f-body); letter-spacing: -.01em; color: var(--ink); text-decoration: none; }
+.brand svg { width: 26px; height: 26px; display: block; }
+.topnav { display: flex; gap: 2px; min-width: 0; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); padding-right: 24px; }
+.topnav::-webkit-scrollbar { display: none; }
+.topnav a { flex: none; padding: 9px 12px; border-radius: 12px; font: 500 15px/20px var(--f-body); color: var(--ink); text-decoration: none; white-space: nowrap; }
+.topnav a:hover { background: var(--chip); }
+.topnav a[aria-current="page"] { background: var(--chip); }
+@media (max-width: 759px) {
+  .topbar-in { gap: 14px; height: 56px; }
+  .brand { font-size: 18px; }
+  .topnav a { font-size: 14px; padding: 8px 10px; }
+}
+
+/* Cover of a trainer page */
+.hero { background: var(--bg); color: var(--ink); }
+.hero .wrap { padding-block: 36px 6px; gap: 0; }
+.hero h1 { font: 500 clamp(32px, 6vw, 48px)/1.08 var(--f-body); text-transform: none; letter-spacing: -.02em; color: var(--ink); }
+.hero h1 span { color: var(--muted); }
+.kicker, .lead, .lane-line, .hero-links { display: none; }
+
+/* Filters */
+.controls { background: var(--bg); border-bottom: 0; }
+@media (min-width: 760px) { .controls { top: calc(64px + env(safe-area-inset-top, 0px)); } }
+.chip { border: 0; background: var(--chip); border-radius: 12px; height: 36px; color: var(--ink); font-weight: 500; }
+.chip:hover { background: var(--chip-hover); }
+.chip .n { font: 500 12px var(--f-body); }
+:root .chip[aria-pressed="true"] { background: var(--btn); border-color: var(--btn); color: var(--btn-ink); }
+:root .chip[aria-pressed="true"] .n { color: var(--btn-ink); opacity: .7; }
+
+/* Headings, blocks, cards */
+.sec h2 { font: 600 clamp(24px, 3.6vw, 32px)/1.15 var(--f-body); text-transform: none; letter-spacing: -.015em; }
+.sec h2 small { font: 500 15px var(--f-body); }
+.gh { font: 600 20px/1.2 var(--f-body); text-transform: none; letter-spacing: -.01em; color: var(--ink); }
+.gh small { font: 500 14px var(--f-body); }
+.rules, .legend { background: var(--surface); border: 0; border-radius: var(--r); }
+.rules { padding: 16px 20px 16px 38px; }
+.card { border-color: transparent; border-radius: var(--r); }
+.tag, .q { text-transform: none; letter-spacing: 0; font: 500 13px/1.3 var(--f-body); }
+.btn { border-radius: 12px; border-color: transparent; background: var(--surface-2); }
+.btn:not(:disabled):hover { background: var(--chip-hover); }
+
+@media print { .topbar { display: none; } }
+</style>
 </head>
 <body>
+<header class="topbar"><div class="wrap topbar-in"><a class="brand" href="./"><svg viewBox="0 0 26 26" aria-hidden="true"><rect x="4.5" y="4.5" width="17" height="17" rx="2" transform="rotate(45 13 13)" fill="#fff" stroke="#9AA1A9"/><rect x="8" y="8" width="10" height="10" rx="1" transform="rotate(45 13 13)" fill="#FFC72C"/></svg>ПДД РК</a><nav class="topnav" aria-label="Тренажёры"><a href="cifry.html">Цифры</a><a href="perekrestki.html">Перекрёстки</a><a href="znaki.html">Знаки</a><a href="kolca.html">Кольца</a><a href="razvoroty.html">Развороты</a><a href="stoyanka.html">Стоянка</a><a href="pomosh.html">Первая помощь</a><a href="dop.html" aria-current="page">Доп. вопросы</a></nav></div></header>
 
 <header class="hero">
   <div class="wrap">
     <h1>Дополнительные вопросы <span>ПДД РК</span></h1>
-    <p class="hero-links"><a href="./">Все тренажёры</a><a href="cifry.html">Цифры ПДД РК →</a><a href="perekrestki.html">Перекрёстки →</a><a href="znaki.html">Знаки и разметка →</a><a href="kolca.html">Кольца →</a><a href="razvoroty.html">Развороты и перестроения →</a><a href="stoyanka.html">Стоянка и остановка →</a><a href="pomosh.html">Первая помощь →</a></p>
     <div class="lane-line" aria-hidden="true"></div>
   </div>
 </header>

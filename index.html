@@ -3,54 +3,115 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Тренажёры ПДД РК</title>
 <meta name="description" content="Бесплатные тренажёры по правилам дорожного движения Республики Казахстан: цифры, перекрёстки, знаки, кольца, развороты, стоянка, первая помощь, дополнительные вопросы.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:wght@600;700&family=Golos+Text:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&display=swap">
 <style>
-/* Layout: asphalt hero, then a grid of trainer tiles. */
+:root { --f-body: "Golos Text", system-ui, "Segoe UI", Roboto, Arial, sans-serif; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; } }
+/* Site chrome for the published pages: white top bar with the trainer menu, grey page, white rounded blocks,
+   sentence-case headings, black buttons. Added by build_site.py after each page's own styles; scene colours
+   (road, ground, cars) stay as the pages define them. */
 :root {
-  --bg: #F2F5F7; --surface: #FFFFFF; --ink: #14202A; --ink-2: #33414D; --muted: #5B6975; --line: #D5DEE4;
-  --accent: #0A87A8; --accent-text: #006C8A; --on-road: #F3F6F8; --on-road-2: #AEBAC3;
-  --f-num: "Fira Sans Extra Condensed", "Arial Narrow", sans-serif;
-  --f-body: "Golos Text", system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+  --bg: #F2F3F5; --surface: #FFFFFF; --surface-2: #F2F3F5;
+  --ink: #1F2125; --ink-2: #3D424A; --muted: #666B73; --line: #E3E5E8;
+  --chip: #E9EAEC; --chip-hover: #DEE0E3; --btn: #111214; --btn-ink: #FFFFFF;
+  --r: 20px;
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --bg: #0D1317; --surface: #151D23; --ink: #E3EAEE; --ink-2: #C3CDD4; --muted: #93A2AD; --line: #283540; --accent: #3BBFDB; --accent-text: #5CCBE3; color-scheme: dark; }
+  :root:not([data-theme="light"]) {
+    --bg: #0E1013; --surface: #181B1F; --surface-2: #20242A;
+    --ink: #F1F2F4; --ink-2: #C9CDD3; --muted: #959BA3; --line: #2A2F35;
+    --chip: #262A30; --chip-hover: #30353C; --btn: #F1F2F4; --btn-ink: #111214;
+  }
 }
-:root[data-theme="dark"] { --bg: #0D1317; --surface: #151D23; --ink: #E3EAEE; --ink-2: #C3CDD4; --muted: #93A2AD; --line: #283540; --accent: #3BBFDB; --accent-text: #5CCBE3; color-scheme: dark; }
+:root[data-theme="dark"] {
+  --bg: #0E1013; --surface: #181B1F; --surface-2: #20242A;
+  --ink: #F1F2F4; --ink-2: #C9CDD3; --muted: #959BA3; --line: #2A2F35;
+  --chip: #262A30; --chip-hover: #30353C; --btn: #F1F2F4; --btn-ink: #111214;
+}
+body { background: var(--bg); }
+
+/* Top bar */
+.topbar { position: sticky; top: 0; z-index: 30; background: var(--surface); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
+.topbar-in { display: flex; align-items: center; gap: 28px; height: 64px; }
+.brand { flex: none; display: inline-flex; align-items: center; gap: 10px; font: 600 20px/1 var(--f-body); letter-spacing: -.01em; color: var(--ink); text-decoration: none; }
+.brand svg { width: 26px; height: 26px; display: block; }
+.topnav { display: flex; gap: 2px; min-width: 0; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); padding-right: 24px; }
+.topnav::-webkit-scrollbar { display: none; }
+.topnav a { flex: none; padding: 9px 12px; border-radius: 12px; font: 500 15px/20px var(--f-body); color: var(--ink); text-decoration: none; white-space: nowrap; }
+.topnav a:hover { background: var(--chip); }
+.topnav a[aria-current="page"] { background: var(--chip); }
+@media (max-width: 759px) {
+  .topbar-in { gap: 14px; height: 56px; }
+  .brand { font-size: 18px; }
+  .topnav a { font-size: 14px; padding: 8px 10px; }
+}
+
+/* Cover of a trainer page */
+.hero { background: var(--bg); color: var(--ink); }
+.hero .wrap { padding-block: 36px 6px; gap: 0; }
+.hero h1 { font: 500 clamp(32px, 6vw, 48px)/1.08 var(--f-body); text-transform: none; letter-spacing: -.02em; color: var(--ink); }
+.hero h1 span { color: var(--muted); }
+.kicker, .lead, .lane-line, .hero-links { display: none; }
+
+/* Filters */
+.controls { background: var(--bg); border-bottom: 0; }
+@media (min-width: 760px) { .controls { top: calc(64px + env(safe-area-inset-top, 0px)); } }
+.chip { border: 0; background: var(--chip); border-radius: 12px; height: 36px; color: var(--ink); font-weight: 500; }
+.chip:hover { background: var(--chip-hover); }
+.chip .n { font: 500 12px var(--f-body); }
+:root .chip[aria-pressed="true"] { background: var(--btn); border-color: var(--btn); color: var(--btn-ink); }
+:root .chip[aria-pressed="true"] .n { color: var(--btn-ink); opacity: .7; }
+
+/* Headings, blocks, cards */
+.sec h2 { font: 600 clamp(24px, 3.6vw, 32px)/1.15 var(--f-body); text-transform: none; letter-spacing: -.015em; }
+.sec h2 small { font: 500 15px var(--f-body); }
+.gh { font: 600 20px/1.2 var(--f-body); text-transform: none; letter-spacing: -.01em; color: var(--ink); }
+.gh small { font: 500 14px var(--f-body); }
+.rules, .legend { background: var(--surface); border: 0; border-radius: var(--r); }
+.rules { padding: 16px 20px 16px 38px; }
+.card { border-color: transparent; border-radius: var(--r); }
+.tag, .q { text-transform: none; letter-spacing: 0; font: 500 13px/1.3 var(--f-body); }
+.btn { border-radius: 12px; border-color: transparent; background: var(--surface-2); }
+.btn:not(:disabled):hover { background: var(--chip-hover); }
+
+@media print { .topbar { display: none; } }
+
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--f-body); }
-.wrap { max-width: 1100px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-.hero { background: #2B3339; color: var(--on-road); }
-.hero .wrap { padding-block: 32px 30px; display: grid; gap: 12px; }
-.kicker { margin: 0; font: 600 12px/1.3 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--on-road-2); display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
-.kicker .kz { background: #00AFCA; color: #062A33; padding: 3px 8px; border-radius: 4px; }
-h1 { margin: 0; font: 700 clamp(44px, 9vw, 96px)/.92 var(--f-num); text-transform: uppercase; text-wrap: balance; }
-h1 span { color: #FFC72C; }
-.lead { margin: 0; max-width: 62ch; color: var(--on-road-2); font-size: 16px; }
-.lane-line { height: 6px; margin-top: 6px; background: repeating-linear-gradient(90deg, var(--on-road) 0 56px, transparent 56px 96px); opacity: .9; }
-.grid { display: grid; gap: 14px; padding-block: 24px 30px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
-.tile { display: grid; gap: 8px; align-content: start; padding: 18px 18px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; color: inherit; text-decoration: none; min-width: 0; }
-.tile:hover { border-color: var(--accent); }
-.tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.t-name { font: 700 28px/1 var(--f-num); text-transform: uppercase; }
-.t-what { color: var(--ink-2); }
-.t-size { font: 600 13px var(--f-body); color: var(--accent-text); }
-.foot { border-top: 1px solid var(--line); padding-block: 18px 36px; color: var(--muted); font-size: 13.5px; display: grid; gap: 6px; }
-.foot p { margin: 0; max-width: 90ch; }
-.foot a { color: var(--accent-text); }
+body { color: var(--ink); font: 400 15px/1.5 var(--f-body); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.cover .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 440px); gap: 32px; align-items: center; padding-block: 44px 40px; }
+.cover h1 { margin: 0; font: 500 clamp(36px, 6vw, 56px)/1.05 var(--f-body); letter-spacing: -.025em; text-wrap: balance; }
+.cover p { margin: 14px 0 28px; max-width: 30ch; font-size: clamp(17px, 2.2vw, 20px); line-height: 1.3; color: var(--muted); }
+.cta { display: inline-flex; align-items: center; height: 52px; padding: 0 28px; border-radius: 14px; background: var(--btn); color: var(--btn-ink); font: 500 16px var(--f-body); text-decoration: none; }
+.cta:hover { opacity: .88; }
+.art { display: block; width: 100%; height: auto; }
+@media (max-width: 759px) {
+  .cover .wrap { grid-template-columns: 1fr; gap: 24px; padding-block: 28px 28px; }
+  .art { max-width: 420px; }
+}
+.panel { background: var(--surface); border-radius: 32px 32px 0 0; padding-block: 28px 40px; min-height: 40vh; }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); }
+.tile { display: grid; grid-template-rows: auto auto 1fr auto; gap: 8px; padding: 22px 22px 20px; background: var(--surface-2); border-radius: 24px; color: inherit; text-decoration: none; min-width: 0; }
+.tile:hover { background: var(--chip-hover); }
+.tile:focus-visible { outline: 2px solid var(--accent, #0A87A8); outline-offset: 2px; }
+.t-name { font: 600 22px/1.2 var(--f-body); letter-spacing: -.01em; }
+.t-what { color: var(--muted); }
+.t-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
+.t-size { font-size: 14px; color: var(--ink-2); }
+.t-go { flex: none; display: inline-flex; align-items: center; height: 40px; padding: 0 18px; border-radius: 12px; background: var(--btn); color: var(--btn-ink); font: 500 15px var(--f-body); }
 </style>
 </head>
 <body>
-<header class="hero">
-  <div class="wrap">
-    <h1>Тренажёры <span>ПДД РК</span></h1>
-    <div class="lane-line" aria-hidden="true"></div>
-  </div>
-</header>
-<main class="wrap grid"><a class="tile" href="cifry.html"><span class="t-name">Цифры ПДД РК</span><span class="t-what">Скорости, расстояния, люфты, сроки, штрафы</span><span class="t-size">108 чисел</span></a><a class="tile" href="perekrestki.html"><span class="t-name">Перекрёстки</span><span class="t-what">Кто едет первым</span><span class="t-size">52 ситуации</span></a><a class="tile" href="znaki.html"><span class="t-name">Знаки и разметка</span><span class="t-what">Знаки, таблички, линии разметки</span><span class="t-size">227 знаков, 34 линии</span></a><a class="tile" href="kolca.html"><span class="t-name">Кольца</span><span class="t-what">Въезд, перестроение, выезд, остановка</span><span class="t-size">21 ситуация</span></a><a class="tile" href="razvoroty.html"><span class="t-name">Развороты и перестроения</span><span class="t-what">Где развернуться, кто уступает при перестроении</span><span class="t-size">33 ситуации</span></a><a class="tile" href="stoyanka.html"><span class="t-name">Стоянка и остановка</span><span class="t-what">Где встать, знаки 3.27–3.30, знак 5.15, таблички 7.6</span><span class="t-size">75 ситуаций</span></a><a class="tile" href="pomosh.html"><span class="t-name">Первая помощь</span><span class="t-what">Вопросы экзамена: реанимация, кровотечения, переломы, ожоги</span><span class="t-size">56 вопросов</span></a><a class="tile" href="dop.html"><span class="t-name">Дополнительные вопросы</span><span class="t-what">Вопросы экзамена: занос, гололёд, вода, свет, аварийка, сигналы рукой, ДТП, буксировка</span><span class="t-size">122 вопроса</span></a></main>
+<header class="topbar"><div class="wrap topbar-in"><a class="brand" href="./"><svg viewBox="0 0 26 26" aria-hidden="true"><rect x="4.5" y="4.5" width="17" height="17" rx="2" transform="rotate(45 13 13)" fill="#fff" stroke="#9AA1A9"/><rect x="8" y="8" width="10" height="10" rx="1" transform="rotate(45 13 13)" fill="#FFC72C"/></svg>ПДД РК</a><nav class="topnav" aria-label="Тренажёры"><a href="cifry.html">Цифры</a><a href="perekrestki.html">Перекрёстки</a><a href="znaki.html">Знаки</a><a href="kolca.html">Кольца</a><a href="razvoroty.html">Развороты</a><a href="stoyanka.html">Стоянка</a><a href="pomosh.html">Первая помощь</a><a href="dop.html">Доп. вопросы</a></nav></div></header>
+<header class="cover"><div class="wrap">
+  <div><h1>Тренажёры ПДД РК</h1><p>Решайте задачи по ПДД Казахстана и проверяйте себя</p><a class="cta" href="cifry.html">Начать</a></div>
+  <svg class="art" viewBox="0 0 440 340" role="img" aria-label="Кольцевой перекрёсток сверху: две машины и знаки"><defs><clipPath id="art-c"><rect width="440" height="340" rx="32"/></clipPath><filter id="art-s" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity=".25"/></filter></defs><g clip-path="url(#art-c)"><rect width="440" height="340" fill="#DCE6D4"/><rect x="0" y="140" width="440" height="64" fill="#3A434A"/><rect x="188" y="0" width="64" height="340" fill="#3A434A"/><circle cx="220" cy="172" r="96" fill="#3A434A"/><circle cx="220" cy="172" r="70" fill="none" stroke="#EEF2F4" stroke-width="2.5" stroke-dasharray="11 9"/><circle cx="220" cy="172" r="44" fill="#A9CF94" stroke="#C3CCD2" stroke-width="5"/><rect x="60" y="146" width="6" height="52" fill="#EEF2F4" opacity=".9"/><rect x="72" y="146" width="6" height="52" fill="#EEF2F4" opacity=".9"/><rect x="84" y="146" width="6" height="52" fill="#EEF2F4" opacity=".9"/><rect x="96" y="146" width="6" height="52" fill="#EEF2F4" opacity=".9"/><rect x="108" y="146" width="6" height="52" fill="#EEF2F4" opacity=".9"/><g stroke="#EEF2F4" stroke-width="2.5" stroke-dasharray="14 12"><line x1="0" y1="172" x2="44" y2="172"/><line x1="350" y1="172" x2="440" y2="172"/><line x1="220" y1="0" x2="220" y2="56"/><line x1="220" y1="290" x2="220" y2="340"/></g><g transform="translate(286 118) rotate(-135)"><rect x="-12" y="-21" width="24" height="42" rx="7" fill="#2F80ED"/><rect x="-8.5" y="-12" width="17" height="9" rx="2.5" fill="#0B1820" opacity=".55"/><rect x="-8.5" y="10" width="17" height="6" rx="2" fill="#0B1820" opacity=".4"/></g><g transform="translate(236 318) rotate(0)"><rect x="-12" y="-21" width="24" height="42" rx="7" fill="#F2994A"/><rect x="-8.5" y="-12" width="17" height="9" rx="2.5" fill="#0B1820" opacity=".55"/><rect x="-8.5" y="10" width="17" height="6" rx="2" fill="#0B1820" opacity=".4"/></g></g><g transform="translate(276 268)"><rect x="-1.5" y="0" width="3" height="26" fill="#8E9BA4"/><g filter="url(#art-s)"><path d="M-18 -26 h36 l-18 31 z" fill="#fff" stroke="#D52B1E" stroke-width="5" stroke-linejoin="round"/></g></g><g transform="translate(150 92)"><rect x="-1.5" y="0" width="3" height="26" fill="#8E9BA4"/><g filter="url(#art-s)"><circle cy="-14" r="18" fill="#1D5FD8" stroke="#fff" stroke-width="2.5"/><path d="M8.1 -18.7 A9.4 9.4 0 0 0 -2.9 -22.9" fill="none" stroke="#fff" stroke-width="3"/><path d="M-8.1 -21.2 L-4.2 -26.9 L-1.6 -18.9 Z" fill="#fff"/><path d="M0.0 -4.6 A9.4 9.4 0 0 0 9.2 -12.1" fill="none" stroke="#fff" stroke-width="3"/><path d="M10.3 -17.4 L13.3 -11.2 L5.0 -12.9 Z" fill="#fff"/><path d="M-8.1 -18.7 A9.4 9.4 0 0 0 -6.3 -7.0" fill="none" stroke="#fff" stroke-width="3"/><path d="M-2.2 -3.4 L-9.1 -3.9 L-3.5 -10.2 Z" fill="#fff"/></g></g><g transform="translate(372 112)"><rect x="-1.5" y="0" width="3" height="26" fill="#8E9BA4"/><g filter="url(#art-s)"><rect x="-15" y="-30" width="30" height="30" rx="2" transform="rotate(45 0 -15)" fill="#fff" stroke="#9AA1A9"/><rect x="-9" y="-24" width="18" height="18" rx="1" transform="rotate(45 0 -15)" fill="#FFC72C"/></g></g></svg>
+</div></header>
+<main class="panel"><div class="wrap grid"><a class="tile" href="cifry.html"><span class="t-name">Цифры ПДД РК</span><span class="t-what">Скорости, расстояния, люфты, сроки, штрафы</span><span></span><span class="t-foot"><span class="t-size">108 чисел</span><span class="t-go">Начать</span></span></a><a class="tile" href="perekrestki.html"><span class="t-name">Перекрёстки</span><span class="t-what">Кто едет первым</span><span></span><span class="t-foot"><span class="t-size">52 ситуации</span><span class="t-go">Начать</span></span></a><a class="tile" href="znaki.html"><span class="t-name">Знаки и разметка</span><span class="t-what">Знаки, таблички, линии разметки</span><span></span><span class="t-foot"><span class="t-size">227 знаков, 34 линии</span><span class="t-go">Начать</span></span></a><a class="tile" href="kolca.html"><span class="t-name">Кольца</span><span class="t-what">Въезд, перестроение, выезд, остановка</span><span></span><span class="t-foot"><span class="t-size">21 ситуация</span><span class="t-go">Начать</span></span></a><a class="tile" href="razvoroty.html"><span class="t-name">Развороты и перестроения</span><span class="t-what">Где развернуться, кто уступает при перестроении</span><span></span><span class="t-foot"><span class="t-size">33 ситуации</span><span class="t-go">Начать</span></span></a><a class="tile" href="stoyanka.html"><span class="t-name">Стоянка и остановка</span><span class="t-what">Где встать, знаки 3.27–3.30, знак 5.15, таблички 7.6</span><span></span><span class="t-foot"><span class="t-size">75 ситуаций</span><span class="t-go">Начать</span></span></a><a class="tile" href="pomosh.html"><span class="t-name">Первая помощь</span><span class="t-what">Вопросы экзамена: реанимация, кровотечения, переломы, ожоги</span><span></span><span class="t-foot"><span class="t-size">56 вопросов</span><span class="t-go">Начать</span></span></a><a class="tile" href="dop.html"><span class="t-name">Дополнительные вопросы</span><span class="t-what">Вопросы экзамена: занос, гололёд, вода, свет, аварийка, сигналы рукой, ДТП, буксировка</span><span></span><span class="t-foot"><span class="t-size">122 вопроса</span><span class="t-go">Начать</span></span></a></div></main>
 </body>
 </html>
